@@ -6,4 +6,8 @@ repositories {
 
 dependencies {
   compileOnly fileTree(dir: 'libs', include: '*.jar')
+  compileOnly 'com.google.guava:guava:22.0'
+  compileOnly 'org.yaml:snakeyaml:1.18'
+
+  testCompile 'junit:junit:4.12'
 }
