@@ -4,6 +4,8 @@
  */
 package org.yunshanmc.lmc.core.resource;
 
+import com.google.common.base.Strings;
+
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,5 +34,9 @@ public interface Resource {
      */
     InputStream getInputStream() throws IOException;
     
-    
+    static String pathToRoot(String path) {
+        if (Strings.isNullOrEmpty(path)) return "/";
+        if (path.charAt(0) == '/') return path;
+        return '/' + path;
+    }
 }

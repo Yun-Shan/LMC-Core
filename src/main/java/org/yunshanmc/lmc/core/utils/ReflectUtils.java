@@ -4,7 +4,6 @@
  */
 package org.yunshanmc.lmc.core.utils;
 
-import org.yunshanmc.lmc.core.resource.Path;
 import org.yunshanmc.lmc.core.resource.Resource;
 import org.yunshanmc.lmc.core.resource.URLResource;
 
@@ -30,7 +29,7 @@ public class ReflectUtils {
      */
     @Nonnull
     public static List<Resource> traceResources(StackTraceElement[] stackTrace, String resPath) {
-        resPath = Path.toRoot(resPath);
+        resPath = Resource.pathToRoot(resPath);
         List<Resource> ress = new ArrayList<>();
         for (StackTraceElement stack : stackTrace) {
             try {
