@@ -16,46 +16,76 @@ import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class StandardResourceManagerTest {
     
     private static Method m_resolvePath;
     private static StandardResourceManager resourceManager;
     
+    private static File testDir;
+    private static File testJar;
+    
     @Before
     public void setup() throws Exception {
         m_resolvePath = StandardResourceManager.class.getDeclaredMethod("resolvePath", String.class);
         m_resolvePath.setAccessible(true);
-        File testDir = new File("build" + File.separator + "testing");
-        testDir.mkdirs();
+        testDir = new File("build" + File.separator + "testing");
+        if (!testDir.exists()) assertTrue(testDir.mkdirs());
         
-        File testJar = new File(testDir, "standardRM.jar");
-        if (!testJar.exists()) testJar.createNewFile();
-        
+        testJar = new File(testDir, "standardRM.jar");
         JarOutputStream out = new JarOutputStream(new FileOutputStream(testJar));
         out.putNextEntry(new JarEntry("a"));
         out.write("TEST a".getBytes(StandardCharsets.UTF_8));
-        out.flush();
+        out.closeEntry();
+        out.putNextEntry(new JarEntry("b/c"));
+        out.write("TEST a-b-c".getBytes(StandardCharsets.UTF_8));
         out.closeEntry();
         out.close();
-        
-        
-        JarFile jar = new JarFile(testJar);
-        Constructor<StandardResourceManager> c = StandardResourceManager.class.getDeclaredConstructor(JarFile.class,
+        Constructor<StandardResourceManager> c = StandardResourceManager.class.getDeclaredConstructor(File.class,
                                                                                                       Path.class);
         c.setAccessible(true);
-        resourceManager = c.newInstance(jar, testJar.toPath());
+        resourceManager = c.newInstance(testJar, testDir.toPath());
     }
     
     @Test
     public void getSelfResource() throws Exception {
+
         assertNotNull(resourceManager.getSelfResource("a"));
         assertArrayEquals(ByteStreams.toByteArray(resourceManager.getSelfResource("a").getInputStream()),
                           "TEST a".getBytes(StandardCharsets.UTF_8));
+        assertNotNull(resourceManager.getSelfResource("b/c"));
+        assertArrayEquals(ByteStreams.toByteArray(resourceManager.getSelfResource("b/c").getInputStream()),
+                          "TEST a-b-c".getBytes(StandardCharsets.UTF_8));
+    
+        // Jar文件更新，并通知资源管理器
+        JarOutputStream out = new JarOutputStream(new FileOutputStream(testJar));
+        out.putNextEntry(new JarEntry("e/f/g"));
+        out.write("TEST a".getBytes(StandardCharsets.UTF_8));
+        out.closeEntry();
+        out.putNextEntry(new JarEntry("q"));
+        out.write("TEST a-b-c".getBytes(StandardCharsets.UTF_8));
+        out.closeEntry();
+        out.close();
+        resourceManager.updateJar();
+        assertNotNull(resourceManager.getSelfResource("e/f/g"));
+        assertArrayEquals(ByteStreams.toByteArray(resourceManager.getSelfResource("e/f/g").getInputStream()),
+                          "TEST a".getBytes(StandardCharsets.UTF_8));
+        assertNotNull(resourceManager.getSelfResource("q"));
+        assertArrayEquals(ByteStreams.toByteArray(resourceManager.getSelfResource("q").getInputStream()),
+                          "TEST a-b-c".getBytes(StandardCharsets.UTF_8));
+        
     }
+    
+    @Test
+    public void getFileResource() throws Exception {/// TODO
+    
+    }
+    
+    @Test
+    public void getFolderResources() throws Exception {
+    }
+    
     
     @Test
     public void resolvePath() throws Exception {

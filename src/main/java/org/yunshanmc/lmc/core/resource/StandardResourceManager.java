@@ -14,6 +14,9 @@ import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
@@ -29,10 +32,11 @@ import java.util.zip.ZipEntry;
  */
 public class StandardResourceManager implements ResourceManager {
     
-    private final JarFile jar;
+    private final File jarFile;
+    private JarFile jar;
     private final Path pluginFolder;
     
-    private String jarRootPath;
+    private Path jarRootPath = Paths.get("");
     
     /**
      * 通过Bukkit插件实例构造一个标准资源管理器
@@ -41,18 +45,24 @@ public class StandardResourceManager implements ResourceManager {
      * @throws IOException 当读取插件Jar文件失败时抛出
      */
     public StandardResourceManager(Plugin plugin) throws IOException {
-        this(new JarFile(plugin.getClass().getProtectionDomain().getCodeSource().getLocation().getFile()),
+        this(new File(plugin.getClass().getProtectionDomain().getCodeSource().getLocation().getFile()),
              plugin.getDataFolder().toPath());
     }
     
-    private StandardResourceManager(JarFile jar, Path pluginFolder) {
-        this.jar = jar;
+    private StandardResourceManager(File jarFile, Path pluginFolder) throws IOException {
+        this.jarFile = jarFile;
+        this.jar = new JarFile(jarFile);
         this.pluginFolder = pluginFolder;
     }
     
     @Override
+    public void updateJar() throws IOException {
+        this.jar = new JarFile(this.jarFile);
+    }
+    
+    @Override
     public Resource getSelfResource(String path) {
-        return this.getSelfResource(this.checkResourcePath(path));
+        return this.getSelfResource(this.jarRootPath.resolve(this.checkResourcePath(path)));
     }
     
     @Override
@@ -66,7 +76,7 @@ public class StandardResourceManager implements ResourceManager {
     }
     
     protected Resource getSelfResource(Path resPath) {
-        ZipEntry entry = this.jar.getEntry(resPath.toString());
+        ZipEntry entry = this.jar.getEntry(resPath.toString().replace('\\',  '/'));
         if (entry == null || entry.isDirectory()) return null;
         try {
             return new InputStreamResource(this.jar.getInputStream(entry));
@@ -146,7 +156,7 @@ public class StandardResourceManager implements ResourceManager {
         Path resPath = size == 1 ? Paths.get(subs.get(0)) : Paths.get(subs.get(0),
                                                                       Arrays.copyOfRange(subs.toArray(new String[size]),
                                                                                          1,
-                                                                                         size - 1));
+                                                                                         size));
         resPath = resPath.normalize();
         if (resPath.startsWith("..")) {// 禁止切到父级目录
             resPath = resPath.subpath(1, resPath.getNameCount());
@@ -163,7 +173,7 @@ public class StandardResourceManager implements ResourceManager {
      * @param jarRootPath Jar资源的根路径
      */
     public void setJarRootPath(String jarRootPath) {
-        this.jarRootPath = !Strings.isNullOrEmpty(jarRootPath) ? jarRootPath : "";
+        this.jarRootPath = Paths.get(Strings.nullToEmpty(jarRootPath));
     }
     
     private static abstract class ResourceFileVisitor extends SimpleFileVisitor<Path> {
