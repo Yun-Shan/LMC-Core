@@ -2,10 +2,12 @@
  * Author: Yun-Shan
  * Date: 2017/06/16
  */
-package org.yunshanmc.lmc.core.resource;
+package org.yunshanmc.lmc.core.locale;
 
 import org.bukkit.plugin.Plugin;
 import org.yunshanmc.lmc.core.locale.LocaleManager;
+import org.yunshanmc.lmc.core.resource.Resource;
+import org.yunshanmc.lmc.core.resource.StandardResourceManager;
 
 import java.io.IOException;
 import java.nio.file.Path;

@@ -9,13 +9,12 @@ import org.yunshanmc.lmc.core.config.ConfigManager;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.locale.LocaleManager;
 import org.yunshanmc.lmc.core.message.MessageManager;
-import org.yunshanmc.lmc.core.resource.I18nResourceManager;
+import org.yunshanmc.lmc.core.locale.I18nResourceManager;
 import org.yunshanmc.lmc.core.resource.ResourceManager;
 import org.yunshanmc.lmc.core.resource.StandardResourceManager;
 
 import java.io.IOException;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 /**
  * //TODO
