@@ -25,4 +25,7 @@ public interface MessageManager {
      */
     Message getMessage(String key);
 
+    void setDebugLevel(int debugLevel);
+
+    int getDebugLevel();
 }

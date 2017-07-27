@@ -10,18 +10,12 @@ import org.bukkit.entity.Player;
  * //TODO 注释
  */
 public class DefaultMessageFormat implements MessageFormat {
-    
-    private static final DefaultMessageFormat INSTANCE = new DefaultMessageFormat();
-    
-    // 为了PAPIMessageFormat可以单例 故使用package-private而非private
-    DefaultMessageFormat() {}
-    
-    public static DefaultMessageFormat getInstance() {
-        return INSTANCE;
-    }
-    
+
     @Override
     public String format(Player player, String msg, Object... args) {
-        return null;// TODO
+        for (int i = 0; i < args.length; i++) {
+            msg = msg.replace("[" + (i + 1) + ']', String.valueOf(args[i]));
+        }
+        return msg;
     }
 }

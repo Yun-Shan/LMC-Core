@@ -11,15 +11,7 @@ import org.bukkit.entity.Player;
  * //TODO 注释
  */
 public class PAPIMessageFormat extends DefaultMessageFormat {
-    
-    private static final PAPIMessageFormat INSTANCE = new PAPIMessageFormat();
-    
-    private PAPIMessageFormat() {super();}
-    
-    public static PAPIMessageFormat getInstance() {
-        return INSTANCE;
-    }
-    
+
     @Override
     public String format(Player player, String msg, Object... args) {
         return PlaceholderAPI.setPlaceholders(player, super.format(player,  msg, args));
