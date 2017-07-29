@@ -1,6 +1,7 @@
 package org.yunshanmc.lmc.core.config;
 
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.resource.Resource;
 import org.yunshanmc.lmc.core.resource.ResourceManager;
 
@@ -18,21 +19,28 @@ public class DefaultConfigManager implements ConfigManager {
 
     @Override
     public YamlConfiguration getDefaultConfig(String path) {
-        return null;
+        return this.readConfig(this.resourceManager.getSelfResource(path));
+    }
+
+    @Override
+    public YamlConfiguration getUserConfig(String path) {
+        return this.readConfig(this.resourceManager.getFolderResource(path));
     }
 
     @Override
     public YamlConfiguration getConfig(String path) {
-        try {
-            return YamlConfiguration.loadConfiguration(new InputStreamReader(this.resourceManager.getSelfResource(path).getInputStream(), StandardCharsets.UTF_8));
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+        YamlConfiguration cfg = this.getUserConfig(path);
+        if (cfg == null) cfg = this.getDefaultConfig(path);
+        return cfg;
     }
 
     @Override
     public YamlConfiguration readConfig(Resource resource) {
-        return null;
+        try {
+            return YamlConfiguration.loadConfiguration(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            ExceptionHandler.handle(e);
+            return null;
+        }
     }
 }

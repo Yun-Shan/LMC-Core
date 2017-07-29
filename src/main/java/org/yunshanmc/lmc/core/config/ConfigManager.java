@@ -12,9 +12,11 @@ import org.yunshanmc.lmc.core.resource.Resource;
  */
 public interface ConfigManager {
 
+    YamlConfiguration getConfig(String path);
+
     YamlConfiguration getDefaultConfig(String path);
 
-    YamlConfiguration getConfig(String path);
+    YamlConfiguration getUserConfig(String path);
 
     YamlConfiguration readConfig(Resource resource);
 }
