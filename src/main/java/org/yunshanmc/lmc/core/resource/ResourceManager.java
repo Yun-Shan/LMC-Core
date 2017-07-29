@@ -39,7 +39,7 @@ public interface ResourceManager {
      * @param path 资源路径
      * @return 表示资源的对象，当资源不存在时返回null
      */
-    Resource getFileResource(String path);
+    Resource getFolderResource(String path);
     
     /**
      * 获取插件文件夹的资源

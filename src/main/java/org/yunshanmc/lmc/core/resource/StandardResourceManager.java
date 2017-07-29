@@ -66,7 +66,7 @@ public class StandardResourceManager implements ResourceManager {
     }
     
     @Override
-    public Resource getFileResource(String path) {
+    public Resource getFolderResource(String path) {
         return this.getFileResource(this.checkResourcePath(path));
     }
     
