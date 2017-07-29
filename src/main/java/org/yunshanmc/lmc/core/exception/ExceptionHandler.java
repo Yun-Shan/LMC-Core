@@ -4,74 +4,102 @@
  */
 package org.yunshanmc.lmc.core.exception;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
+import org.yunshanmc.lmc.core.internal.BuiltinMessage;
+import org.yunshanmc.lmc.core.internal.Utils;
 import org.yunshanmc.lmc.core.resource.Resource;
 import org.yunshanmc.lmc.core.utils.ReflectUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * 异常处理器
  */
 public final class ExceptionHandler {
-    
-    private ExceptionHandler() {}// 禁止实例化
-    
+
+    private ExceptionHandler() {
+    }// 禁止实例化
+
     static {
-        new ExceptionHandlerThread().start();
+        for (int i = 0; i < 3; i++) {
+            new ExceptionHandlerThread(i + 1).start();
+        }
     }
-    
+
     /**
-     * 默认的异常处理器 //TODO 实现默认异常处理器
+     * 默认的异常处理器
      */
-    private static BiConsumer<Throwable, String> DEFAULT_HANDLER;
-    
+    private static Consumer<ExceptionInfo> DEFAULT_HANDLER = info -> {
+        Throwable err = info.getThrowable();
+        String desc = info.getDescription();
+
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        PrintWriter writer = new PrintWriter(buffer);
+        err.printStackTrace(writer);
+
+        Bukkit.getConsoleSender().sendMessage(
+                BuiltinMessage.getMessage("DefaultErrorHandler",
+                                          info.getPlugin(),
+                                          err.getClass().getName(),
+                                          desc != null ? desc : (err.getMessage() != null ? err.getMessage() : "无"),
+                                          new String(buffer.toByteArray())
+                )
+        );
+    };
+
     private static final Queue<ExceptionInfo> QUEUE = new ConcurrentLinkedQueue<>();
-    
-    private static final Map<String, BiConsumer<Throwable, String>> HANDLERS = new HashMap<>();
-    
-    public static void setHandler(Plugin plugin, BiConsumer<Throwable, String> handler) {
-         HANDLERS.put(plugin.getName(), handler);
+
+    private static final Map<String, Consumer<ExceptionInfo>> HANDLERS = new HashMap<>();
+
+    public static void setHandler(Plugin plugin, Consumer<ExceptionInfo> handler) {
+        HANDLERS.put(plugin.getName(), handler);
     }
-    
+
     public static void handle(Throwable t) {
         handle(t, null);
     }
-    
+
     public static void handle(Throwable t, String description) {
         QUEUE.offer(new ExceptionInfo(t, description));
     }
-    
+
     private static class ExceptionHandlerThread extends Thread {
-        
-        public ExceptionHandlerThread() {
-            super("LMC Exception Handler");
+
+        public ExceptionHandlerThread(int num) {
+            super("LMC Exception Handler " + num);
         }
-    
+
         @Override
         public void run() {
             ExceptionInfo err;
             while ((err = QUEUE.poll()) != null) {
                 List<Resource> resList = ReflectUtils.traceResources(err.getThrowable().getStackTrace(), "plugin.yml");
-                BiConsumer<Throwable, String> handler = DEFAULT_HANDLER;
-                
+                Consumer<ExceptionInfo> handler = DEFAULT_HANDLER;
+
                 if (!resList.isEmpty()) {
                     try {
-                        YamlConfiguration yml = YamlConfiguration.loadConfiguration(new InputStreamReader(resList.get(0).getInputStream(),
-                                                                                  StandardCharsets.UTF_8));
-                        handler = HANDLERS.get(yml.getString("name"));
+                        YamlConfiguration yml = YamlConfiguration.loadConfiguration(
+                                new InputStreamReader(resList.get(0).getInputStream(),
+                                                      StandardCharsets.UTF_8));
+                        String plugin = yml.getString("name");
+                        err.setPlugin(plugin);
+                        handler = HANDLERS.get(plugin);
                     } catch (IOException e) {
                         ExceptionHandler.handle(e);
                     }
                 }
-                
-                handler.accept(err.getThrowable(), err.getDescription());
+
+                handler.accept(err);
             }
             try {
                 Thread.sleep(1000);
@@ -80,23 +108,34 @@ public final class ExceptionHandler {
             }
         }
     }
-    
-    private static class ExceptionInfo {
-        
+
+    public static class ExceptionInfo {
+
         private Throwable throwable;
         private String description;
-        
+        private String plugin;// 出现异常的插件，该变量会在异常处理线程中被设置
+
         public ExceptionInfo(Throwable err, String description) {
             this.throwable = err;
             this.description = description;
         }
-        
+
+        public void setPlugin(String plugin) {
+            this.plugin = plugin;
+        }
+
+        public String getPlugin() {
+            return plugin;
+        }
+
         public Throwable getThrowable() {
             return this.throwable;
         }
-        
+
         public String getDescription() {
             return this.description;
         }
+
+
     }
 }
