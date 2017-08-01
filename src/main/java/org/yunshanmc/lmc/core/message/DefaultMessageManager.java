@@ -31,7 +31,7 @@ public class DefaultMessageManager implements MessageManager {
     }
 
     @Override
-    public MessageSender createMessageSender() {
+    public MessageSender getMessageSender() {
         return new DefaultMessageSender(this).setDebugLevel(this.getDebugLevel());
     }
     

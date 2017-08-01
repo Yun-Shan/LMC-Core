@@ -10,11 +10,11 @@ package org.yunshanmc.lmc.core.message;
 public interface MessageManager {
     
     /**
-     * 创建消息发送者
+     * 获取消息发送者
      *
-     * @return 新建的消息发送者
+     * @return 消息发送者
      */
-    MessageSender createMessageSender();
+    MessageSender getMessageSender();
     
     /**
      * 获取本地化信息的MessageFormat对象
