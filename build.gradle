@@ -1,4 +1,5 @@
 apply plugin: 'java'
+apply plugin: 'maven-publish'
 
 repositories {
   jcenter()
@@ -29,4 +30,16 @@ dependencies {
   testCompile 'junit:junit:4.12'
   testCompile 'com.google.guava:guava:22.0'
   testCompile 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
+}
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      groupId 'org.yunshanmc'
+      artifactId 'epicguild'
+      version '1.0.0'
+
+      from components.java
+    }
+  }
 }

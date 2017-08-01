@@ -14,7 +14,7 @@ import org.yunshanmc.lmc.core.resource.ResourceManager;
 import org.yunshanmc.lmc.core.resource.StandardResourceManager;
 
 import java.io.IOException;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * //TODO
@@ -22,12 +22,12 @@ import java.util.function.BiConsumer;
 public abstract class LMCPlugin extends JavaPlugin {
     
     protected boolean useI18n;
-    
+
     protected LocaleManager localeManager;
     protected ResourceManager resourceManager;
     protected ConfigManager configManager;
     protected MessageManager messageManager;
-    protected BiConsumer<Throwable, String> exceptionHandler;
+    protected Consumer<ExceptionHandler.ExceptionInfo> exceptionHandler;
     
     @Override
     public final void onLoad() {
@@ -54,11 +54,31 @@ public abstract class LMCPlugin extends JavaPlugin {
             ExceptionHandler.handle(e);
             return false;
         }
-        
-        if (this.exceptionHandler != null) this.exceptionHandler = (err, desc) -> {
-        
-        };
+
+        /* 为避免插件信息相关功能初始化失败导致报错信息异常，
+         * 在资源管理器和信息管理器都初始化完毕之后才设置异常处理器，
+         * 若资源管理器和信息管理器初始化出现异常，将由默认异常处理器处理
+         */
+        if (this.exceptionHandler != null) this.exceptionHandler = ExceptionHandler.DEFAULT_HANDLER;
         ExceptionHandler.setHandler(this, this.exceptionHandler);
         return true;
+    }
+
+
+    // TODO 注释
+    public LocaleManager getLocaleManager() {
+        return localeManager;
+    }
+
+    public ResourceManager getResourceManager() {
+        return resourceManager;
+    }
+
+    public ConfigManager getConfigManager() {
+        return configManager;
+    }
+
+    public MessageManager getMessageManager() {
+        return messageManager;
     }
 }

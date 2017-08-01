@@ -39,7 +39,7 @@ public final class ExceptionHandler {
     /**
      * 默认的异常处理器
      */
-    private static Consumer<ExceptionInfo> DEFAULT_HANDLER = info -> {
+    public static Consumer<ExceptionInfo> DEFAULT_HANDLER = info -> {
         Throwable err = info.getThrowable();
         String desc = info.getDescription();
 
