@@ -36,7 +36,7 @@ publishing {
   publications {
     mavenJava(MavenPublication) {
       groupId 'org.yunshanmc'
-      artifactId 'epicguild'
+      artifactId 'LMC-Core'
       version '1.0.0'
 
       from components.java
