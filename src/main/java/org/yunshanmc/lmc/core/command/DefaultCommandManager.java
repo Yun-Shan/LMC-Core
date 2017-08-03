@@ -41,11 +41,9 @@ public class DefaultCommandManager implements CommandManager, CommandExecutor, T
 
     // 测试用
     DefaultCommandManager() {
-        try {
-            Class.forName("org.junit.Test");
-        } catch (ClassNotFoundException e) {
-            throw new UnsupportedOperationException();
-        }
+        // 只有测试类能调用
+        if ("org.yunshanmc.lmc.core.command.DefaultCommandManagerTest".equals(
+                new Throwable().getStackTrace()[1].getClassName())) throw new UnsupportedOperationException();
         this.handleCommand = "test";
     }
 
