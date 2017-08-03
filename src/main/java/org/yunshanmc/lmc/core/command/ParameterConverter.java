@@ -8,7 +8,19 @@ import java.util.Map;
 
 public abstract class ParameterConverter<T> {
 
-    private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
+    private static final MethodHandles.Lookup LOOKUP;
+
+    private static Method M_Convert;
+
+    static {
+        LOOKUP = MethodHandles.lookup();
+        for (Method m : ParameterConverter.class.getDeclaredMethods()) {
+            if ("convert".equals(m.getName())) {
+                M_Convert = m;
+                break;
+            }
+        }
+    }
 
     private static final Map<Class<?>, ParameterConverter<?>> converters = new HashMap<>();
 
@@ -27,25 +39,53 @@ public abstract class ParameterConverter<T> {
         converters.put(converter.convertTo, converter);
     }
 
-    public abstract T convert(String str);
+    public T convert(String str) {
+        if (str == null) return this.getDefaultValue();
+        try {
+            T res = this.convertArg(str);
+            if (res == null) throw new ArgConverterFailException(str, this.convertTo);
+            return res;
+        } catch (ArgConverterFailException e) {
+            throw e;
+        } catch (Throwable t) {
+            throw new ArgConverterFailException(str, this.convertTo, t);
+        }
+    }
+
+    public T getDefaultValue() {
+        return null;
+    }
+
+    protected abstract T convertArg(String str);
 
     public final MethodHandle toMethodHandle() {
         try {
-            Method mConvert = null;
-            for (Method m : this.getClass().getDeclaredMethods()) {
-                if (m.getName().equals("convert") && m.getParameterCount() == 1 &&
-                    m.getParameterTypes()[0] == String.class) {
-                    mConvert = m;
-                    break;
-                }
-            }
-            assert mConvert != null;// 不断言IDE会有mConvert可能为null的提示，很烦qwq。实际上mConvert不可能为null
-            MethodHandle handle = LOOKUP.unreflect(mConvert).bindTo(this);
+            MethodHandle handle = LOOKUP.unreflect(M_Convert).bindTo(this);
             handle = handle.asType(handle.type().changeReturnType(this.convertTo));
             return handle;
         } catch (IllegalAccessException e) {// 已经setAccessible，该异常不会出现
             e.printStackTrace();
             throw new UnknownError();
         }
+    }
+
+    static {
+        register(new ParameterConverter<String>(String.class) {
+            @Override
+            public String convertArg(String str) {
+                return str;
+            }
+        });
+        register(new ParameterConverter<Integer>(int.class) {
+            @Override
+            public Integer convertArg(String arg) {
+                return Integer.valueOf(arg);
+            }
+
+            @Override
+            public Integer getDefaultValue() {
+                return -1;
+            }
+        });
     }
 }

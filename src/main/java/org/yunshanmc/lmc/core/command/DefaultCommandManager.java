@@ -39,6 +39,16 @@ public class DefaultCommandManager implements CommandManager, CommandExecutor, T
         this.messageSender = plugin.getMessageManager().getMessageSender();
     }
 
+    // 测试用
+    DefaultCommandManager() {
+        try {
+            Class.forName("org.junit.Test");
+        } catch (ClassNotFoundException e) {
+            throw new UnsupportedOperationException();
+        }
+        this.handleCommand = "test";
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         return false;
@@ -127,6 +137,10 @@ public class DefaultCommandManager implements CommandManager, CommandExecutor, T
                 else converters[i] = converter.toMethodHandle();
             }
 
+            // 绑定到原始对象
+            // 必须最先绑定，后续处理都忽略了此方法句柄的this参数
+            handle = handle.bindTo(command);
+
             if (senderIdx > 0) {// Sender参数位置不在第一个的将其移到第一个
                 Class<?>[] args = m.getParameterTypes();
                 Class<?> senderType = args[senderIdx];
@@ -134,25 +148,47 @@ public class DefaultCommandManager implements CommandManager, CommandExecutor, T
                 args[0] = senderType;
 
                 int[] idxs = new int[args.length];
+                /* 将senderIdx移到第一个参数，senderIdx前面的参数依次右移
+                 * 故senderIdx处的idx为0，senderIDx前面的索引都+1
+                 * 该处索引序列转换示例
+                 *         4
+                 * 0 1 2 3 ss 5 6
+                 *         5
+                 * 1 2 3 4 ss 5 6
+                 *
+                 * 1 2 3 4 0  5 6
+                 *
+                 * MethodHandles.permuteArguments的reorder语义：原来的参数索引在新排序中的位置(而非新排序在原索引的位置)
+                 */
                 for (int i = 0; i < idxs.length; i++) {
-                    idxs[i] = i;
+                    if (i > senderIdx) idxs[i] = i;
+                    else idxs[i] = i + 1;
                 }
-                idxs[0] = senderIdx;
                 idxs[senderIdx] = 0;
 
                 handle = MethodHandles.permuteArguments(handle, MethodType.methodType(m.getReturnType(), args), idxs);
-            } else {// 没有Sender参数的在最前面加上Sender参数
+            } else if (!needSender) {// 没有Sender参数的在最前面加上Sender参数
                 handle = MethodHandles.dropArguments(handle, 0, CommandSender.class);
             }
             // 过滤参数
             handle = MethodHandles.filterArguments(handle, 1, converters);
-            // 绑定到原始对象
-            handle = handle.bindTo(command);
+            // 字符串数组转为参数列表
+            handle = handle.asSpreader(String[].class, converters.length);
+
+            // 参数最大数量，忽略Sender参数
+            int maxArgCount = paramCount;
+            if (needSender) maxArgCount -= 1;
+
+            // 参数最小数量，有可选参数时是optionalStartIds，无可选参数时是最大参数数量
+            int minArgCount = optionalStartIds > 0 ? optionalStartIds : paramCount;
+            // 同时有必填参数和可选参数且Sender参数的位置在optionalStartIds前面时，忽略Sender参数
+            if (needSender && (optionalStartIds <= 0 || senderIdx < optionalStartIds)) minArgCount -= 1;
+
 
             this.registerCommand(new SimpleCommandImpl(cmdInfo, this.messageSender, handle,
                                                        needSender ? parameters[senderIdx].getType().asSubclass(
-                                                      CommandSender.class) : null,
-                                              optionalStartIds > 0 ? optionalStartIds : paramCount, paramCount));
+                                                               CommandSender.class) : null,
+                                                       minArgCount, maxArgCount));
         });
     }
 
@@ -161,9 +197,9 @@ public class DefaultCommandManager implements CommandManager, CommandExecutor, T
         this.commands.remove(cmdName);
     }
 
-    private static class SimpleCommandImpl extends LMCCommand {
+    static class SimpleCommandImpl extends LMCCommand {
 
-        private final MethodHandle handle;
+        final MethodHandle handle;
         private final Class<? extends CommandSender> senderType;
         private final int minArgCount;
         private final int maxArgCount;
@@ -182,15 +218,17 @@ public class DefaultCommandManager implements CommandManager, CommandExecutor, T
         }
 
         @Override
-        public void execute(CommandSender sender, String... args) {
+        public void execute(CommandSender sender, String... args) {// TODO 提示
             if (this.senderType != null && !this.senderType.isInstance(sender)) {
                 //this.onSenderTypeDisallow(sender, args);
                 return;
             } else if (args.length > this.maxArgCount) {
                 //this.onTooManyArgs(sender, args);
+                System.out.println("max");
                 return;
             } else if (args.length < this.minArgCount) {
                 //this.onTooLittleArgs(sender, args);
+                System.out.println("min");
                 return;
             }
             if (args.length < this.maxArgCount) {
@@ -200,10 +238,14 @@ public class DefaultCommandManager implements CommandManager, CommandExecutor, T
                 this.handle.invoke(sender, args);
             } catch (ArgConverterFailException e) {
                 //this.onArgConvertFail(sender, e.getArg(), e.getConvertTo(), args);
+                System.out.println("convert");
             } catch (WrongMethodTypeException | ClassCastException e) {
                 // 该项错误不应该出现，若出现则是DefaultCommandManager类的registerCommands(SimpleLMCCommand command)方法有bug
+                e.printStackTrace();
+                ExceptionHandler.handle(e);
                 this.messageSender.warningConsole("bug.simpleCommandRegister", this.getName());
             } catch (Throwable e) {// 该项为命令处理方法抛出的异常
+                e.printStackTrace();
                 ExceptionHandler.handle(e);
             }
         }
