@@ -146,15 +146,16 @@ public class DefaultCommandManager implements CommandManager, CommandExecutor, T
                 args[0] = senderType;
 
                 int[] idxs = new int[args.length];
-                /* 将senderIdx移到第一个参数，senderIdx前面的参数依次右移
+                /*
+                 * 将senderIdx移到第一个参数，senderIdx前面的参数依次右移
                  * 故senderIdx处的idx为0，senderIDx前面的索引都+1
                  * 该处索引序列转换示例
                  *         4
-                 * 0 1 2 3 ss 5 6
+                 * 0 1 2 3 s 5 6
                  *         5
-                 * 1 2 3 4 ss 5 6
+                 * 1 2 3 4 s 5 6
                  *
-                 * 1 2 3 4 0  5 6
+                 * 1 2 3 4 0 5 6
                  *
                  * MethodHandles.permuteArguments的reorder语义：原来的参数索引在新排序中的位置(而非新排序在原索引的位置)
                  */
