@@ -8,7 +8,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.yunshanmc.lmc.core.resource.Resource;
 
 /**
- * //TODO
+ * //TODO 注释
  */
 public interface ConfigManager {
 
