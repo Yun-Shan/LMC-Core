@@ -8,7 +8,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.yunshanmc.lmc.core.internal.BuiltinMessage;
-import org.yunshanmc.lmc.core.internal.Utils;
 import org.yunshanmc.lmc.core.resource.Resource;
 import org.yunshanmc.lmc.core.utils.ReflectUtils;
 
@@ -17,9 +16,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
