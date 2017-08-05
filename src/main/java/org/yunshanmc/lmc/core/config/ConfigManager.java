@@ -9,6 +9,7 @@ import org.yunshanmc.lmc.core.resource.Resource;
 
 /**
  * //TODO 注释
+ *
  */
 public interface ConfigManager {
 
