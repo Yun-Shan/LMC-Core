@@ -19,12 +19,16 @@ public class DefaultConfigManager implements ConfigManager {
 
     @Override
     public YamlConfiguration getDefaultConfig(String path) {
-        return this.readConfig(this.resourceManager.getSelfResource(path));
+        Resource res = this.resourceManager.getSelfResource(path);
+        if (res == null) return null;
+        return this.readConfig(res);
     }
 
     @Override
     public YamlConfiguration getUserConfig(String path) {
-        return this.readConfig(this.resourceManager.getFolderResource(path));
+        Resource res = this.resourceManager.getFolderResource(path);
+        if (res == null) return null;
+        return this.readConfig(res);
     }
 
     @Override
