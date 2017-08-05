@@ -32,14 +32,22 @@ dependencies {
   testCompile 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
 }
 
+task sourceJar(type: Jar) {
+  from sourceSets.main.allJava
+}
+
 publishing {
   publications {
     mavenJava(MavenPublication) {
       groupId 'org.yunshanmc'
       artifactId 'LMC-Core'
-      version '1.0.0'
+      version '1.0.0-SNAPSHOT'
 
       from components.java
+
+      artifact sourceJar {
+        classifier "sources"
+      }
     }
   }
 }

@@ -31,7 +31,7 @@ public class DefaultMessageManagerTest {
             "    test3_1_2: $测试2\n";
 
     @Before
-    public void setup() throws Exception {
+    public void setUp() throws Exception {
         File testDir = new File("build" + File.separator + "testing");
         if (!testDir.exists()) assertTrue(testDir.mkdirs());
 

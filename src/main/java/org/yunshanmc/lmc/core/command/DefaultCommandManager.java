@@ -41,9 +41,11 @@ public class DefaultCommandManager implements CommandManager, CommandExecutor, T
 
     // 测试用
     DefaultCommandManager() {
+        Object obj = new Throwable().getStackTrace();
         // 只有测试类能调用
-        if ("org.yunshanmc.lmc.core.command.DefaultCommandManagerTest".equals(
-                new Throwable().getStackTrace()[1].getClassName())) throw new UnsupportedOperationException();
+        if ("org/yunshanmc/lmc/core/command/DefaultCommandManagerTest".equals(
+                new Throwable().getStackTrace()[1].getClassName()))
+            throw new UnsupportedOperationException();
         this.handleCommand = "test";
     }
 

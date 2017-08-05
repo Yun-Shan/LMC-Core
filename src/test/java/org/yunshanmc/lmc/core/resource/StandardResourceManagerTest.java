@@ -27,7 +27,7 @@ public class StandardResourceManagerTest {
     private static File testJar;
     
     @Before
-    public void setup() throws Exception {
+    public void setUp() throws Exception {
         m_resolvePath = StandardResourceManager.class.getDeclaredMethod("resolvePath", String.class);
         m_resolvePath.setAccessible(true);
         testDir = new File("build" + File.separator + "testing");
