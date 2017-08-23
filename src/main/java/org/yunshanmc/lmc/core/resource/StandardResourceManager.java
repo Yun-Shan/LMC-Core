@@ -14,10 +14,14 @@ import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.*;
+import java.net.URLDecoder;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.List;
@@ -45,7 +49,7 @@ public class StandardResourceManager implements ResourceManager {
      * @throws IOException 当读取插件Jar文件失败时抛出
      */
     public StandardResourceManager(Plugin plugin) throws IOException {
-        this(new File(plugin.getClass().getProtectionDomain().getCodeSource().getLocation().getFile()),
+        this(new File(URLDecoder.decode(plugin.getClass().getProtectionDomain().getCodeSource().getLocation().getFile(), "UTF-8")),
              plugin.getDataFolder().toPath());
     }
     
