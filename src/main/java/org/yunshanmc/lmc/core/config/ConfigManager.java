@@ -4,6 +4,7 @@
  */
 package org.yunshanmc.lmc.core.config;
 
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.yunshanmc.lmc.core.resource.Resource;
 
@@ -12,11 +13,13 @@ import org.yunshanmc.lmc.core.resource.Resource;
  */
 public interface ConfigManager {
 
-    YamlConfiguration getConfig(String path);
+    FileConfiguration getConfig(String path);
 
-    YamlConfiguration getDefaultConfig(String path);
+    FileConfiguration getDefaultConfig(String path);
 
-    YamlConfiguration getUserConfig(String path);
+    FileConfiguration getUserConfig(String path);
 
-    YamlConfiguration readConfig(Resource resource);
+    FileConfiguration getPluginConfig();
+
+    FileConfiguration readConfig(Resource resource);
 }
