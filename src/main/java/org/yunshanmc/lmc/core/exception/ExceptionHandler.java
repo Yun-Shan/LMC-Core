@@ -52,7 +52,7 @@ public final class ExceptionHandler {
                 BuiltinMessage.getMessage("DefaultErrorHandler",
                                           info.getPlugin(),
                                           err.getClass().getName(),
-                                          desc != null ? desc : (err.getMessage() != null ? err.getMessage() : "无"),
+                                          desc != null ? desc : "无",
                                           new String(buffer.toByteArray())
                 )
         );
@@ -67,7 +67,7 @@ public final class ExceptionHandler {
     }
 
     public static void handle(Throwable t) {
-        handle(t, null);
+        handle(t, t.getMessage());
     }
 
     public static void handle(Throwable t, String description) {
@@ -136,7 +136,5 @@ public final class ExceptionHandler {
         public String getDescription() {
             return this.description;
         }
-
-
     }
 }
