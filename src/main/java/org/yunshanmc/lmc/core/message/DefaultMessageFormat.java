@@ -14,7 +14,7 @@ public class DefaultMessageFormat implements MessageFormat {
     @Override
     public String format(Player player, String msg, Object... args) {
         for (int i = 0; i < args.length; i++) {
-            msg = msg.replace("[" + (i + 1) + ']', String.valueOf(args[i]));
+            msg = msg.replace("{" + (i + 1) + '}', String.valueOf(args[i]));
         }
         return msg;
     }

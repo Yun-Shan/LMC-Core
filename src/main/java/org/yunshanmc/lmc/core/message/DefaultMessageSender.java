@@ -13,42 +13,53 @@ import java.lang.reflect.Proxy;
  * //TODO
  */
 public class DefaultMessageSender implements MessageSender {
-    
-    public static final Player CONSOLE_FAKE_PLAYER = (Player) Proxy.newProxyInstance(DefaultMessageFormat.class.getClassLoader(),
-                                                                                     new Class<?>[]{ Player.class },
-                                                                                     (proxy, method, args) -> {
-                                                                                         switch (method.getName()) {
-                                                                                             case "sendMessage":
-                                                                                                 Bukkit.getConsoleSender().sendMessage(
-                                                                                                         (String) args[0]);
-                                                                                                 return null;
-                                                                                             case "getName":
-                                                                                             case "getDisplayName":
-                                                                                             case "getCustomName":
-                                                                                             case "getPlayerListName":
-                                                                                                 return "[$Console]";
-                                                                                             default:
-                                                                                                 return null;
-                                                                                         }
-                                                                                     });
-    
-    private MessageManager messageManager;
+
+    public static final Player CONSOLE_FAKE_PLAYER = (Player) Proxy.newProxyInstance(
+            DefaultMessageFormat.class.getClassLoader(),
+            new Class<?>[]{Player.class},
+            (proxy, method, args) -> {
+                switch (method.getName()) {
+                    case "sendMessage":
+                        if (args[0] instanceof String) Bukkit.getConsoleSender().sendMessage(
+                                (String) args[0]);
+                        else if (args[0] instanceof String[]) Bukkit.getConsoleSender().sendMessage(
+                                (String[]) args[0]);
+                        return null;
+                    case "getName":
+                    case "getDisplayName":
+                    case "getCustomName":
+                    case "getPlayerListName":
+                        return "[$Console$]";
+                    default:
+                        return null;
+                }
+            });
+
+    private final MessageManager messageManager;
 
     private int debugLevel;
 
     public DefaultMessageSender(MessageManager messageManager) {
         this.messageManager = messageManager;
     }
-    
+
+    @Override
+    public String getMessage(String msgKey, Object... args) {
+        return this.messageManager.getMessage(msgKey).getMessage(CONSOLE_FAKE_PLAYER, args);
+    }
+
     @Override
     public MessageSender message(Player receiver, String type, String msgKey, Object... args) {
-        String msg = this.messageManager.getMessage(msgKey).getMessage(receiver, args);
-        msg = this.messageManager.getMessage("message.type." + type).getMessage(receiver, msg);// 将信息放入类型模板
+        String[] msgs = this.messageManager.getMessage(msgKey).getMessages(receiver, args);
+        // 将信息放入类型模板
+        for (int i = 0; i < msgs.length; i++) {
+            msgs[i] = this.messageManager.getMessage("message.type." + type).getMessage(receiver, msgs[i]);
+        }
 
-        receiver.sendMessage(msg);
+        receiver.sendMessage(msgs);
         return this;
     }
-    
+
     @Override
     public MessageSender messageConsole(String type, String msgKey, Object... args) {
         this.message(CONSOLE_FAKE_PLAYER, type, msgKey, args);

@@ -12,6 +12,15 @@ import org.bukkit.entity.Player;
 public interface MessageSender {
 
     /**
+     * 获取信息字符串
+     *
+     * @param msgKey 信息key
+     * @param args 信息文本中的参数列表
+     * @return 格式化后的信息字符串
+     */
+    String getMessage(String msgKey, Object... args);
+
+    /**
      * 向玩家发送信息
      *
      * @param receiver 接收信息的玩家

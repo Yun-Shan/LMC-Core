@@ -4,6 +4,7 @@
  */
 package org.yunshanmc.lmc.core.message;
 
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.yunshanmc.lmc.core.config.ConfigManager;
 
@@ -18,7 +19,7 @@ public class DefaultMessageManager implements MessageManager {
     protected final ConfigManager configManager;
     
     private Map<String, Message> messageCache = new HashMap<>();
-    private YamlConfiguration defaultMsg;
+    private FileConfiguration defaultMsg;
     private int debugLevel;
 
     private static final String MESSAGE_PATH = "messages.yml";
@@ -42,6 +43,9 @@ public class DefaultMessageManager implements MessageManager {
             message = this.getMessageFromResource(key);
             this.messageCache.put(key, message);
         }
+        if (message == null) {
+            return new Message.MissingMessage(key);
+        }
         return message;
     }
 
@@ -56,7 +60,7 @@ public class DefaultMessageManager implements MessageManager {
     }
 
     protected Message getMessageFromResource(String key) {
-        YamlConfiguration cfg = this.configManager.getConfig(MESSAGE_PATH);
+        FileConfiguration cfg = this.configManager.getConfig(MESSAGE_PATH);
         String msg = null;
         // 这段代码感觉特别不优雅，于是写清楚注释
         // 尝试从用户配置获取
