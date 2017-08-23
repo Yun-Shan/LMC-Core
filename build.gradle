@@ -1,53 +1,67 @@
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
+
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 
 repositories {
-  jcenter()
-  maven {// SpigotMC
-    url 'https://hub.spigotmc.org/nexus/content/groups/public/'
-  }
-  maven {// For bungeecord-chat
-    url 'https://oss.sonatype.org/content/repositories/snapshots/'
-  }
-  maven {// For PlaceholderAPI
-    url 'http://repo.extendedclip.com/content/repositories/placeholderapi/'
-  }
+    jcenter()
+    maven {// SpigotMC
+        url 'https://hub.spigotmc.org/nexus/content/groups/public/'
+    }
+    maven {// For bungeecord-chat
+        url 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
+    maven {// For PlaceholderAPI
+        url 'http://repo.extendedclip.com/content/repositories/placeholderapi/'
+    }
 }
 
 targetCompatibility = 1.8
 sourceCompatibility = 1.8
 
 tasks.withType(JavaCompile) {
-	options.encoding = 'UTF-8'
+    options.encoding = 'UTF-8'
 }
 
 dependencies {
-  compileOnly 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
-  compileOnly 'me.clip:placeholderapi:2.0.8'
-  compileOnly 'com.google.guava:guava:22.0'
-  compileOnly 'org.yaml:snakeyaml:1.18'
+    compileOnly 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
+    compileOnly 'me.clip:placeholderapi:2.0.8'
+    compileOnly 'com.google.guava:guava:22.0'
+    compileOnly 'org.yaml:snakeyaml:1.18'
+    // ORM
+    compile 'com.j256.ormlite:ormlite-core:5.0'
+    compile 'com.j256.ormlite:ormlite-jdbc:5.0'
 
-  testCompile 'junit:junit:4.12'
-  testCompile 'com.google.guava:guava:22.0'
-  testCompile 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
+    testCompile 'junit:junit:4.12'
+    testCompile 'com.google.guava:guava:22.0'
+    testCompile 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
 }
 
 task sourceJar(type: Jar) {
-  from sourceSets.main.allJava
+    from sourceSets.main.allJava
 }
 
 publishing {
-  publications {
-    mavenJava(MavenPublication) {
-      groupId 'org.yunshanmc'
-      artifactId 'LMC-Core'
-      version '1.0.0-SNAPSHOT'
+    publications {
+        mavenJava(MavenPublication) {
+            groupId 'org.yunshanmc'
+            artifactId 'LMC-Core'
+            version '1.0.0-SNAPSHOT'
 
-      from components.java
+            from components.java
 
-      artifact sourceJar {
-        classifier "sources"
-      }
+            artifact sourceJar {
+                classifier "sources"
+            }
+        }
     }
-  }
 }
+
+task sendToServer {
+    if (file('D:\\Minecarft\\Servers\\Test - 1.11.2\\plugins').exists())
+        Files.copy(file('build/libs/LMC-Core.jar').toPath(), Paths.get("D:\\Minecarft\\Servers\\Test - 1.11.2\\plugins\\LMC-Core.jar"), StandardCopyOption.REPLACE_EXISTING)
+}
+
+build.finalizedBy sendToServer
