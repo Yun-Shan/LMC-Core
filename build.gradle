@@ -60,7 +60,7 @@ publishing {
 }
 
 task sendToServer {
-    if (file('D:\\Minecarft\\Servers\\Test - 1.11.2\\plugins').exists())
+    if (new File('D:\\Minecarft\\Servers\\Test - 1.11.2\\plugins').exists())
         Files.copy(file('build/libs/LMC-Core.jar').toPath(), Paths.get("D:\\Minecarft\\Servers\\Test - 1.11.2\\plugins\\LMC-Core.jar"), StandardCopyOption.REPLACE_EXISTING)
 }
 
