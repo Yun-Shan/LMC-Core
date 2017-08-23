@@ -6,9 +6,11 @@ package org.yunshanmc.lmc.core;
 
 import org.bukkit.plugin.java.JavaPlugin;
 import org.yunshanmc.lmc.core.config.ConfigManager;
+import org.yunshanmc.lmc.core.config.DefaultConfigManager;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.locale.I18nResourceManager;
 import org.yunshanmc.lmc.core.locale.LocaleManager;
+import org.yunshanmc.lmc.core.message.DefaultMessageManager;
 import org.yunshanmc.lmc.core.message.MessageManager;
 import org.yunshanmc.lmc.core.resource.ResourceManager;
 import org.yunshanmc.lmc.core.resource.StandardResourceManager;
@@ -54,6 +56,8 @@ public abstract class LMCPlugin extends JavaPlugin {
             ExceptionHandler.handle(e);
             return false;
         }
+        this.configManager = new DefaultConfigManager(this.resourceManager);
+        this.messageManager = new DefaultMessageManager(this.configManager);
 
         /* 为避免插件信息相关功能初始化失败导致报错信息异常，
          * 在资源管理器和信息管理器都初始化完毕之后才设置异常处理器，
