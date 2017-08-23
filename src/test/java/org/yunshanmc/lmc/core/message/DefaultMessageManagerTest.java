@@ -55,14 +55,11 @@ public class DefaultMessageManagerTest {
         assertEquals("qqq", getRawMessage("test2"));
         assertEquals("测试", getRawMessage("test3.test3_1.test3_1_1"));
         assertEquals("$测试2", getRawMessage("test3.test3_1.test3_1_2"));
-        assertEquals(null, getRawMessage("null_key"));
-        assertEquals(null, getRawMessage("test3"));
-        assertEquals(null, getRawMessage("test3.test3_1"));
+        assertEquals("§cMissingLanguage: null_key", this.messageManager.getMessage("null_key").getMessage(null));
     }
 
     private String getRawMessage(String key) {
-        Message message = this.messageManager.getMessage(key);
-        return message != null ? message.getRawMessage() : null;
+        return this.messageManager.getMessage(key).getRawMessage();
     }
 
 }
