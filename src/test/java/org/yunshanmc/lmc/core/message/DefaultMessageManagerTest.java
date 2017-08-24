@@ -1,5 +1,6 @@
 package org.yunshanmc.lmc.core.message;
 
+import org.bukkit.entity.Player;
 import org.junit.Before;
 import org.junit.Test;
 import org.yunshanmc.lmc.core.config.ConfigManager;
@@ -55,7 +56,7 @@ public class DefaultMessageManagerTest {
         assertEquals("qqq", getRawMessage("test2"));
         assertEquals("测试", getRawMessage("test3.test3_1.test3_1_1"));
         assertEquals("$测试2", getRawMessage("test3.test3_1.test3_1_2"));
-        assertEquals("§cMissingLanguage: null_key", this.messageManager.getMessage("null_key").getMessage(null));
+        assertEquals("§cMissingLanguage: null_key", this.messageManager.getMessage("null_key").getMessage((Player)null));
     }
 
     private String getRawMessage(String key) {

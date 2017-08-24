@@ -3,6 +3,7 @@ package org.yunshanmc.lmc.core.command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.junit.Test;
+import org.yunshanmc.lmc.core.command.executors.CommandExecutor;
 import org.yunshanmc.lmc.core.message.DefaultMessageFormat;
 
 import java.lang.reflect.Field;
@@ -10,6 +11,7 @@ import java.lang.reflect.Proxy;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.assertEquals;
 
@@ -23,11 +25,18 @@ public class DefaultCommandManagerTest {
         Player fakePlayer = (Player) Proxy.newProxyInstance(DefaultMessageFormat.class.getClassLoader(),
                                                             new Class<?>[]{Player.class},
                                                             (proxy, method, args) -> method.invoke(proxy, args));
-        Field fcommands = DefaultCommandManager.class.getDeclaredField("commands");
-        fcommands.setAccessible(true);
+        Field fexecutor = DefaultCommandManager.class.getDeclaredField("commandExecutor");
+        fexecutor.setAccessible(true);
 
         DefaultCommandManager manager = new DefaultCommandManager();
-        Map<String, LMCCommand> commands = (Map<String, LMCCommand>) fcommands.get(manager);
+        AtomicReference<Map<String, LMCCommand>> ar = new AtomicReference<>();
+        CommandExecutor executor = new CommandExecutor(manager, null) {
+            {
+                ar.set(this.commands);
+            }
+        };
+        fexecutor.set(manager, executor);
+        Map<String, LMCCommand> commands = ar.get();
 
         AtomicInteger counter = new AtomicInteger(0);
 
