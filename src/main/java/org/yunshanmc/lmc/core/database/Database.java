@@ -59,7 +59,7 @@ public abstract class Database {
         this.closed = true;
     }
 
-    protected void checkNotClosed() {
+    public void checkNotClosed() {
         if (this.closed) throw new IllegalStateException(messageSender.getMessage("database.close"));
     }
 

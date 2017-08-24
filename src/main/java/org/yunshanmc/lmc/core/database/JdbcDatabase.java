@@ -33,6 +33,7 @@ public class JdbcDatabase extends Database {
     }
 
     public Connection getConnection() {
+        this.checkNotClosed();
         return this.connection;
     }
 }

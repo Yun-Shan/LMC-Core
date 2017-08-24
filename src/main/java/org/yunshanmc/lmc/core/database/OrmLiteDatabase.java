@@ -28,12 +28,8 @@ public class OrmLiteDatabase extends Database {
         return true;
     }
 
-    @Override
-    public void close() {
-
-    }
-
     public ConnectionSource getConnectionSource() {
+        this.checkNotClosed();
         return this.connectionSource;
     }
 }
