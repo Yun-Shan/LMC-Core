@@ -156,4 +156,24 @@ public abstract class LMCCommand {
     public void showHelp(CommandSender sender) {
 
     }
+
+    /**
+     * 执行命令
+     *
+     * @param sender
+     *     命令执行者
+     * @param args
+     *     参数列表
+     */
+    public abstract void execute(net.md_5.bungee.api.CommandSender sender, String... args);
+
+    /**
+     * 显示命令帮助
+     *
+     * @param sender
+     *     显示命令帮助的对象
+     */
+    public void showHelp(net.md_5.bungee.api.CommandSender sender) {
+
+    }
 }

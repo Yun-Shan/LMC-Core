@@ -1,12 +1,13 @@
 package org.yunshanmc.lmc.core.command;
 
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
+import net.md_5.bungee.api.plugin.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.PluginCommand;
-import org.bukkit.command.TabCompleter;
 import org.yunshanmc.lmc.core.LMCBukkitPlugin;
+import org.yunshanmc.lmc.core.LMCBungeeCordPlugin;
 import org.yunshanmc.lmc.core.LMCPlugin;
+import org.yunshanmc.lmc.core.command.executors.BukkitExecutor;
+import org.yunshanmc.lmc.core.command.executors.BungeeCordExecutor;
+import org.yunshanmc.lmc.core.command.executors.CommandExecutor;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.message.MessageSender;
 
@@ -15,28 +16,31 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.invoke.WrongMethodTypeException;
 import java.lang.reflect.Parameter;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-public class DefaultCommandManager implements CommandManager, CommandExecutor, TabCompleter {
+public class DefaultCommandManager implements CommandManager {
 
     private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
 
     private final String handleCommand;
 
-    private Map<String, LMCCommand> commands = new HashMap<>();
+    private CommandExecutor commandExecutor;
 
     private MessageSender messageSender;
 
     public DefaultCommandManager(LMCBukkitPlugin plugin, String handleCommand) {
-        this.handleCommand = handleCommand;
-        PluginCommand command = plugin.getCommand(handleCommand);
-        command.setExecutor(this);
-        command.setTabCompleter(this);
+        this((LMCPlugin) plugin, handleCommand);
+        this.commandExecutor = new BukkitExecutor(this, plugin.getMessageManager().getMessageSender(), plugin);
+    }
 
+    public DefaultCommandManager(LMCBungeeCordPlugin plugin, String cmdName, String permission, String... aliases) {
+        this(plugin, cmdName);
+        this.commandExecutor = new BungeeCordExecutor(this, plugin.getMessageManager().getMessageSender(), plugin,
+                                                      permission, aliases);
+    }
+
+    private DefaultCommandManager(LMCPlugin plugin, String handleCommand) {
+        this.handleCommand = handleCommand;
         this.messageSender = plugin.getMessageManager().getMessageSender();
     }
 
@@ -51,27 +55,13 @@ public class DefaultCommandManager implements CommandManager, CommandExecutor, T
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        return false;
-    }
-
-    @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        List<String> cmds = new ArrayList<>(this.commands.keySet());
-        if (args.length == 0) return cmds;
-
-        cmds.removeIf(cmd -> cmd.startsWith(args[0]));
-        return cmds;
-    }
-
-    @Override
     public String getHandleCommand() {
         return this.handleCommand;
     }
 
     @Override
     public void registerCommand(LMCCommand command) {
-        this.commands.put(command.getName(), command);
+        this.commandExecutor.registerCommand(command);
     }
 
     @Override
@@ -196,7 +186,7 @@ public class DefaultCommandManager implements CommandManager, CommandExecutor, T
 
     @Override
     public void unregisterCommand(String cmdName) {
-        this.commands.remove(cmdName);
+        this.commandExecutor.unregisterCommand(cmdName);
     }
 
     static class SimpleCommandImpl extends LMCCommand {
@@ -221,6 +211,20 @@ public class DefaultCommandManager implements CommandManager, CommandExecutor, T
 
         @Override
         public void execute(CommandSender sender, String... args) {// TODO 提示
+            this.execute((Object)sender, args);
+        }
+
+        @Override
+        public void showHelp(CommandSender sender) {
+
+        }
+
+        @Override
+        public void execute(net.md_5.bungee.api.CommandSender sender, String... args) {
+            this.execute((Object)sender, args);
+        }
+
+        private void execute(Object sender, String... args) {// TODO 提示
             if (this.senderType != null && !this.senderType.isInstance(sender)) {
                 //this.onSenderTypeDisallow(sender, args);
                 return;
@@ -250,11 +254,6 @@ public class DefaultCommandManager implements CommandManager, CommandExecutor, T
                 e.printStackTrace();
                 ExceptionHandler.handle(e);
             }
-        }
-
-        @Override
-        public void showHelp(CommandSender sender) {
-
         }
     }
 }
