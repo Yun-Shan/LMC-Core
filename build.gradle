@@ -32,7 +32,8 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
     testCompile 'com.google.guava:guava:22.0'
-    testCompile 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
+    testCompile 'org.spigotmc:spigot-api:1.12.1-R0.1-SNAPSHOT'
+    testCompile 'net.md-5:bungeecord-api:1.12-SNAPSHOT'
 }
 
 task sourceJar(type: Jar) {
@@ -55,7 +56,7 @@ publishing {
     }
 }
 
-task sendToServer {
+task sendToServer << {
     if (new File('D:\\Minecarft\\Servers\\Test - 1.11.2\\plugins').exists())
         Files.copy(file('build/libs/LMC-Core.jar').toPath(), Paths.get("D:\\Minecarft\\Servers\\Test - 1.11.2\\plugins\\LMC-Core.jar"), StandardCopyOption.REPLACE_EXISTING)
 }
