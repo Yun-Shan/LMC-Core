@@ -5,6 +5,7 @@
 package org.yunshanmc.lmc.core.locale;
 
 import org.bukkit.plugin.Plugin;
+import org.yunshanmc.lmc.core.LMCPlugin;
 import org.yunshanmc.lmc.core.locale.LocaleManager;
 import org.yunshanmc.lmc.core.resource.Resource;
 import org.yunshanmc.lmc.core.resource.StandardResourceManager;
@@ -33,7 +34,7 @@ public class I18nResourceManager extends StandardResourceManager {
      * @param plugin Bukkit插件实例
      * @throws IOException 当读取插件Jar文件失败时抛出
      */
-    public I18nResourceManager(Plugin plugin, LocaleManager localeManager) throws IOException {
+    public I18nResourceManager(LMCPlugin plugin, LocaleManager localeManager) throws IOException {
         super(plugin);
         this.localeManager = localeManager;
         localeManager.addListener(locale -> this.localeTags = new Path[]{ Paths.get(locale.toLanguageTag()),

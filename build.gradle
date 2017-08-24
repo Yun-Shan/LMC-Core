@@ -10,9 +10,6 @@ repositories {
     maven {// SpigotMC
         url 'https://hub.spigotmc.org/nexus/content/groups/public/'
     }
-    maven {// For bungeecord-chat
-        url 'https://oss.sonatype.org/content/repositories/snapshots/'
-    }
     maven {// For PlaceholderAPI
         url 'http://repo.extendedclip.com/content/repositories/placeholderapi/'
     }
@@ -26,10 +23,9 @@ tasks.withType(JavaCompile) {
 }
 
 dependencies {
-    compileOnly 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
+    compileOnly 'org.spigotmc:spigot-api:1.12.1-R0.1-SNAPSHOT'
+    compileOnly 'net.md-5:bungeecord-api:1.12-SNAPSHOT'
     compileOnly 'me.clip:placeholderapi:2.0.8'
-    compileOnly 'com.google.guava:guava:22.0'
-    compileOnly 'org.yaml:snakeyaml:1.18'
     // ORM
     compile 'com.j256.ormlite:ormlite-core:5.0'
     compile 'com.j256.ormlite:ormlite-jdbc:5.0'

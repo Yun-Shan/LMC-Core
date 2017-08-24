@@ -5,6 +5,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
+import org.yunshanmc.lmc.core.LMCBukkitPlugin;
 import org.yunshanmc.lmc.core.LMCPlugin;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.message.MessageSender;
@@ -30,7 +31,7 @@ public class DefaultCommandManager implements CommandManager, CommandExecutor, T
 
     private MessageSender messageSender;
 
-    public DefaultCommandManager(LMCPlugin plugin, String handleCommand) {
+    public DefaultCommandManager(LMCBukkitPlugin plugin, String handleCommand) {
         this.handleCommand = handleCommand;
         PluginCommand command = plugin.getCommand(handleCommand);
         command.setExecutor(this);

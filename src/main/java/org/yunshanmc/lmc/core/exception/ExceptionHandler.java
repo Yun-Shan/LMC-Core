@@ -7,6 +7,7 @@ package org.yunshanmc.lmc.core.exception;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
+import org.yunshanmc.lmc.core.LMCPlugin;
 import org.yunshanmc.lmc.core.internal.BuiltinMessage;
 import org.yunshanmc.lmc.core.resource.Resource;
 import org.yunshanmc.lmc.core.utils.ReflectUtils;
@@ -62,7 +63,7 @@ public final class ExceptionHandler {
 
     private static final Map<String, Consumer<ExceptionInfo>> HANDLERS = new HashMap<>();
 
-    public static void setHandler(Plugin plugin, Consumer<ExceptionInfo> handler) {
+    public static void setHandler(LMCPlugin plugin, Consumer<ExceptionInfo> handler) {
         HANDLERS.put(plugin.getName(), handler);
     }
 

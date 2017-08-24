@@ -8,7 +8,7 @@ import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.bukkit.plugin.Plugin;
+import org.yunshanmc.lmc.core.LMCPlugin;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 
 import java.io.File;
@@ -48,7 +48,7 @@ public class StandardResourceManager implements ResourceManager {
      * @param plugin Bukkit插件实例
      * @throws IOException 当读取插件Jar文件失败时抛出
      */
-    public StandardResourceManager(Plugin plugin) throws IOException {
+    public StandardResourceManager(LMCPlugin plugin) throws IOException {
         this(new File(URLDecoder.decode(plugin.getClass().getProtectionDomain().getCodeSource().getLocation().getFile(), "UTF-8")),
              plugin.getDataFolder().toPath());
     }
