@@ -7,7 +7,6 @@ package org.yunshanmc.lmc.core.utils;
 import org.yunshanmc.lmc.core.resource.Resource;
 import org.yunshanmc.lmc.core.resource.URLResource;
 
-import javax.annotation.Nonnull;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,7 +26,6 @@ public class ReflectUtils {
      * @param resPath    资源路径，会自动转换为根路径(/xxx)
      * @return 追踪到的资源列表
      */
-    @Nonnull
     public static List<Resource> traceResources(StackTraceElement[] stackTrace, String resPath) {
         resPath = Resource.pathToRoot(resPath);
         List<Resource> ress = new ArrayList<>();
