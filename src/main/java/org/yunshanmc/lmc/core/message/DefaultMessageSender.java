@@ -4,10 +4,15 @@
  */
 package org.yunshanmc.lmc.core.message;
 
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Proxy;
+import java.util.Arrays;
 
 /**
  * //TODO
@@ -61,6 +66,17 @@ public class DefaultMessageSender implements MessageSender {
     }
 
     @Override
+    public MessageSender message(ProxiedPlayer receiver, String type, String msgKey, Object... args) {
+        String[] msgs = this.messageManager.getMessage(msgKey).getMessages(receiver, args);
+        for (int i = 0; i < msgs.length; i++) {
+            // 将信息放入类型模板
+            String msg = this.messageManager.getMessage("message.type." + type).getMessage(receiver, msgs[i]);
+            receiver.sendMessage(TextComponent.fromLegacyText(msg));
+        }
+        return this;
+    }
+
+    @Override
     public MessageSender messageConsole(String type, String msgKey, Object... args) {
         this.message(CONSOLE_FAKE_PLAYER, type, msgKey, args);
         return this;
@@ -70,6 +86,11 @@ public class DefaultMessageSender implements MessageSender {
     public MessageSender info(Player receiver, String msgKey, Object... args) {
         this.message(receiver, "info", msgKey, args);
         return this;
+    }
+
+    @Override
+    public MessageSender info(ProxiedPlayer receiver, String msgKey, Object... args) {
+        return null;
     }
 
     @Override
@@ -85,6 +106,11 @@ public class DefaultMessageSender implements MessageSender {
     }
 
     @Override
+    public MessageSender warning(ProxiedPlayer receiver, String msgKey, Object... args) {
+        return null;
+    }
+
+    @Override
     public MessageSender warningConsole(String msgKey, Object... args) {
         this.messageConsole("warning", msgKey, args);
         return this;
@@ -97,6 +123,11 @@ public class DefaultMessageSender implements MessageSender {
     }
 
     @Override
+    public MessageSender error(ProxiedPlayer receiver, String msgKey, Object... args) {
+        return null;
+    }
+
+    @Override
     public MessageSender errorConsole(String msgKey, Object... args) {
         this.messageConsole("error", msgKey, args);
         return this;
@@ -106,6 +137,11 @@ public class DefaultMessageSender implements MessageSender {
     public MessageSender debug(int debugLevel, Player receiver, String msgKey, Object... args) {
         if (this.getDebugLevel() >= debugLevel) this.message(receiver, "debug", msgKey, args);
         return this;
+    }
+
+    @Override
+    public MessageSender debug(int debugLevel, ProxiedPlayer receiver, String msgKey, Object... args) {
+        return null;
     }
 
     @Override

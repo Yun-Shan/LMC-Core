@@ -4,6 +4,7 @@
  */
 package org.yunshanmc.lmc.core.message;
 
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
@@ -33,6 +34,18 @@ public class Message {
     }
 
     public String[] getMessages(Player player, Object... args) {
+        String[] msgs = this.msg.split("\n");
+        for (int i = 0; i < msgs.length; i++) {
+            msgs[i] = this.format.format(player, msgs[i], args);
+        }
+        return msgs;
+    }
+
+    public String getMessage(ProxiedPlayer player, Object... args) {
+        return this.format.format(player, this.msg, args);
+    }
+
+    public String[] getMessages(ProxiedPlayer player, Object... args) {
         String[] msgs = this.msg.split("\n");
         for (int i = 0; i < msgs.length; i++) {
             msgs[i] = this.format.format(player, msgs[i], args);

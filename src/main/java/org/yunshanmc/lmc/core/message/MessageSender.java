@@ -4,6 +4,7 @@
  */
 package org.yunshanmc.lmc.core.message;
 
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.bukkit.entity.Player;
 
 /**
@@ -15,7 +16,7 @@ public interface MessageSender {
      * 获取信息字符串
      *
      * @param msgKey 信息key
-     * @param args 信息文本中的参数列表
+     * @param args   信息文本中的参数列表
      * @return 格式化后的信息字符串
      */
     String getMessage(String msgKey, Object... args);
@@ -29,6 +30,16 @@ public interface MessageSender {
      * @param args     信息文本中的参数列表
      */
     MessageSender message(Player receiver, String type, String msgKey, Object... args);
+
+    /**
+     * 向玩家发送信息
+     *
+     * @param receiver 接收信息的玩家
+     * @param type     信息类型
+     * @param msgKey   信息key
+     * @param args     信息文本中的参数列表
+     */
+    MessageSender message(ProxiedPlayer receiver, String type, String msgKey, Object... args);
 
     /**
      * 向后台发送信息
@@ -49,6 +60,15 @@ public interface MessageSender {
     MessageSender info(Player receiver, String msgKey, Object... args);
 
     /**
+     * 向玩家发送普通信息
+     *
+     * @param receiver 接收信息的玩家
+     * @param msgKey   信息key
+     * @param args     信息文本中的参数列表
+     */
+    MessageSender info(ProxiedPlayer receiver, String msgKey, Object... args);
+
+    /**
      * 向后台发送普通信息
      *
      * @param msgKey 信息key
@@ -64,6 +84,15 @@ public interface MessageSender {
      * @param args     信息文本中的参数列表
      */
     MessageSender warning(Player receiver, String msgKey, Object... args);
+
+    /**
+     * 向玩家发送警告信息
+     *
+     * @param receiver 接收信息的玩家
+     * @param msgKey   信息key
+     * @param args     信息文本中的参数列表
+     */
+    MessageSender warning(ProxiedPlayer receiver, String msgKey, Object... args);
 
     /**
      * 向后台发送警告信息
@@ -83,6 +112,15 @@ public interface MessageSender {
     MessageSender error(Player receiver, String msgKey, Object... args);
 
     /**
+     * 向玩家发送错误信息
+     *
+     * @param receiver 接收信息的玩家
+     * @param msgKey   信息key
+     * @param args     信息文本中的参数列表
+     */
+    MessageSender error(ProxiedPlayer receiver, String msgKey, Object... args);
+
+    /**
      * 向后台发送错误信息
      *
      * @param msgKey 信息key
@@ -100,6 +138,17 @@ public interface MessageSender {
      * @return 自身实例
      */
     MessageSender debug(int debugLevel, Player receiver, String msgKey, Object... args);
+
+    /**
+     * 向玩家发送调试信息
+     *
+     * @param debugLevel 调试等级，仅当传入的调试等级小于等于设置的调试等级时才会发生调试信息
+     * @param receiver   接收信息的玩家
+     * @param msgKey     信息key
+     * @param args       信息文本中的参数列表
+     * @return 自身实例
+     */
+    MessageSender debug(int debugLevel, ProxiedPlayer receiver, String msgKey, Object... args);
 
     /**
      * 向后台发送调试信息
