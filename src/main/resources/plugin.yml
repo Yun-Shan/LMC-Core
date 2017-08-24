@@ -1,0 +1,4 @@
+name: LMC-Core
+main: org.yunshanmc.lmc.core.LMCCoreBukkitPlugin
+version: 1.0.0-beat
+author: YunShan

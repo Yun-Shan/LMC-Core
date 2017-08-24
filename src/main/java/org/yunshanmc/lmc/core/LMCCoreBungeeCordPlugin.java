@@ -4,11 +4,9 @@
  */
 package org.yunshanmc.lmc.core;
 
-import org.bukkit.plugin.java.JavaPlugin;
-
 /**
  * //TODO
  */
-public class LMCCorePlugin extends JavaPlugin {
-    
+public class LMCCoreBungeeCordPlugin extends LMCBungeeCordPlugin {
+
 }
