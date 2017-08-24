@@ -56,8 +56,8 @@ public abstract class LMCPlugin extends JavaPlugin {
             ExceptionHandler.handle(e);
             return false;
         }
-        this.configManager = new DefaultConfigManager(this.resourceManager);
-        this.messageManager = new DefaultMessageManager(this.configManager);
+        if (this.configManager != null)this.configManager = new DefaultConfigManager(this.resourceManager);
+        if (this.messageManager != null)this.messageManager = new DefaultMessageManager(this.configManager);
 
         /* 为避免插件信息相关功能初始化失败导致报错信息异常，
          * 在资源管理器和信息管理器都初始化完毕之后才设置异常处理器，
