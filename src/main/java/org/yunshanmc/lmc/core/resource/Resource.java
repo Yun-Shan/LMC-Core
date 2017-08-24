@@ -6,7 +6,6 @@ package org.yunshanmc.lmc.core.resource;
 
 import com.google.common.base.Strings;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -23,7 +22,6 @@ public interface Resource {
      *
      * @return 资源的URL
      */
-    @Nullable
     URL getURL();
     
     /**

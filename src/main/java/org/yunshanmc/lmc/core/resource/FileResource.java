@@ -6,15 +6,12 @@ package org.yunshanmc.lmc.core.resource;
 
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
 
 /**
  * 文件资源
@@ -27,7 +24,6 @@ public class FileResource implements Resource {
         this.file = file;
     }
     
-    @Nullable
     @Override
     public URL getURL() {
         try {

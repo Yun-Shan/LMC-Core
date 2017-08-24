@@ -4,7 +4,6 @@
  */
 package org.yunshanmc.lmc.core.resource;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -20,7 +19,6 @@ public class InputStreamResource implements Resource {
         this.stream = stream;
     }
     
-    @Nullable
     @Override
     public URL getURL() {
         return null;
