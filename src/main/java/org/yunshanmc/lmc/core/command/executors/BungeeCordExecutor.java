@@ -30,12 +30,11 @@ public class BungeeCordExecutor extends CommandExecutor {
     }
 
     public void execute(CommandSender sender, String[] args) {
-        String cmdName = args.length > 0 ? args[0] : "";
-        LMCCommand cmd = this.commands.get(cmdName);
+        LMCCommand cmd = super.resolveCommand(args);
 
         if (cmd != null) {
             if (!cmd.isValid()) {
-                this.messageSender.info(sender, "command.invalid", this.handleCommand, cmdName);
+                this.messageSender.info(sender, "command.invalid", this.handleCommand, cmd.getName());
                 return;
             }
             if (args.length >= 2) {
@@ -45,7 +44,7 @@ public class BungeeCordExecutor extends CommandExecutor {
             }
             cmd.execute(sender, args);
         } else {
-            this.messageSender.info(sender, "command.notFound", this.handleCommand, cmdName);
+            this.messageSender.info(sender, "command.notFound", this.handleCommand, args.length > 0 ? args[0] : "");
         }
     }
 

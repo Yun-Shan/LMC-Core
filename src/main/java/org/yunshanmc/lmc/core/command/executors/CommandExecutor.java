@@ -23,6 +23,14 @@ public abstract class CommandExecutor {
         this.handleCommand = commandManager.getHandleCommand();
     }
 
+    protected LMCCommand resolveCommand(String[] args) {
+        LMCCommand cmd = null;
+        if (args.length > 0) cmd = this.commands.get(args[0]);
+        // 无参数或第一个参数无法匹配到命令时尝试空命令名
+        if (cmd == null) this.commands.get("");
+        return cmd;
+    }
+
     public void registerCommand(LMCCommand command) {
         this.commands.put(command.getName(), command);
     }

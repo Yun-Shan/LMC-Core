@@ -25,12 +25,11 @@ public class BukkitExecutor extends org.yunshanmc.lmc.core.command.executors.Com
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        String cmdName = args.length > 0 ? args[0] : "";
-        LMCCommand cmd = this.commands.get(cmdName);
+        LMCCommand cmd = super.resolveCommand(args);
 
         if (cmd != null) {
             if (!cmd.isValid()) {
-                this.messageSender.info(sender, "command.invalid", this.handleCommand, cmdName);
+                this.messageSender.info(sender, "command.invalid", this.handleCommand, cmd.getName());
                 return true;
             }
             if (args.length >= 2) {
@@ -40,7 +39,7 @@ public class BukkitExecutor extends org.yunshanmc.lmc.core.command.executors.Com
             }
             cmd.execute(sender, args);
         } else {
-            this.messageSender.info(sender, "command.notFound", this.handleCommand, cmdName);
+            this.messageSender.info(sender, "command.notFound", this.handleCommand, args.length > 0 ? args[0] : "");
         }
         return true;
     }
