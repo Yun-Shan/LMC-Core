@@ -1,17 +1,17 @@
 package org.yunshanmc.lmc.core.command;
 
-public class ArgConverterFailException extends RuntimeException {
+public class ParamConverterFailException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
     private final String   arg;
     private final Class<?> convertTo;
 
-    public ArgConverterFailException(String arg, Class<?> convertTo) {
+    public ParamConverterFailException(String arg, Class<?> convertTo) {
         this(arg, convertTo, null);
     }
 
-    public ArgConverterFailException(String arg, Class<?> convertTo, Throwable cause) {
+    public ParamConverterFailException(String arg, Class<?> convertTo, Throwable cause) {
         super(cause);
         this.arg = arg;
         this.convertTo = convertTo;

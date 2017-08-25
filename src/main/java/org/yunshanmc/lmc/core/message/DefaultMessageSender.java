@@ -12,6 +12,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.yunshanmc.lmc.core.utils.PlatformUtils;
 
 import java.lang.reflect.Proxy;
 
@@ -20,59 +21,73 @@ import java.lang.reflect.Proxy;
  */
 public class DefaultMessageSender implements MessageSender {
 
-    public static final Player FAKE_PLAYER_BUKKIT = (Player) Proxy.newProxyInstance(
-            DefaultMessageFormat.class.getClassLoader(),
-            new Class<?>[]{Player.class},
-            (proxy, method, args) -> {
-                switch (method.getName()) {
-                    case "sendMessage":
-                        if (args[0] instanceof String) Bukkit.getConsoleSender().sendMessage(
-                                (String) args[0]);
-                        else if (args[0] instanceof String[]) Bukkit.getConsoleSender().sendMessage(
-                                (String[]) args[0]);
-                        return null;
-                    case "getName":
-                    case "getDisplayName":
-                    case "getCustomName":
-                    case "getPlayerListName":
-                        return "[$Console$]";
-                    default:
-                        throw new UnsupportedOperationException();
-                }
-            });
-
-    public static final ProxiedPlayer FAKE_PLAYER_BUNGEE = (ProxiedPlayer) Proxy.newProxyInstance(
-            DefaultMessageFormat.class.getClassLoader(),
-            new Class<?>[]{Player.class},
-            (proxy, method, args) -> {
-                switch (method.getName()) {
-                    case "sendMessage":
-                        if (args[0] instanceof String) {
-                            ProxyServer.getInstance().getConsole().sendMessage((String) args[0]);
-                        } else if (args[0] instanceof String[]) {
-                            for (String msg : (String[])args[0]) {
-                                ProxyServer.getInstance().getConsole().sendMessage(msg);
-                            }
-                        } else if (args[0] instanceof BaseComponent) {
-                            ProxyServer.getInstance().getConsole().sendMessage((BaseComponent) args[0]);
-                        } else if (args[0] instanceof BaseComponent[]) {
-                            ProxyServer.getInstance().getConsole().sendMessage((BaseComponent[]) args[0]);
-                        } else if (args[0] instanceof ChatMessageType) {
-                            if (args[0] != ChatMessageType.CHAT) return null;
-                            if (args[1] instanceof BaseComponent) {
-                                ProxyServer.getInstance().getConsole().sendMessage((BaseComponent) args[1]);
-                            } else if (args[1] instanceof BaseComponent[]) {
-                                ProxyServer.getInstance().getConsole().sendMessage((BaseComponent[]) args[1]);
-                            }
+    public static final Player FAKE_PLAYER_BUKKIT;
+    static {
+        if (PlatformUtils.isBukkit()) {
+            FAKE_PLAYER_BUKKIT = (Player) Proxy.newProxyInstance(
+                    DefaultMessageFormat.class.getClassLoader(),
+                    new Class<?>[]{Player.class},
+                    (proxy, method, args) -> {
+                        switch (method.getName()) {
+                            case "sendMessage":
+                                if (args[0] instanceof String) Bukkit.getConsoleSender().sendMessage(
+                                        (String) args[0]);
+                                else if (args[0] instanceof String[]) Bukkit.getConsoleSender().sendMessage(
+                                        (String[]) args[0]);
+                                return null;
+                            case "getName":
+                            case "getDisplayName":
+                            case "getCustomName":
+                            case "getPlayerListName":
+                                return "[$Console$]";
+                            default:
+                                throw new UnsupportedOperationException();
                         }
-                        return null;
-                    case "getName":
-                    case "getDisplayName":
-                        return "[$Console$]";
-                    default:
-                        throw new UnsupportedOperationException();
-                }
-            });
+                    });
+        } else {
+            FAKE_PLAYER_BUKKIT = null;
+        }
+    }
+
+    public static final ProxiedPlayer FAKE_PLAYER_BUNGEE;
+    static {
+        if (PlatformUtils.isBungeeCord()) {
+            FAKE_PLAYER_BUNGEE = (ProxiedPlayer) Proxy.newProxyInstance(
+                    DefaultMessageFormat.class.getClassLoader(),
+                    new Class<?>[]{ProxiedPlayer.class},
+                    (proxy, method, args) -> {
+                        switch (method.getName()) {
+                            case "sendMessage":
+                                if (args[0] instanceof String) {
+                                    ProxyServer.getInstance().getConsole().sendMessage((String) args[0]);
+                                } else if (args[0] instanceof String[]) {
+                                    for (String msg : (String[]) args[0]) {
+                                        ProxyServer.getInstance().getConsole().sendMessage(msg);
+                                    }
+                                } else if (args[0] instanceof BaseComponent) {
+                                    ProxyServer.getInstance().getConsole().sendMessage((BaseComponent) args[0]);
+                                } else if (args[0] instanceof BaseComponent[]) {
+                                    ProxyServer.getInstance().getConsole().sendMessage((BaseComponent[]) args[0]);
+                                } else if (args[0] instanceof ChatMessageType) {
+                                    if (args[0] != ChatMessageType.CHAT) return null;
+                                    if (args[1] instanceof BaseComponent) {
+                                        ProxyServer.getInstance().getConsole().sendMessage((BaseComponent) args[1]);
+                                    } else if (args[1] instanceof BaseComponent[]) {
+                                        ProxyServer.getInstance().getConsole().sendMessage((BaseComponent[]) args[1]);
+                                    }
+                                }
+                                return null;
+                            case "getName":
+                            case "getDisplayName":
+                                return "[$Console$]";
+                            default:
+                                throw new UnsupportedOperationException();
+                        }
+                    });
+        } else {
+            FAKE_PLAYER_BUNGEE = null;
+        }
+    }
 
     private final MessageManager messageManager;
 

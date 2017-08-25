@@ -1,6 +1,5 @@
 package org.yunshanmc.lmc.core.command;
 
-import net.md_5.bungee.api.plugin.Command;
 import org.bukkit.command.CommandSender;
 import org.yunshanmc.lmc.core.LMCBukkitPlugin;
 import org.yunshanmc.lmc.core.LMCBungeeCordPlugin;
@@ -10,6 +9,7 @@ import org.yunshanmc.lmc.core.command.executors.BungeeCordExecutor;
 import org.yunshanmc.lmc.core.command.executors.CommandExecutor;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.message.MessageSender;
+import org.yunshanmc.lmc.core.utils.PlatformUtils;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -86,7 +86,16 @@ public class DefaultCommandManager implements CommandManager {
                                                           this.handleCommand,
                                                           cmdInfo.name());
                         return;
-                    } else if (!CommandSender.class.isAssignableFrom(param.getType())) {
+                    }
+
+                    boolean allow = false;
+                    if (PlatformUtils.isBukkit()) {
+                        allow = CommandSender.class.isAssignableFrom(param.getType());
+                    }
+                    if (!allow && PlatformUtils.isBungeeCord()) {
+                        allow = net.md_5.bungee.api.CommandSender.class.isAssignableFrom(param.getType());
+                    }
+                    if (!allow) {
                         // Sender参数类型必须是CommandSender/子接口/实现类
                         this.messageSender.warningConsole(msgPath + "fail.unsupportedSender",
                                                           this.handleCommand,
@@ -178,8 +187,7 @@ public class DefaultCommandManager implements CommandManager {
 
 
             this.registerCommand(new SimpleCommandImpl(cmdInfo, this.messageSender, handle,
-                                                       needSender ? parameters[senderIdx].getType().asSubclass(
-                                                               CommandSender.class) : null,
+                                                       needSender ? parameters[senderIdx].getType() : null,
                                                        minArgCount, maxArgCount));
         });
     }
@@ -192,13 +200,13 @@ public class DefaultCommandManager implements CommandManager {
     static class SimpleCommandImpl extends LMCCommand {
 
         final MethodHandle handle;
-        private final Class<? extends CommandSender> senderType;
+        private final Class<?> senderType;
         private final int minArgCount;
         private final int maxArgCount;
 
         private MessageSender messageSender;
 
-        private SimpleCommandImpl(SimpleCommand cmdInfo, MessageSender messageSender, MethodHandle handle, Class<? extends CommandSender> senderType, int minArgCount, int maxArgCount) {
+        private SimpleCommandImpl(SimpleCommand cmdInfo, MessageSender messageSender, MethodHandle handle, Class<?> senderType, int minArgCount, int maxArgCount) {
             super(cmdInfo.name(), cmdInfo.description(), cmdInfo.aliases(), cmdInfo.permissions());
 
             this.messageSender = messageSender;
@@ -211,7 +219,7 @@ public class DefaultCommandManager implements CommandManager {
 
         @Override
         public void execute(CommandSender sender, String... args) {// TODO 提示
-            this.execute((Object)sender, args);
+            this.execute((Object) sender, args);
         }
 
         @Override
@@ -221,7 +229,7 @@ public class DefaultCommandManager implements CommandManager {
 
         @Override
         public void execute(net.md_5.bungee.api.CommandSender sender, String... args) {
-            this.execute((Object)sender, args);
+            this.execute((Object) sender, args);
         }
 
         private void execute(Object sender, String... args) {// TODO 提示
@@ -242,7 +250,7 @@ public class DefaultCommandManager implements CommandManager {
             }
             try {
                 this.handle.invoke(sender, args);
-            } catch (ArgConverterFailException e) {
+            } catch (ParamConverterFailException e) {
                 //this.onArgConvertFail(sender, e.getArg(), e.getConvertTo(), args);
                 System.out.println("convert");
             } catch (WrongMethodTypeException | ClassCastException e) {

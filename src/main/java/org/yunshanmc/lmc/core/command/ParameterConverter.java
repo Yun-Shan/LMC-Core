@@ -1,5 +1,12 @@
 package org.yunshanmc.lmc.core.command;
 
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
+import org.yunshanmc.lmc.core.utils.PlatformUtils;
+
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
@@ -43,12 +50,12 @@ public abstract class ParameterConverter<T> {
         if (str == null) return this.getDefaultValue();
         try {
             T res = this.convertArg(str);
-            if (res == null) throw new ArgConverterFailException(str, this.convertTo);
+            if (res == null) throw new ParamConverterFailException(str, this.convertTo);
             return res;
-        } catch (ArgConverterFailException e) {
+        } catch (ParamConverterFailException e) {
             throw e;
         } catch (Throwable t) {
-            throw new ArgConverterFailException(str, this.convertTo, t);
+            throw new ParamConverterFailException(str, this.convertTo, t);
         }
     }
 
@@ -87,5 +94,78 @@ public abstract class ParameterConverter<T> {
                 return -1;
             }
         });
+        register(new ParameterConverter<Double>(double.class) {
+            @Override
+            public Double convertArg(String arg) {
+                return Double.valueOf(arg);
+            }
+
+            @Override
+            public Double getDefaultValue() {
+                return Double.NaN;
+            }
+        });
+        register(new ParameterConverter<Boolean>(boolean.class) {
+            @Override
+            public Boolean convertArg(String arg) {
+                arg = arg.toLowerCase();
+                switch (arg) {
+                    case "true":
+                    case "t":
+                    case "1": return true;
+
+                    case "false":
+                    case "f":
+                    case "0": return false;
+
+                    default:
+                        return null;
+                }
+            }
+
+            @Override
+            public Boolean getDefaultValue() {
+                return false;
+            }
+        });
+
+        if (PlatformUtils.isBukkit()) {
+            register(new ParameterConverter<Player>(Player.class) {
+                @Override
+                public Player convertArg(String arg) {
+                    return Bukkit.getPlayerExact(arg);
+                }
+
+                @Override
+                public Player getDefaultValue() {
+                    return null;
+                }
+            });
+            register(new ParameterConverter<OfflinePlayer>(OfflinePlayer.class) {
+                @Override
+                public OfflinePlayer convertArg(String arg) {
+                    OfflinePlayer p = Bukkit.getOfflinePlayer(arg);
+                    return p.hasPlayedBefore() ? p : null;
+                }
+
+                @Override
+                public OfflinePlayer getDefaultValue() {
+                    return null;
+                }
+            });
+        }
+        if (PlatformUtils.isBungeeCord()) {
+            register(new ParameterConverter<ProxiedPlayer>(ProxiedPlayer.class) {
+                @Override
+                public ProxiedPlayer convertArg(String arg) {
+                    return ProxyServer.getInstance().getPlayer(arg);
+                }
+
+                @Override
+                public ProxiedPlayer getDefaultValue() {
+                    return null;
+                }
+            });
+        }
     }
 }
