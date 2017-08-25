@@ -49,14 +49,14 @@ public abstract class LMCBukkitPlugin extends JavaPlugin implements LMCPlugin {
             ExceptionHandler.handle(e);
             return false;
         }
-        if (this.configManager != null)this.configManager = new DefaultConfigManager(this.resourceManager);
-        if (this.messageManager != null)this.messageManager = new DefaultMessageManager(this.configManager);
+        if (this.configManager == null) this.configManager = new DefaultConfigManager(this.resourceManager);
+        if (this.messageManager == null) this.messageManager = new DefaultMessageManager(this.configManager);
 
         /* 为避免插件信息相关功能初始化失败导致报错信息异常，
          * 在资源管理器和信息管理器都初始化完毕之后才设置异常处理器，
          * 若资源管理器和信息管理器初始化出现异常，将由默认异常处理器处理
          */
-        if (this.exceptionHandler != null) this.exceptionHandler = ExceptionHandler.DEFAULT_HANDLER;
+        if (this.exceptionHandler == null) this.exceptionHandler = ExceptionHandler.DEFAULT_HANDLER;
         ExceptionHandler.setHandler(this, this.exceptionHandler);
         return true;
     }
