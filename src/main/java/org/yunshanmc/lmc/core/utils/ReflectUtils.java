@@ -15,8 +15,10 @@ import java.util.List;
 /**
  * 反射相关工具
  */
-public class ReflectUtils {
-    
+public final class ReflectUtils {
+
+    private ReflectUtils(){}
+
     /**
      * 根据调用栈追踪指定资源
      * <p>
