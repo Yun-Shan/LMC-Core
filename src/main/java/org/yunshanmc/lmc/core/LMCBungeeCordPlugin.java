@@ -14,7 +14,7 @@ import org.yunshanmc.lmc.core.resource.StandardResourceManager;
 import java.io.IOException;
 import java.util.function.Consumer;
 
-// XXX: 由于没法必须要继承各个端的插件抽象类，然而没法多继承，暂时找不到好方法，目前所有LMC的实现都会和LMCBukkitPlugin的代码几乎一致
+// XXX: 由于必须要继承各个端的插件抽象类，然而没法多继承，暂时找不到好方法，目前所有LMC的实现都会和LMCBukkitPlugin的代码几乎一致
 public abstract class LMCBungeeCordPlugin extends Plugin implements LMCPlugin {
 
     protected boolean useI18n;
