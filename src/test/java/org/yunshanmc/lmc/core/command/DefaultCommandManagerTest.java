@@ -84,8 +84,8 @@ public class DefaultCommandManagerTest {
             }
 
             @SimpleCommand(name = "test6")
-            public void test6(String str1, @SimpleCommand.OptionalStart String str2, @SimpleCommand.Sender Player player) {
-                assertEquals("owo", str1);
+            public void test6(int int1, @SimpleCommand.OptionalStart String str2, @SimpleCommand.Sender Player player) {
+                assertEquals(666, int1);
                 assertEquals("hhh", str2);
                 assertEquals(6, counter.get());
                 counter.incrementAndGet();
@@ -99,7 +99,7 @@ public class DefaultCommandManagerTest {
         commands.get("test3").execute(fakePlayer);
         commands.get("test4").execute(fakePlayer, "owo");
         commands.get("test5").execute(fakePlayer, "owo", "hhh");
-        commands.get("test6").execute(fakePlayer, "owo", "hhh");
+        commands.get("test6").execute(fakePlayer, "666", "hhh");
         assertEquals(7, counter.get());
     }
 

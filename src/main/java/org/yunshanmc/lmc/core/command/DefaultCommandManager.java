@@ -144,7 +144,9 @@ public class DefaultCommandManager implements CommandManager {
             if (senderIdx > 0) {// Sender参数位置不在第一个的将其移到第一个
                 Class<?>[] args = m.getParameterTypes();
                 Class<?> senderType = args[senderIdx];
-                args[senderIdx] = args[0];
+                for (int i = args.length; i > 0; i--) {
+                    if (i <= senderIdx) args[i] = args[i - 1];
+                }
                 args[0] = senderType;
 
                 int[] idxs = new int[args.length];
