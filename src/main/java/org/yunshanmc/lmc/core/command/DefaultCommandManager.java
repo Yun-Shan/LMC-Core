@@ -125,7 +125,7 @@ public class DefaultCommandManager implements CommandManager {
                 if (needSender && i == senderIdx) continue;
                 ParameterConverter<?> converter = ParameterConverter.getConverter(parameters[i].getType());
                 if (converter == null) {
-                    // Sender参数类型必须是CommandSender/子接口/实现类
+                    // 未注册相应类型的参数转换器
                     this.messageSender.warningConsole(msgPath + "fail.cantFoundParamConverter",
                                                       this.handleCommand,
                                                       cmdInfo.name(),
