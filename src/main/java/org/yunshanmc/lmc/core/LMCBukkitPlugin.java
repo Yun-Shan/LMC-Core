@@ -8,6 +8,7 @@ import org.yunshanmc.lmc.core.locale.I18nResourceManager;
 import org.yunshanmc.lmc.core.locale.LocaleManager;
 import org.yunshanmc.lmc.core.message.DefaultMessageManager;
 import org.yunshanmc.lmc.core.message.MessageManager;
+import org.yunshanmc.lmc.core.message.MessageSender;
 import org.yunshanmc.lmc.core.resource.ResourceManager;
 import org.yunshanmc.lmc.core.resource.StandardResourceManager;
 
@@ -23,6 +24,8 @@ public abstract class LMCBukkitPlugin extends JavaPlugin implements LMCPlugin {
     protected ConfigManager configManager;
     protected MessageManager messageManager;
     protected Consumer<ExceptionHandler.ExceptionInfo> exceptionHandler;
+
+    protected MessageSender messageSender;
 
     @Override
     public final void onLoad() {
@@ -51,6 +54,8 @@ public abstract class LMCBukkitPlugin extends JavaPlugin implements LMCPlugin {
         }
         if (this.configManager == null) this.configManager = new DefaultConfigManager(this.resourceManager);
         if (this.messageManager == null) this.messageManager = new DefaultMessageManager(this.configManager);
+
+        this.messageSender = this.messageManager.getMessageSender();
 
         /* 为避免插件信息相关功能初始化失败导致报错信息异常，
          * 在资源管理器和信息管理器都初始化完毕之后才设置异常处理器，
