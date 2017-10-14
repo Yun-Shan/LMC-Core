@@ -15,29 +15,27 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
+import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
 /**
  * 标准资源管理器
+ * // TODO 提取重复代码
  */
 public class StandardResourceManager implements ResourceManager {
 
     private final File jarFile;
     private JarFile jar;
+    private Path jarRoot;
+
     private final Path pluginFolder;
 
     private Path jarRootPath = Paths.get("");
@@ -56,18 +54,26 @@ public class StandardResourceManager implements ResourceManager {
 
     private StandardResourceManager(File jarFile, Path pluginFolder) throws IOException {
         this.jarFile = jarFile;
-        this.jar = new JarFile(jarFile);
         this.pluginFolder = pluginFolder;
+
+        this.updateJar();
     }
 
     @Override
     public void updateJar() throws IOException {
         this.jar = new JarFile(this.jarFile);
+        FileSystem fs = FileSystems.newFileSystem(Paths.get(this.jarFile.toURI()), null);
+        this.jarRoot = fs.getPath("");
     }
 
     @Override
     public Resource getSelfResource(String path) {
         return this.getSelfResource(this.jarRootPath.resolve(this.checkResourcePath(path)));
+    }
+
+    @Override
+    public Map<String, Resource> getSelfResources(String path, Predicate<String> nameFilter, boolean deep) {
+        return this.getSelfResources(this.checkResourcePath(path), nameFilter, deep);
     }
 
     @Override
@@ -89,6 +95,24 @@ public class StandardResourceManager implements ResourceManager {
             ExceptionHandler.handle(e);
             return null;
         }
+    }
+
+    protected Map<String, Resource> getSelfResources(Path dirPath, Predicate<String> nameFilter, boolean deep) {
+        dirPath = this.jarRoot.resolve(dirPath);
+        if (!Files.isDirectory(dirPath, LinkOption.NOFOLLOW_LINKS)) return null;
+        try {
+            Map<String, Resource> allRes = Maps.newLinkedHashMap();
+            ResourceFileVisitor visitor = deep ? new DeepFileVisitor(nameFilter) : new NotDeepFileVisitor(nameFilter);
+            Files.walkFileTree(dirPath, visitor);
+            List<Path> resPaths = visitor.getResourcePaths();
+            for (Path resPath : resPaths) {
+                allRes.put(this.jarRoot.relativize(resPath).toString(), new FileResource(resPath.toFile()));
+            }
+            if (!allRes.isEmpty()) return allRes;
+        } catch (IOException e) {
+            ExceptionHandler.handle(e);
+        }
+        return null;
     }
 
     protected Resource getFileResource(Path resPath) {

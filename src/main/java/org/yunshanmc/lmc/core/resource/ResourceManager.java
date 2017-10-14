@@ -32,7 +32,19 @@ public interface ResourceManager {
      * @return 表示资源的对象，当资源不存在或获取失败时返回null
      */
     Resource getSelfResource(String path);
-    
+
+    /**
+     * 获取自身Jar文件夹的资源
+     * <p>
+     * 此方法会获取某个文件夹中所有符合条件的资源
+     *
+     * @param path       文件夹路径
+     * @param nameFilter 文件名过滤器，传null视为获取所有文件资源
+     * @param deep       是否深度遍历，为true时会遍历子文件夹的文件
+     * @return 文件相对路径以及表示其资源的对象组成的Map，当文件夹不存在或没有符合条件的资源时返回null
+     */
+    Map<String, Resource> getSelfResources(String path, Predicate<String> nameFilter, boolean deep);
+
     /**
      * 获取插件文件夹中的文件资源
      *
@@ -49,7 +61,7 @@ public interface ResourceManager {
      * @param path       文件夹路径
      * @param nameFilter 文件名过滤器，传null视为获取所有文件资源
      * @param deep       是否深度遍历，为true时会遍历子文件夹的文件
-     * @return 文件名以及表示其资源的对象组成的Map，当文件夹不存在或没有符合条件的资源时返回null
+     * @return 文件相对路径以及表示其资源的对象组成的Map，当文件夹不存在或没有符合条件的资源时返回null
      */
     Map<String, Resource> getFolderResources(String path, Predicate<String> nameFilter, boolean deep);
     
