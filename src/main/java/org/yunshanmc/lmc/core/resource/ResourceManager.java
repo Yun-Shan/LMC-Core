@@ -59,9 +59,21 @@ public interface ResourceManager {
      * <b>注意：若参数<code>force</code>设为false，则当资源已存在时会直接返回true，而不会尝试写入</b>
      *
      * @param path       资源路径
-     * @param resToWrite 要写入的资源的输入流
+     * @param resource 要写入的资源
      * @param force      当资源已存在时是否要覆盖
      * @return 成功写入返回true，否则返回false
      */
-    boolean writeResource(String path, InputStream resToWrite, boolean force);
+    boolean writeResource(String path, Resource resource, boolean force);
+
+    /**
+     * 向插件文件夹写入默认资源
+     * <p>
+     * <b>注意：若参数<code>force</code>设为false，则当资源已存在时会直接返回true，而不会尝试写入</b>
+     *
+     * @param selfPath 资源在插件Jar中的路径
+     * @param dirPath 资源要写入到插件文件夹的相对路径
+     * @param force 当插件文件夹有同名文件存在时是否覆盖
+     * @return 保存成功 或 已有同名文件且不强制覆盖 时返回true，否则返回false
+     */
+    boolean saveDefaultResource(String selfPath, String dirPath, boolean force);
 }
