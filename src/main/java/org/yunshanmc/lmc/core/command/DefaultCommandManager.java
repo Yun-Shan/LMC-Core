@@ -208,6 +208,7 @@ public class DefaultCommandManager implements CommandManager {
 
         private MessageSender messageSender;
 
+        // TODO cmdInfo 信息读取 命令执行时进行相应处理
         private SimpleCommandImpl(SimpleCommand cmdInfo, MessageSender messageSender, MethodHandle handle, Class<?> senderType, int minArgCount, int maxArgCount) {
             super(cmdInfo.name(), cmdInfo.description(), cmdInfo.aliases(), cmdInfo.permissions());
 

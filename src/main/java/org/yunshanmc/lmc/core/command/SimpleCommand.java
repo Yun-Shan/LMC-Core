@@ -11,7 +11,7 @@ public @interface SimpleCommand {
 
     String[] permissions() default {};
 
-    String description() default " ";
+    String description() default "";
 
     String[] aliases() default {};
 
