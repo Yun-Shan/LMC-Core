@@ -19,15 +19,6 @@ public class JdbcDatabase extends Database {
 
     @Override
     protected boolean connect(String jdbcUrl) throws SQLException {
-        try {
-            Class.forName(this.dbType.getDriverClass());
-        } catch (ClassNotFoundException e) {
-            ExceptionHandler.handle(e);
-            messageSender.errorConsole("database.loadDriverClassFail",
-                                       this.dbType.getName(),
-                                       this.dbType.getDriverClass());
-            return false;
-        }
         this.connection = DriverManager.getConnection(jdbcUrl);
         return true;
     }

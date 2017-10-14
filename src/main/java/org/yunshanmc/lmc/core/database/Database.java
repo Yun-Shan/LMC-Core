@@ -17,7 +17,7 @@ public abstract class Database {
     private volatile boolean closed = false;
     protected DatabaseType dbType;
 
-    public Database(FileConfiguration pluginConfig, MessageSender messageSender){
+    public Database(FileConfiguration pluginConfig, MessageSender messageSender) {
         this.dbConfig = pluginConfig.getConfigurationSection("database");
         this.messageSender = messageSender;
     }
@@ -37,6 +37,13 @@ public abstract class Database {
         // 构建JDBC URL
         String dbUrl = this.dbType.constructJdbcUrl(dbCfg);
         if (dbUrl == null) return false;
+
+        try {
+            Class.forName(this.dbType.getDriverClass());
+        } catch (ClassNotFoundException e) {
+            ExceptionHandler.handle(e);
+            return fail("database.loadDriverClassFail", this.dbType.getName(), this.dbType.getDriverClass());
+        }
 
         messageSender.debugConsole(2, "database.tryConnect", dbType, dbUrl);
         try {
