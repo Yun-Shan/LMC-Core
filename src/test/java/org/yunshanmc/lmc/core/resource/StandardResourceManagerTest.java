@@ -85,6 +85,14 @@ public class StandardResourceManagerTest {
     @Test
     public void getFolderResources() throws Exception {
     }
+
+    @Test
+    public void writeResource() throws Exception {
+        Resource res = resourceManager.getSelfResource("a");
+        assertNotNull(res);
+        assertTrue(resourceManager.writeResource("a", res, true));
+        assertTrue(new File(testDir, "a").exists());
+    }
     
     
     @Test

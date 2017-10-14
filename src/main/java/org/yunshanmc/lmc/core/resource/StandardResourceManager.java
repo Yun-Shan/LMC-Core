@@ -150,7 +150,11 @@ public class StandardResourceManager implements ResourceManager {
         }
         try {
             File f = resPath.toFile();
-            if (f.exists() || (f.getParentFile().mkdirs() && f.createNewFile())) {
+            if (f.exists() // 文件存在
+                || (// 文件不存在时尝试创建文件
+                        (f.getParentFile().exists() || f.getParentFile().mkdirs())
+                        && f.createNewFile()
+                )) {
                 InputStream stream = resource.getInputStream();
                 if (stream == null) return false;
                 Files.copy(stream, resPath, StandardCopyOption.REPLACE_EXISTING);
