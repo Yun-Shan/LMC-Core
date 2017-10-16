@@ -3,7 +3,6 @@ package org.bukkit.configuration.file;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Reader;
 import java.util.Map;
 import java.util.logging.Level;
@@ -181,43 +180,11 @@ public class YamlConfiguration extends FileConfiguration {
         } catch (IOException ex) {
             Bukkit.getLogger().log(Level.SEVERE, "Cannot load " + file, ex);
         } catch (InvalidConfigurationException ex) {
-            Bukkit.getLogger().log(Level.SEVERE, "Cannot load " + file , ex);
+            Bukkit.getLogger().log(Level.SEVERE, "Cannot load " + file, ex);
         }
 
         return config;
     }
-
-    /**
-     * Creates a new {@link YamlConfiguration}, loading from the given stream.
-     * <p>
-     * Any errors loading the Configuration will be logged and then ignored.
-     * If the specified input is not a valid config, a blank config will be
-     * returned.
-     *
-     * @param stream Input stream
-     * @return Resulting configuration
-     * @throws IllegalArgumentException Thrown if stream is null
-     * @deprecated does not properly consider encoding
-     * @see #load(InputStream)
-     * @see #loadConfiguration(Reader)
-     */
-    @Deprecated
-    public static YamlConfiguration loadConfiguration(InputStream stream) {
-        Validate.notNull(stream, "Stream cannot be null");
-
-        YamlConfiguration config = new YamlConfiguration();
-
-        try {
-            config.load(stream);
-        } catch (IOException ex) {
-            Bukkit.getLogger().log(Level.SEVERE, "Cannot load configuration from stream", ex);
-        } catch (InvalidConfigurationException ex) {
-            Bukkit.getLogger().log(Level.SEVERE, "Cannot load configuration from stream", ex);
-        }
-
-        return config;
-    }
-
 
     /**
      * Creates a new {@link YamlConfiguration}, loading from the given reader.
