@@ -14,6 +14,7 @@ import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -34,11 +35,10 @@ public class StandardResourceManager implements ResourceManager {
 
     private final File jarFile;
     private JarFile jar;
+    private FileSystem jarFileSystem;
     private Path jarRoot;
 
     private final Path pluginFolder;
-
-    private Path jarRootPath = Paths.get("");
 
     /**
      * 通过Bukkit插件实例构造一个标准资源管理器
@@ -55,35 +55,38 @@ public class StandardResourceManager implements ResourceManager {
     private StandardResourceManager(File jarFile, Path pluginFolder) throws IOException {
         this.jarFile = jarFile;
         this.pluginFolder = pluginFolder;
-
         this.updateJar();
     }
 
     @Override
     public void updateJar() throws IOException {
         this.jar = new JarFile(this.jarFile);
-        FileSystem fs = FileSystems.newFileSystem(Paths.get(this.jarFile.toURI()), null);
-        this.jarRoot = fs.getPath("");
+        this.jarFileSystem = FileSystems.newFileSystem(Paths.get(this.jarFile.toURI()), null);
+        this.jarRoot = this.jarFileSystem.getPath("");
     }
 
     @Override
     public Resource getSelfResource(String path) {
-        return this.getSelfResource(this.jarRootPath.resolve(this.checkResourcePath(path)));
+        Path resPath = this.checkResourcePath(path, true);
+        if (this.jarRoot.getNameCount() > 0) resPath = this.jarRoot.resolve(path);
+        return this.getSelfResource(resPath);
     }
 
     @Override
     public Map<String, Resource> getSelfResources(String path, Predicate<String> nameFilter, boolean deep) {
-        return this.getSelfResources(this.checkResourcePath(path), nameFilter, deep);
+        Path resPath = this.checkResourcePath(path, true);
+        if (this.jarRoot.getNameCount() > 0) resPath = this.jarRoot.resolve(path);
+        return this.getSelfResources(resPath, nameFilter, deep);
     }
 
     @Override
     public Resource getFolderResource(String path) {
-        return this.getFileResource(this.checkResourcePath(path));
+        return this.getFileResource(this.checkResourcePath(path, false));
     }
 
     @Override
     public Map<String, Resource> getFolderResources(String path, Predicate<String> nameFilter, boolean deep) {
-        return this.getFolderResources(this.checkResourcePath(path), nameFilter, deep);
+        return this.getFolderResources(this.checkResourcePath(path, false), nameFilter, deep);
     }
 
     protected Resource getSelfResource(Path resPath) {
@@ -98,7 +101,6 @@ public class StandardResourceManager implements ResourceManager {
     }
 
     protected Map<String, Resource> getSelfResources(Path dirPath, Predicate<String> nameFilter, boolean deep) {
-        dirPath = this.jarRoot.resolve(dirPath);
         if (!Files.isDirectory(dirPath, LinkOption.NOFOLLOW_LINKS)) return null;
         try {
             Map<String, Resource> allRes = Maps.newLinkedHashMap();
@@ -106,7 +108,7 @@ public class StandardResourceManager implements ResourceManager {
             Files.walkFileTree(dirPath, visitor);
             List<Path> resPaths = visitor.getResourcePaths();
             for (Path resPath : resPaths) {
-                allRes.put(this.jarRoot.relativize(resPath).toString(), new FileResource(resPath.toFile()));
+                allRes.put(this.jarRoot.relativize(this.jarFileSystem.getPath(resPath.toString().substring(1))).toString(), new URLResource(resPath.toUri().toURL()));
             }
             if (!allRes.isEmpty()) return allRes;
         } catch (IOException e) {
@@ -143,7 +145,7 @@ public class StandardResourceManager implements ResourceManager {
 
     @Override
     public boolean writeResource(String path, Resource resource, boolean force) {
-        Path resPath = this.checkResourcePath(path);
+        Path resPath = this.checkResourcePath(path, false);
         resPath = this.pluginFolder.resolve(resPath);
         if (!force && Files.exists(resPath, LinkOption.NOFOLLOW_LINKS)) {
             return true;// 资源已存在，且参数force设为不覆盖，直接返回
@@ -177,27 +179,29 @@ public class StandardResourceManager implements ResourceManager {
      * <p>
      * 资源路径不能为空，不能尝试切换到资源根目录的父级目录
      *
-     * @param path 资源路径
+     * @param path  资源路径
+     * @param isJar 是否为自身Jar的路径，该方法会根据此参数选择相应的文件管理器
      * @return 转换为Path类型的资源路径
      * @throws IllegalArgumentException 当资源路径不合法时抛出
      */
-    protected Path checkResourcePath(String path) {
-        Path resPath = resolvePath(path);
+    protected Path checkResourcePath(String path, boolean isJar) {
+        Path resPath = this.resolvePath(path, isJar ? this.jarRoot.getFileSystem() : this.pluginFolder.getFileSystem());
         if (resPath == null) throw new IllegalArgumentException("Invalid Path: " + path); // TODO I18n
         return resPath;
     }
 
-    private static Path resolvePath(String path) {
+    private Path resolvePath(String path, FileSystem fs) {
         if (Strings.isNullOrEmpty(path)) return null;
         path = path.replace('\\', '/');
         List<String> subs = Lists.newArrayList();
         Splitter.on('/').omitEmptyStrings().split(path).forEach(subs::add);
         if (subs.isEmpty()) return null;
         int size = subs.size();
-        Path resPath = size == 1 ? Paths.get(subs.get(0)) : Paths.get(subs.get(0),
-                                                                      Arrays.copyOfRange(subs.toArray(new String[size]),
-                                                                                         1,
-                                                                                         size));
+        Path resPath = size == 1 ? fs.getPath(subs.get(0)) : fs.getPath(subs.get(0),
+                                                                        Arrays.copyOfRange(
+                                                                                subs.toArray(new String[size]),
+                                                                                1,
+                                                                                size));
         resPath = resPath.normalize();
         if (resPath.startsWith("..")) {// 禁止切到父级目录
             resPath = resPath.subpath(1, resPath.getNameCount());
@@ -214,7 +218,7 @@ public class StandardResourceManager implements ResourceManager {
      * @param jarRootPath Jar资源的根路径
      */
     public void setJarRootPath(String jarRootPath) {
-        this.jarRootPath = Paths.get(Strings.nullToEmpty(jarRootPath));
+        this.jarRoot = this.jarFileSystem.getPath(Strings.nullToEmpty(jarRootPath)).normalize();
     }
 
     private static abstract class ResourceFileVisitor extends SimpleFileVisitor<Path> {
@@ -236,8 +240,7 @@ public class StandardResourceManager implements ResourceManager {
         public FileVisitResult visitFile(Path filePath, BasicFileAttributes attrs) throws IOException {
             Objects.requireNonNull(filePath);
             Objects.requireNonNull(attrs);
-            File file = filePath.toFile();
-            if (file.canRead() && this.nameFilter.test(file.getName())) {
+            if (Files.isRegularFile(filePath, LinkOption.NOFOLLOW_LINKS) && Files.isReadable(filePath) && this.nameFilter.test(filePath.getFileName().toString())) {
                 this.resPaths.add(filePath);
             }
             return FileVisitResult.CONTINUE;
