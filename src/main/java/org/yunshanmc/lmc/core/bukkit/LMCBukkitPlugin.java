@@ -1,6 +1,7 @@
-package org.yunshanmc.lmc.core;
+package org.yunshanmc.lmc.core.bukkit;
 
 import org.bukkit.plugin.java.JavaPlugin;
+import org.yunshanmc.lmc.core.LMCPlugin;
 import org.yunshanmc.lmc.core.config.ConfigManager;
 import org.yunshanmc.lmc.core.config.DefaultConfigManager;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;

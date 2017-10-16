@@ -1,4 +1,4 @@
-package org.yunshanmc.lmc.core.command.executors;
+package org.yunshanmc.lmc.core.bukkit.command.executors;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

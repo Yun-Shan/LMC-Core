@@ -1,4 +1,4 @@
-package org.yunshanmc.lmc.core.command.executors;
+package org.yunshanmc.lmc.core.bungee.command.executors;
 
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.plugin.Command;
@@ -6,6 +6,7 @@ import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.TabExecutor;
 import org.yunshanmc.lmc.core.command.CommandManager;
 import org.yunshanmc.lmc.core.command.LMCCommand;
+import org.yunshanmc.lmc.core.command.executors.CommandExecutor;
 import org.yunshanmc.lmc.core.message.MessageSender;
 
 import java.util.ArrayList;

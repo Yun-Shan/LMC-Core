@@ -1,11 +1,11 @@
 package org.yunshanmc.lmc.core.command;
 
 import org.bukkit.command.CommandSender;
-import org.yunshanmc.lmc.core.LMCBukkitPlugin;
-import org.yunshanmc.lmc.core.LMCBungeeCordPlugin;
+import org.yunshanmc.lmc.core.bukkit.LMCBukkitPlugin;
+import org.yunshanmc.lmc.core.bungee.LMCBungeeCordPlugin;
 import org.yunshanmc.lmc.core.LMCPlugin;
-import org.yunshanmc.lmc.core.command.executors.BukkitExecutor;
-import org.yunshanmc.lmc.core.command.executors.BungeeCordExecutor;
+import org.yunshanmc.lmc.core.bukkit.command.executors.BukkitExecutor;
+import org.yunshanmc.lmc.core.bungee.command.executors.BungeeCordExecutor;
 import org.yunshanmc.lmc.core.command.executors.CommandExecutor;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.message.MessageSender;
