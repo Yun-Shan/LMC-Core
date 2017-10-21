@@ -98,8 +98,24 @@ public class DefaultMessageSender implements MessageSender {
     }
 
     @Override
+    public String getMessage(String msgKey, Player player, Object... args) {
+        return this.messageManager.getMessage(msgKey).getMessage(player, args);
+    }
+
+    @Override
+    public String getMessage(String msgKey, ProxiedPlayer player, Object... args) {
+        return this.messageManager.getMessage(msgKey).getMessage(player, args);
+    }
+
+    @Override
     public String getMessage(String msgKey, Object... args) {
-        return this.messageManager.getMessage(msgKey).getMessage(FAKE_PLAYER_BUKKIT, args);
+        if (PlatformUtils.isBukkit()) {
+            return this.getMessage(msgKey, FAKE_PLAYER_BUKKIT, args);
+        } else if (PlatformUtils.isBungeeCord()) {
+            return this.getMessage(msgKey, FAKE_PLAYER_BUNGEE, args);
+        } else {
+            throw new UnsupportedOperationException("Unsupported Platform");
+        }
     }
 
     @Override
@@ -119,9 +135,9 @@ public class DefaultMessageSender implements MessageSender {
     public MessageSender message(net.md_5.bungee.api.CommandSender receiver, String type, String msgKey, Object... args) {
         ProxiedPlayer player = receiver instanceof ProxiedPlayer ? (ProxiedPlayer)receiver : FAKE_PLAYER_BUNGEE;
         String[] msgs = this.messageManager.getMessage(msgKey).getMessages(player, args);
-        for (int i = 0; i < msgs.length; i++) {
+        for (String msg : msgs) {
             // 将信息放入类型模板
-            String msg = this.messageManager.getMessage("message.type." + type).getMessage(player, msgs[i]);
+            msg = this.messageManager.getMessage("message.type." + type).getMessage(player, msg);
             receiver.sendMessage(TextComponent.fromLegacyText(msg));
         }
         return this;

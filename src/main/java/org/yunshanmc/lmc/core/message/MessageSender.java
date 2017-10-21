@@ -4,7 +4,9 @@
  */
 package org.yunshanmc.lmc.core.message;
 
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 /**
  * 信息发送者，用于向后台/玩家发送信息
@@ -12,7 +14,25 @@ import org.bukkit.command.CommandSender;
 public interface MessageSender {
 
     /**
-     * 获取信息字符串
+     * 获取信息字符串(BungeeCode)
+     *
+     * @param msgKey 信息key
+     * @param args   信息文本中的参数列表
+     * @return 格式化后的信息字符串
+     */
+    String getMessage(String msgKey, ProxiedPlayer player, Object... args);
+
+    /**
+     * 获取信息字符串(Bukkit)
+     *
+     * @param msgKey 信息key
+     * @param args   信息文本中的参数列表
+     * @return 格式化后的信息字符串
+     */
+    String getMessage(String msgKey, Player player, Object... args);
+
+    /**
+     * 获取信息字符串(无玩家信息的格式化)
      *
      * @param msgKey 信息key
      * @param args   信息文本中的参数列表
