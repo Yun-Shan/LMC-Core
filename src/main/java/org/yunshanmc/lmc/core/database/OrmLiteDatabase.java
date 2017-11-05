@@ -23,8 +23,10 @@ public class OrmLiteDatabase extends Database {
 
         // 连接测试
         DatabaseConnection conn = this.connectionSource.getReadWriteConnection("");
-        conn.executeStatement("SHOW TABLES;", DatabaseConnection.DEFAULT_RESULT_FLAGS);
-        this.connectionSource.releaseConnection(conn);
+        // TODO: 测试连接语句 各类型数据库适配
+        // MySQL
+        // conn.executeStatement("SELECT 1;", DatabaseConnection.DEFAULT_RESULT_FLAGS);
+        // this.connectionSource.releaseConnection(conn);
         return true;
     }
 
