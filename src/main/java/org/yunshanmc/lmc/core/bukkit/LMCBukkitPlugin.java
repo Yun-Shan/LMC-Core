@@ -15,9 +15,12 @@ import org.yunshanmc.lmc.core.resource.ResourceManager;
 import org.yunshanmc.lmc.core.resource.StandardResourceManager;
 
 import java.io.IOException;
-import java.util.Objects;
 import java.util.function.Consumer;
 
+/**
+ * LMC插件的Bukkit实现
+ * XXX: 由于必须要继承各个端的插件抽象类，然而没法多继承，暂时找不到好方法，目前所有LMC的实现都会和LMCBukkitPlugin的代码几乎一致
+ */
 public abstract class LMCBukkitPlugin extends JavaPlugin implements LMCPlugin {
 
     protected boolean useI18n;
