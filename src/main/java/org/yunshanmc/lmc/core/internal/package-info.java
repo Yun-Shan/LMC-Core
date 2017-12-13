@@ -1,4 +1,4 @@
 /*
- * 此包为该插件内部使用，强烈建议其它插件不要使用此包内的类以避免bug
+ * 此包为该插件内部使用，其它插件不建议使用此包内的类
  */
 package org.yunshanmc.lmc.core.internal;

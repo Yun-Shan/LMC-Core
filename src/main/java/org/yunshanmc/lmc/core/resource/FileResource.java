@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Objects;
 
 /**
  * 文件资源
@@ -21,6 +22,7 @@ public class FileResource implements Resource {
     private final File file;
     
     public FileResource(File file) {
+        Objects.requireNonNull(file);
         this.file = file;
     }
     

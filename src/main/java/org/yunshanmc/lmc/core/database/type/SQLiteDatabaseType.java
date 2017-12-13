@@ -28,4 +28,9 @@ public class SQLiteDatabaseType extends DatabaseType {
         messageSender.debugConsole(2, "database.SQLite.buildUrl.jdbcUrl", path, url);
         return url;
     }
+
+    @Override
+    public String getTestSQL() {
+        return null;
+    }
 }

@@ -31,4 +31,9 @@ public class URLResource implements Resource {
         if (this.stream == null) this.stream = this.url.openStream();
         return this.stream;
     }
+
+    @Override
+    protected void finalize() throws Throwable {
+        if (this.stream != null) this.stream.close();
+    }
 }

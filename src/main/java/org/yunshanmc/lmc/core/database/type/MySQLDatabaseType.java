@@ -39,9 +39,15 @@ public class MySQLDatabaseType extends DatabaseType {
                 "&createDatabaseIfNotExist=true" +
                 "&autoReconnect=true" +
                 "&useUnicode=true" +
-                "&characterEncoding=UTF-8",
+                "&characterEncoding=UTF-8" +
+                "&useSSL=false",
                 host, port, dbName, user, password);
         messageSender.debugConsole(2, "database.MySQL.buildUrl.jdbcUrl", host, port, dbName, user, password, url);
         return url;
+    }
+
+    @Override
+    public String getTestSQL() {
+        return "SELECT 1;";
     }
 }

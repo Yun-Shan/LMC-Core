@@ -15,21 +15,47 @@ public abstract class DatabaseType {
         this.messageSender = messageSender;
     }
 
+    /**
+     * 获取类型名(数据库类型)
+     *
+     * @return 数据库类型
+     */
     public final String getName() {
         return this.name;
     }
 
+    /**
+     * 获取数据库驱动类
+     *
+     * @return 数据库驱动类
+     */
     public final String getDriverClass() {
         return this.driverClass;
     }
 
+    /**
+     * 构建用于连接数据库的jdbc url
+     *
+     * @param config 数据库配置
+     * @return 用于连接数据库的jdbc url
+     */
     public abstract String constructJdbcUrl(ConfigurationSection config);
+
+    /**
+     * 获取测试URL，该测试URL用于测试数据库连接是否正常
+     *
+     * @return 测试URL
+     */
+    public abstract String getTestSQL();
 
     public static DatabaseType matchType(String type, MessageSender messageSender) {
         switch (type.toLowerCase()) {
-            case "mysql": return new MySQLDatabaseType(messageSender);
-            case "sqlite": return new SQLiteDatabaseType(messageSender);
-            default: return null;
+            case "mysql":
+                return new MySQLDatabaseType(messageSender);
+            case "sqlite":
+                return new SQLiteDatabaseType(messageSender);
+            default:
+                return null;
         }
     }
 }

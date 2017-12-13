@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.yunshanmc.lmc.core.utils.PlatformUtils;
 
 import java.lang.reflect.Proxy;
+import java.util.Arrays;
 
 /**
  * //TODO
@@ -121,12 +122,11 @@ public class DefaultMessageSender implements MessageSender {
     @Override
     public MessageSender message(CommandSender receiver, String type, String msgKey, Object... args) {
         Player player = receiver instanceof Player ? (Player) receiver : FAKE_PLAYER_BUKKIT;
-        String[] msgs = this.messageManager.getMessage(msgKey).getMessages(player, args);
+        String[] msgs = this.messageManager.getMessage(msgKey).getMessage(player, args).split("\n");
         // 将信息放入类型模板
         for (int i = 0; i < msgs.length; i++) {
             msgs[i] = this.messageManager.getMessage("message.type." + type).getMessage(player, msgs[i]);
         }
-
         receiver.sendMessage(msgs);
         return this;
     }

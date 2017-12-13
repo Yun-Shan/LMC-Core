@@ -6,9 +6,12 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.jar.JarEntry;
@@ -28,7 +31,7 @@ public class StandardResourceManagerTest {
     
     @Before
     public void setUp() throws Exception {
-        m_resolvePath = StandardResourceManager.class.getDeclaredMethod("resolvePath", String.class);
+        m_resolvePath = StandardResourceManager.class.getDeclaredMethod("resolvePath", String.class, FileSystem.class);
         m_resolvePath.setAccessible(true);
         testDir = new File("build" + File.separator + "testing");
         if (!testDir.exists()) assertTrue(testDir.mkdirs());
@@ -50,7 +53,6 @@ public class StandardResourceManagerTest {
     
     @Test
     public void getSelfResource() throws Exception {
-
         assertNotNull(resourceManager.getSelfResource("a"));
         assertArrayEquals(ByteStreams.toByteArray(resourceManager.getSelfResource("a").getInputStream()),
                           "TEST a".getBytes(StandardCharsets.UTF_8));
@@ -68,6 +70,13 @@ public class StandardResourceManagerTest {
         out.closeEntry();
         out.close();
         resourceManager.updateJar();
+        resourceManager.getSelfResources("e", null, true).values().forEach(resource -> {
+            try {
+                System.out.println(new String(ByteStreams.toByteArray(resource.getInputStream())));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
         assertNotNull(resourceManager.getSelfResource("e/f/g"));
         assertArrayEquals(ByteStreams.toByteArray(resourceManager.getSelfResource("e/f/g").getInputStream()),
                           "TEST a".getBytes(StandardCharsets.UTF_8));
@@ -97,12 +106,12 @@ public class StandardResourceManagerTest {
     
     @Test
     public void resolvePath() throws Exception {
-        assertEquals(null, resolvePath(null));
-        assertEquals(null, resolvePath(""));
-        assertEquals(Paths.get("a"), resolvePath("a"));
+        assertEquals(null, resolvePath(null, FileSystems.getDefault()));
+        assertEquals(null, resolvePath("", FileSystems.getDefault()));
+        assertEquals(Paths.get("a"), resolvePath("a", FileSystems.getDefault()));
     }
     
-    private static Object resolvePath(String path) throws Exception {
-        return m_resolvePath.invoke(null, path);
+    private Object resolvePath(String path, FileSystem fs) throws Exception {
+        return m_resolvePath.invoke(null, path, fs);
     }
 }

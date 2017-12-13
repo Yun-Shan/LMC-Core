@@ -47,7 +47,7 @@ public class DefaultMessageManagerTest {
         c.setAccessible(true);
         ResourceManager resourceManager = c.newInstance(testJar, testDir.toPath());
         ConfigManager configManager = new DefaultConfigManager(resourceManager);
-        this.messageManager = new DefaultMessageManager(configManager);
+        this.messageManager = new DefaultMessageManager(null, configManager);
     }
 
     @Test

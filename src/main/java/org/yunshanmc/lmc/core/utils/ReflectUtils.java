@@ -35,7 +35,7 @@ public final class ReflectUtils {
             try {
                 Class<?> cls = Class.forName(stack.getClassName());
                 URL url = cls.getResource(resPath);
-                ress.add(new URLResource(url));
+                if (url != null) ress.add(new URLResource(url));
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();// TODO 测试该异常被抛出的时机，再进行相应处理
             }

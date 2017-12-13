@@ -149,7 +149,7 @@ public class GroupMessageManagerTest {
         c.setAccessible(true);
         ResourceManager resourceManager = c.newInstance(testJar, testDir.toPath());
         ConfigManager configManager = new DefaultConfigManager(resourceManager);
-        this.messageManager = new GroupMessageManager(configManager);
+        this.messageManager = new GroupMessageManager(null, configManager);
     }
 
     @Test

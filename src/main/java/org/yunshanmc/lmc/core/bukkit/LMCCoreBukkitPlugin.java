@@ -4,11 +4,18 @@
  */
 package org.yunshanmc.lmc.core.bukkit;
 
-import org.yunshanmc.lmc.core.bukkit.LMCBukkitPlugin;
-
 /**
  * //TODO
  */
 public class LMCCoreBukkitPlugin extends LMCBukkitPlugin {
 
+    @Override
+    protected void init() {
+        this.useGroupMessage = true;
+    }
+
+    @Override
+    public void onEnable() {
+        this.messageSender.infoConsole("message.test");
+    }
 }

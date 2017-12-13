@@ -8,7 +8,14 @@ package org.yunshanmc.lmc.core.message;
  * 信息管理器
  */
 public interface MessageManager {
-    
+
+    /**
+     * 获取消息上下文
+     *
+     * @return 消息上下文
+     */
+    MessageContext getContext();
+
     /**
      * 获取消息发送者
      *

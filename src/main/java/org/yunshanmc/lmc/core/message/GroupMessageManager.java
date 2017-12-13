@@ -1,6 +1,7 @@
 package org.yunshanmc.lmc.core.message;
 
 import org.bukkit.configuration.file.FileConfiguration;
+import org.yunshanmc.lmc.core.LMCPlugin;
 import org.yunshanmc.lmc.core.config.ConfigManager;
 
 import java.io.File;
@@ -17,17 +18,17 @@ public class GroupMessageManager extends DefaultMessageManager {
     private MessageGroup defMsgGroup;
     private String userMsgPath;
 
-    public GroupMessageManager(ConfigManager configManager) {
-        this(configManager, MESSAGE_DIR);
+    public GroupMessageManager(LMCPlugin plugin, ConfigManager configManager) {
+        this(plugin, configManager, MESSAGE_DIR);
     }
 
-    public GroupMessageManager(ConfigManager configManager, String defMsgPath) {
-        super(configManager);
+    public GroupMessageManager(LMCPlugin plugin, ConfigManager configManager, String defMsgPath) {
+        super(plugin, configManager);
         this.userMsgPath = defMsgPath;
         // init default message name
         Map<String, FileConfiguration> cfgs = configManager.getDefaultConfigs(defMsgPath, true);
         MessageGroup msgGroup = new MessageGroup("", cfgs.remove(""), new HashMap<>());
-        int startIdx = defMsgPath.length() + 1;// "xxxx" + "/"
+        int startIdx = defMsgPath.length() + 1;// "xxx" + "/"
         cfgs.forEach((path, cfg) -> {
             MessageGroup group = msgGroup;
             MessageGroup sub;
@@ -68,7 +69,7 @@ public class GroupMessageManager extends DefaultMessageManager {
         if (cfg != null
             // 去除key的组路径部分
             && cfg.isString(key.substring(path.indexOf('.') - this.userMsgPath.length()))) {
-            msg =  new Message(cfg.getString(key.substring(path.indexOf('.') - this.userMsgPath.length())));
+            msg =  new Message(cfg.getString(key.substring(path.indexOf('.') - this.userMsgPath.length())), this.context);
         }
         if (msg == null) msg = this.defMsgGroup.getMessage(key);
         return msg;
@@ -89,7 +90,7 @@ public class GroupMessageManager extends DefaultMessageManager {
         public Message getMessage(String key) {
             Message msg = null;
             if (this.cfg != null && this.cfg.isString(key)) {
-                msg = new Message(cfg.getString(key));
+                msg = new Message(cfg.getString(key), GroupMessageManager.this.context);
             } else {// 搜索子组
                 int groupSep = key.indexOf('.');
                 if (groupSep > 0) {

@@ -4,11 +4,13 @@
  */
 package org.yunshanmc.lmc.core.bungee;
 
-import org.yunshanmc.lmc.core.bungee.LMCBungeeCordPlugin;
-
 /**
  * //TODO
  */
 public class LMCCoreBungeeCordPlugin extends LMCBungeeCordPlugin {
 
+    @Override
+    protected void init() {
+        this.useGroupMessage = true;
+    }
 }

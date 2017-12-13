@@ -14,15 +14,21 @@ import org.bukkit.entity.Player;
 public class Message {
 
     private final String msg;
+    private final MessageContext context;
     private MessageFormat format;
 
-    public Message(String msg) {
-        this(msg, new DefaultMessageFormat());
+    public Message(String msg, MessageContext context) {
+        this(msg, context, new DefaultMessageFormat(context));
     }
 
-    public Message(String msg, MessageFormat format) {
+    public Message(String msg, MessageContext context, MessageFormat format) {
         this.msg = ChatColor.translateAlternateColorCodes('&', msg);
+        this.context = context;
         this.format = format;
+    }
+
+    public MessageContext getContext() {
+        return this.context;
     }
 
     public String getRawMessage() {

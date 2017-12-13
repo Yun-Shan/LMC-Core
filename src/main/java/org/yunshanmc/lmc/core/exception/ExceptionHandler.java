@@ -4,9 +4,9 @@
  */
 package org.yunshanmc.lmc.core.exception;
 
+import com.google.common.base.Strings;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.plugin.Plugin;
 import org.yunshanmc.lmc.core.LMCPlugin;
 import org.yunshanmc.lmc.core.internal.BuiltinMessage;
 import org.yunshanmc.lmc.core.resource.Resource;
@@ -20,8 +20,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 /**
@@ -32,11 +34,18 @@ public final class ExceptionHandler {
     private ExceptionHandler() {
     }// 禁止实例化
 
-    static {
+    private static final AtomicBoolean STOP_FLAG = new AtomicBoolean(false);
+
+    public static void start() {
         for (int i = 0; i < 3; i++) {
-            new ExceptionHandlerThread(i + 1).start();
+            new ExceptionHandlerThread(i + 1, STOP_FLAG).start();
         }
     }
+
+    public static void stop() {
+        STOP_FLAG.set(true);
+    }
+
 
     /**
      * 默认的异常处理器
@@ -48,13 +57,15 @@ public final class ExceptionHandler {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         PrintWriter writer = new PrintWriter(buffer);
         err.printStackTrace(writer);
+        writer.flush();
+        writer.close();
 
         Bukkit.getConsoleSender().sendMessage(
                 BuiltinMessage.getMessage("DefaultErrorHandler",
-                                          info.getPlugin(),
-                                          err.getClass().getName(),
-                                          desc != null ? desc : "无",
-                                          new String(buffer.toByteArray())
+                        info.getPlugin(),
+                        err.getClass().getName(),
+                        Strings.nullToEmpty(desc),
+                        new String(buffer.toByteArray())
                 )
         );
     };
@@ -64,6 +75,7 @@ public final class ExceptionHandler {
     private static final Map<String, Consumer<ExceptionInfo>> HANDLERS = new HashMap<>();
 
     public static void setHandler(LMCPlugin plugin, Consumer<ExceptionInfo> handler) {
+        Objects.requireNonNull(handler);
         HANDLERS.put(plugin.getName(), handler);
     }
 
@@ -77,36 +89,43 @@ public final class ExceptionHandler {
 
     private static class ExceptionHandlerThread extends Thread {
 
-        public ExceptionHandlerThread(int num) {
+        private final AtomicBoolean stopFlag;
+
+        public ExceptionHandlerThread(int num, AtomicBoolean stopFlag) {
             super("LMC Exception Handler " + num);
+            this.stopFlag = stopFlag;
         }
 
         @Override
         public void run() {
             ExceptionInfo err;
             while ((err = QUEUE.poll()) != null) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    ExceptionHandler.handle(e);
+                }
+                if (this.stopFlag.get()) break;
+
                 List<Resource> resList = ReflectUtils.traceResources(err.getThrowable().getStackTrace(), "plugin.yml");
                 Consumer<ExceptionInfo> handler = DEFAULT_HANDLER;
 
                 if (!resList.isEmpty()) {
                     try {
+                        if (this.stopFlag.get()) break;
                         YamlConfiguration yml = YamlConfiguration.loadConfiguration(
                                 new InputStreamReader(resList.get(0).getInputStream(),
-                                                      StandardCharsets.UTF_8));
+                                        StandardCharsets.UTF_8));
                         String plugin = yml.getString("name");
                         err.setPlugin(plugin);
                         handler = HANDLERS.get(plugin);
                     } catch (IOException e) {
-                        ExceptionHandler.handle(e);
+                        DEFAULT_HANDLER.accept(new ExceptionInfo(e, BuiltinMessage.getMessage("InExceptionHandler_ExceptionDescription")));
                     }
                 }
 
+                if (this.stopFlag.get()) break;
                 handler.accept(err);
-            }
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                ExceptionHandler.handle(e);
             }
         }
     }
@@ -115,7 +134,7 @@ public final class ExceptionHandler {
 
         private Throwable throwable;
         private String description;
-        private String plugin;// 出现异常的插件，该变量会在异常处理线程中被设置
+        private String plugin;// 出现异常的插件(该变量会在异常处理线程中被设置)
 
         public ExceptionInfo(Throwable err, String description) {
             this.throwable = err;

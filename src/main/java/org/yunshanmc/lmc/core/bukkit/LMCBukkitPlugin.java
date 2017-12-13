@@ -8,17 +8,20 @@ import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.locale.I18nResourceManager;
 import org.yunshanmc.lmc.core.locale.LocaleManager;
 import org.yunshanmc.lmc.core.message.DefaultMessageManager;
+import org.yunshanmc.lmc.core.message.GroupMessageManager;
 import org.yunshanmc.lmc.core.message.MessageManager;
 import org.yunshanmc.lmc.core.message.MessageSender;
 import org.yunshanmc.lmc.core.resource.ResourceManager;
 import org.yunshanmc.lmc.core.resource.StandardResourceManager;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public abstract class LMCBukkitPlugin extends JavaPlugin implements LMCPlugin {
 
     protected boolean useI18n;
+    protected boolean useGroupMessage;
 
     protected LocaleManager localeManager;
     protected ResourceManager resourceManager;
@@ -54,7 +57,11 @@ public abstract class LMCBukkitPlugin extends JavaPlugin implements LMCPlugin {
             return false;
         }
         if (this.configManager == null) this.configManager = new DefaultConfigManager(this.resourceManager);
-        if (this.messageManager == null) this.messageManager = new DefaultMessageManager(this.configManager);
+        if (this.messageManager == null) {
+            this.messageManager = this.useGroupMessage
+                    ? new GroupMessageManager(this, this.configManager)
+                    : new DefaultMessageManager(this, this.configManager);
+        }
 
         this.messageSender = this.messageManager.getMessageSender();
 
@@ -64,9 +71,14 @@ public abstract class LMCBukkitPlugin extends JavaPlugin implements LMCPlugin {
          */
         if (this.exceptionHandler == null) this.exceptionHandler = ExceptionHandler.DEFAULT_HANDLER;
         ExceptionHandler.setHandler(this, this.exceptionHandler);
+        ExceptionHandler.start();
         return true;
     }
 
+    @Override
+    public void onDisable() {
+        ExceptionHandler.stop();
+    }
 
     // TODO 注释
     public LocaleManager getLocaleManager() {

@@ -7,6 +7,7 @@ package org.yunshanmc.lmc.core.resource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Objects;
 
 /**
  * //TODO
@@ -14,8 +15,9 @@ import java.net.URL;
 public class InputStreamResource implements Resource {
     
     private final InputStream stream;
-    
+
     public InputStreamResource(InputStream stream) {
+        Objects.requireNonNull(stream);
         this.stream = stream;
     }
     
@@ -27,5 +29,10 @@ public class InputStreamResource implements Resource {
     @Override
     public InputStream getInputStream() throws IOException {
         return this.stream;
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        this.stream.close();
     }
 }

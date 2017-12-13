@@ -4,6 +4,8 @@
  */
 package org.yunshanmc.lmc.core.locale;
 
+import org.yunshanmc.lmc.core.internal.BuiltinMessage;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -21,7 +23,7 @@ public class LocaleManager {
     private final List<Consumer<Locale>> listeners = new ArrayList<>();
     
     public LocaleManager() {
-        this.current = Locale.getDefault();
+        this.setLocale(Locale.getDefault());
     }
     
     public Locale getLocale() {
@@ -30,6 +32,7 @@ public class LocaleManager {
     
     public void setLocale(Locale locale) {
         this.current = locale;
+        BuiltinMessage.setLocale(locale);
         this.listeners.forEach(listener -> listener.accept(locale));
     }
     

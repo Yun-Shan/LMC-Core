@@ -23,13 +23,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
-import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
 /**
  * 标准资源管理器
  * // TODO 提取重复代码
+ * // TODO JAR更新后无法获取资源
  */
 public class StandardResourceManager implements ResourceManager {
 
@@ -41,7 +41,7 @@ public class StandardResourceManager implements ResourceManager {
     private final Path pluginFolder;
 
     /**
-     * 通过Bukkit插件实例构造一个标准资源管理器
+     * 通过插件实例构造一个标准资源管理器
      *
      * @param plugin Bukkit插件实例
      * @throws IOException 当读取插件Jar文件失败时抛出
@@ -108,7 +108,7 @@ public class StandardResourceManager implements ResourceManager {
             Files.walkFileTree(dirPath, visitor);
             List<Path> resPaths = visitor.getResourcePaths();
             for (Path resPath : resPaths) {
-                allRes.put(this.jarRoot.relativize(this.jarFileSystem.getPath(resPath.toString().substring(1))).toString(), new URLResource(resPath.toUri().toURL()));
+                allRes.put(resPath.toString().substring(1), new InputStreamResource(Files.newInputStream(resPath)));
             }
             if (!allRes.isEmpty()) return allRes;
         } catch (IOException e) {
@@ -185,12 +185,12 @@ public class StandardResourceManager implements ResourceManager {
      * @throws IllegalArgumentException 当资源路径不合法时抛出
      */
     protected Path checkResourcePath(String path, boolean isJar) {
-        Path resPath = this.resolvePath(path, isJar ? this.jarRoot.getFileSystem() : this.pluginFolder.getFileSystem());
+        Path resPath = resolvePath(path, isJar ? this.jarRoot.getFileSystem() : this.pluginFolder.getFileSystem());
         if (resPath == null) throw new IllegalArgumentException("Invalid Path: " + path); // TODO I18n
         return resPath;
     }
 
-    private Path resolvePath(String path, FileSystem fs) {
+    private static Path resolvePath(String path, FileSystem fs) {
         if (Strings.isNullOrEmpty(path)) return null;
         path = path.replace('\\', '/');
         List<String> subs = Lists.newArrayList();
