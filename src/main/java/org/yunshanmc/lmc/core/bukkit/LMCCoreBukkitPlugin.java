@@ -16,6 +16,6 @@ public class LMCCoreBukkitPlugin extends LMCBukkitPlugin {
 
     @Override
     public void onEnable() {
-        this.messageSender.infoConsole("message.test");
+
     }
 }
