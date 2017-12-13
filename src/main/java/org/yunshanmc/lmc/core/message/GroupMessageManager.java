@@ -48,6 +48,7 @@ public class GroupMessageManager extends DefaultMessageManager {
 
     @Override
     protected Message getMessageFromResource(String key) {
+        // 根目录的messages.yml的优先级高于messages目录下的分组信息
         Message msg = super.getMessageFromResource(key);
         if (msg != null) return msg;
 
