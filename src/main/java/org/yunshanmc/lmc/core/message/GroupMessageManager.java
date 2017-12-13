@@ -59,21 +59,21 @@ public class GroupMessageManager extends DefaultMessageManager {
             char[] chars = path.toCharArray();
 
             String cfgPath = path.indexOf('.') > 0 ? new String(chars, 0, path.indexOf('.')) : path;
-            cfg = configManager.getUserConfig( cfgPath + ".yml");
+            cfg = configManager.getUserConfig(cfgPath + ".yml");
 
-            if (cfg != null || (firstSep = path.indexOf('.')) == -1) break;
+            if (cfg != null
+                    // 去除key的组路径部分
+                    && cfg.isString(key.substring(path.indexOf('.') - this.userMsgPath.length()))) {
+                // 在用户配置中找到
+                return new Message(cfg.getString(key.substring(path.indexOf('.') - this.userMsgPath.length())), this.context);
+            }
+
+            // 用户配置中未找到，尝试在默认配置中查找
+            if ((firstSep = path.indexOf('.')) == -1) return this.defMsgGroup.getMessage(key);
 
             chars[firstSep] = File.separatorChar;
             path = new String(chars);
         } while (true);
-
-        if (cfg != null
-            // 去除key的组路径部分
-            && cfg.isString(key.substring(path.indexOf('.') - this.userMsgPath.length()))) {
-            msg =  new Message(cfg.getString(key.substring(path.indexOf('.') - this.userMsgPath.length())), this.context);
-        }
-        if (msg == null) msg = this.defMsgGroup.getMessage(key);
-        return msg;
     }
 
     private class MessageGroup {
