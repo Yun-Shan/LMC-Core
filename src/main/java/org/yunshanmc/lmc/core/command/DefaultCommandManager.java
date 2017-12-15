@@ -17,6 +17,7 @@ import java.lang.invoke.MethodType;
 import java.lang.invoke.WrongMethodTypeException;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
+import java.util.List;
 
 public class DefaultCommandManager implements CommandManager {
 
@@ -197,6 +198,11 @@ public class DefaultCommandManager implements CommandManager {
     @Override
     public void unregisterCommand(String cmdName) {
         this.commandExecutor.unregisterCommand(cmdName);
+    }
+
+    @Override
+    public List<LMCCommand> getCommands() {
+        return this.commandExecutor.getCommands();
     }
 
     static class SimpleCommandImpl extends LMCCommand {

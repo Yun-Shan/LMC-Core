@@ -3,6 +3,8 @@ package org.yunshanmc.lmc.core.command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.List;
+
 public interface CommandManager {
 
     /**
@@ -15,24 +17,27 @@ public interface CommandManager {
     /**
      * 批量注册注解命令
      *
-     * @param command
-     *     要注册的命令
+     * @param command 包含注解命令的对象
      */
     void registerCommands(SimpleLMCCommand command);
 
     /**
      * 注册命令
      *
-     * @param command
-     *     要注册的命令
+     * @param command 要注册的命令
      */
     void registerCommand(LMCCommand command);
 
     /**
      * 删除命令
      *
-     * @param cmdName
-     *     要删除的命令名
+     * @param cmdName 要删除的命令名
      */
     void unregisterCommand(String cmdName);
+
+    /**
+     * 获取所有已注册的命令
+     * @return 所有已注册的命令(该列表不可修改)
+     */
+    List<LMCCommand> getCommands();
 }

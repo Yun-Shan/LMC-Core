@@ -1,11 +1,12 @@
 package org.yunshanmc.lmc.core.command.executors;
 
+import com.google.common.collect.ImmutableList;
 import org.yunshanmc.lmc.core.command.CommandManager;
 import org.yunshanmc.lmc.core.command.LMCCommand;
 import org.yunshanmc.lmc.core.message.MessageSender;
 
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public abstract class CommandExecutor {
@@ -37,5 +38,9 @@ public abstract class CommandExecutor {
 
     public void unregisterCommand(String cmdName) {
         this.commands.remove(cmdName);
+    }
+
+    public List<LMCCommand> getCommands() {
+        return ImmutableList.copyOf(this.commands.values());
     }
 }
