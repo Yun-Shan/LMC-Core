@@ -4,26 +4,49 @@ public final class PlatformUtils {
 
     private PlatformUtils(){}// 禁止实例化
 
-    private static boolean Bukkit = false;
-    private static boolean BungeeCord = false;
+    private static PlatformType platform;
+
     static {
         try {
             Class.forName("org.bukkit.plugin.java.JavaPlugin");
-            Bukkit = true;
+            platform = PlatformType.Bukkit;
         } catch (ClassNotFoundException ignored) {
         }
-        try {
-            Class.forName("net.md_5.bungee.api.plugin.Plugin");
-            BungeeCord = true;
-        } catch (ClassNotFoundException ignored) {
+        if (platform == null) {
+            try {
+                Class.forName("net.md_5.bungee.api.plugin.Plugin");
+                platform = PlatformType.BungeeCord;
+            } catch (ClassNotFoundException ignored) {
+            }
         }
+
+        if (platform == null) platform = PlatformType.Unknown;
     }
 
     public static boolean isBukkit() {
-        return Bukkit;
+        return platform == PlatformType.Bukkit;
     }
 
     public static boolean isBungeeCord() {
-        return BungeeCord;
+        return platform == PlatformType.BungeeCord;
+    }
+
+    public static boolean isTest() {
+        try {
+            return !PlatformUtils.class.getProtectionDomain().getCodeSource().getLocation().getFile().contains(".jar");
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    public static PlatformType getPlatformType() {
+        return platform;
+    }
+
+    public enum PlatformType {
+        Bukkit,
+        BungeeCord,
+
+        Unknown
     }
 }

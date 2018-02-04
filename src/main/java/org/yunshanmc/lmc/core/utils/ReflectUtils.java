@@ -4,6 +4,7 @@
  */
 package org.yunshanmc.lmc.core.utils;
 
+import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.resource.Resource;
 import org.yunshanmc.lmc.core.resource.URLResource;
 
@@ -17,7 +18,8 @@ import java.util.List;
  */
 public final class ReflectUtils {
 
-    private ReflectUtils(){}
+    private ReflectUtils() {
+    }
 
     /**
      * 根据调用栈追踪指定资源
@@ -26,9 +28,10 @@ public final class ReflectUtils {
      *
      * @param stackTrace 调用栈
      * @param resPath    资源路径，会自动转换为根路径(/xxx)
+     * @param reverse    由于调用栈是倒序的，该参数指定是否将倒序转为正序，true即转为正序，false即保持倒序
      * @return 追踪到的资源列表
      */
-    public static List<Resource> traceResources(StackTraceElement[] stackTrace, String resPath) {
+    public static List<Resource> traceResources(StackTraceElement[] stackTrace, String resPath, boolean reverse) {
         resPath = Resource.pathToRoot(resPath);
         List<Resource> ress = new ArrayList<>();
         for (StackTraceElement stack : stackTrace) {
@@ -37,11 +40,27 @@ public final class ReflectUtils {
                 URL url = cls.getResource(resPath);
                 if (url != null) ress.add(new URLResource(url));
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();// TODO 测试该异常被抛出的时机，再进行相应处理
+                ExceptionHandler.handle(e);
             }
         }
-        Collections.reverse(ress);
+        if (reverse) Collections.reverse(ress);
         return ress;
     }
-    
+
+    public static void checkSafeCall() {
+        StackTraceElement[] elements = new Throwable().getStackTrace();
+        try {
+            Class<?> beCalled = Class.forName(elements[1].getClassName());
+            Class cls = Class.forName(elements[2].getClassName());
+            if (// 测试环境(测试环境代码不在jar中)
+                !cls.getProtectionDomain().getCodeSource().getLocation().getFile().contains(".jar")
+                // 正式环境
+                || cls.getProtectionDomain().getCodeSource().equals(beCalled.getProtectionDomain().getCodeSource())
+                ) return;
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        throw new Error("unsafe call");
+    }
+
 }

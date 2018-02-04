@@ -11,11 +11,15 @@ repositories {
     }
 }
 
+group = 'org.yunshanmc'
+version = '1.0.0-SNAPSHOT'
+
 targetCompatibility = 1.8
 sourceCompatibility = 1.8
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
+    options.compilerArgs = ['-parameters']
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
@@ -56,12 +60,19 @@ dependencies {
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-            groupId 'org.yunshanmc'
-            artifactId 'LMC-Core'
-            version '1.0.0-SNAPSHOT'
+        Plugin(MavenPublication) {
+            groupId project.group
+            artifactId project.name
+            version project.version
 
             from components.java
+        }
+
+        Source(MavenPublication) {
+            groupId project.group
+            artifactId project.name
+            version project.version
+            artifact sourcesJar
         }
     }
 }

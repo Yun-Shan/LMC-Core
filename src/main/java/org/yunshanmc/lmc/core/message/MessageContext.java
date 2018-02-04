@@ -25,6 +25,9 @@ public class MessageContext {
     public <T> T get(String name) {
         return (T) this.valMap.get(name);
     }
+    public String getString(String name) {
+        return String.valueOf(this.valMap.get(name));
+    }
 
     public LMCPlugin getPlugin() {
         return this.plugin;

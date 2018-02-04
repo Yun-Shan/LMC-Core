@@ -1,15 +1,20 @@
 package org.yunshanmc.lmc.core.command;
 
+import com.google.common.base.Strings;
 import org.bukkit.command.CommandSender;
 
+import java.util.Arrays;
 import java.util.Objects;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public abstract class LMCCommand {
 
-    private static final String[] EMPTY_STRINGS = new String[]{};
+    private static final String[] EMPTY_STRINGS = new String[0];
 
     private final String name;
     private String[] aliases;
+    private String usage;
     private String description;
     private String[] permissions;
 
@@ -19,30 +24,35 @@ public abstract class LMCCommand {
      * @param name 命令名
      */
     public LMCCommand(String name) {
-        this(name, null, null, null);
+        this(name, null, null, null, null);
     }
 
     /**
-     * @param name 命令名
+     * @param name        命令名
      * @param permissions 命令所需权限
      */
     public LMCCommand(String name, String[] permissions) {
-        this(name, null, null, permissions);
+        this(name, null, null, null, permissions);
     }
 
     /**
-     * @param name 命令名
+     * @param name        命令名
+     * @param usage       命令用法
      * @param description 命令描述
-     * @param aliases 命令别名
+     * @param aliases     命令别名
      * @param permissions 命令所需权限
      */
-    public LMCCommand(String name, String description, String[] aliases, String[] permissions) {
+    public LMCCommand(String name, String usage, String description, String[] aliases, String[] permissions) {
         Objects.requireNonNull(name);
-
         this.name = name;
-        this.description = description != null ? description : "";
-        this.aliases = aliases != null ? aliases : EMPTY_STRINGS;
-        this.permissions = permissions != null ? permissions : EMPTY_STRINGS;
+        this.usage = Strings.nullToEmpty(usage);
+        this.description = Strings.nullToEmpty(description);
+        BiFunction<String[], Boolean, String[]> filter = (arr, admitEmpty) -> Arrays.stream(aliases != null ? aliases : EMPTY_STRINGS)
+                .distinct()
+                .filter(alias -> admitEmpty ? alias != null : !Strings.isNullOrEmpty(alias))
+                .toArray(String[]::new);
+        this.aliases = filter.apply(aliases, true);
+        this.permissions = filter.apply(permissions, false);
 
         this.setValidity(true);
     }
@@ -63,6 +73,17 @@ public abstract class LMCCommand {
      */
     public String[] getAliases() {
         return aliases;
+    }
+
+    /**
+     * 获取命令用法
+     * <p>
+     * 一般为顺序列出的参数列表
+     *
+     * @return 命令用法
+     */
+    public String getUsage() {
+        return this.usage;
     }
 
     /**
@@ -97,9 +118,7 @@ public abstract class LMCCommand {
     /**
      * 设置命令有效性
      *
-     * @param valid
-     *     是否有效
-     *
+     * @param valid 是否有效
      * @return 是否设置成功
      */
     public final boolean setValidity(boolean valid) {
@@ -140,18 +159,16 @@ public abstract class LMCCommand {
     /**
      * 执行命令
      *
-     * @param sender
-     *     命令执行者
-     * @param args
-     *     参数列表
+     * @param sender 命令执行者
+     * @param label  玩家输入的主命令
+     * @param args   参数列表
      */
-    public abstract void execute(CommandSender sender, String... args);
+    public abstract void execute(CommandSender sender, String label, String... args);
 
     /**
      * 显示命令帮助
      *
-     * @param sender
-     *     显示命令帮助的对象
+     * @param sender 显示命令帮助的对象
      */
     public void showHelp(CommandSender sender) {
 
@@ -160,18 +177,16 @@ public abstract class LMCCommand {
     /**
      * 执行命令
      *
-     * @param sender
-     *     命令执行者
-     * @param args
-     *     参数列表
+     * @param sender 命令执行者
+     * @param label  玩家输入的主命令
+     * @param args   参数列表
      */
-    public abstract void execute(net.md_5.bungee.api.CommandSender sender, String... args);
+    public abstract void execute(net.md_5.bungee.api.CommandSender sender, String label, String... args);
 
     /**
      * 显示命令帮助
      *
-     * @param sender
-     *     显示命令帮助的对象
+     * @param sender 显示命令帮助的对象
      */
     public void showHelp(net.md_5.bungee.api.CommandSender sender) {
 

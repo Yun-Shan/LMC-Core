@@ -74,7 +74,6 @@ public abstract class LMCBukkitPlugin extends JavaPlugin implements LMCPlugin {
          */
         if (this.exceptionHandler == null) this.exceptionHandler = ExceptionHandler.DEFAULT_HANDLER;
         ExceptionHandler.setHandler(this, this.exceptionHandler);
-        ExceptionHandler.start();
         return true;
     }
 
@@ -85,18 +84,18 @@ public abstract class LMCBukkitPlugin extends JavaPlugin implements LMCPlugin {
 
     // TODO 注释
     public LocaleManager getLocaleManager() {
-        return localeManager;
+        return this.localeManager;
     }
 
     public ResourceManager getResourceManager() {
-        return resourceManager;
+        return this.resourceManager;
     }
 
     public ConfigManager getConfigManager() {
-        return configManager;
+        return this.configManager;
     }
 
     public MessageManager getMessageManager() {
-        return messageManager;
+        return this.messageManager;
     }
 }

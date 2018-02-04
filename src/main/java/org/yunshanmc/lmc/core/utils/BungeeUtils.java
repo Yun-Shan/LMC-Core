@@ -36,7 +36,7 @@ public class BungeeUtils {
     public static List<Plugin> tracePlugins(StackTraceElement[] stackTrace, boolean duplicate) {
         PluginManager pm = ProxyServer.getInstance().getPluginManager();
         Function<String, List<Plugin>> fetcher = fileName -> {
-            List<Resource> resList = ReflectUtils.traceResources(stackTrace, fileName);
+            List<Resource> resList = ReflectUtils.traceResources(stackTrace, fileName, false);
             if (!resList.isEmpty()) {
                 List<Plugin> result = new ArrayList<>();
                 for (Resource res : resList) {
@@ -72,7 +72,7 @@ public class BungeeUtils {
     public static Plugin traceFirstPlugin(StackTraceElement[] stackTrace) {
         PluginManager pm = ProxyServer.getInstance().getPluginManager();
         Function<String, Plugin> fetcher = fileName -> {
-            List<Resource> resList = ReflectUtils.traceResources(stackTrace, fileName);
+            List<Resource> resList = ReflectUtils.traceResources(stackTrace, fileName, false);
             if (!resList.isEmpty()) {
                 try {
                     YamlConfiguration yml = YamlConfiguration.loadConfiguration(

@@ -1,5 +1,6 @@
 package org.yunshanmc.lmc.core.bukkit.command.executors;
 
+import com.google.common.base.Joiner;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -28,18 +29,21 @@ public class BukkitExecutor extends org.yunshanmc.lmc.core.command.executors.Com
         LMCCommand cmd = super.resolveCommand(args);
 
         if (cmd != null) {
-            if (!cmd.isValid()) {
-                this.messageSender.info(sender, "command.invalid", this.handleCommand, cmd.getName());
-                return true;
-            }
-            if (args.length >= 2) {
-                args = Arrays.copyOfRange(args, 1, args.length);
+            if (cmd.isValid()) {
+                if (args.length >= 2) {
+                    args = Arrays.copyOfRange(args, 1, args.length);
+                } else {
+                    args = new String[0];
+                }
+                cmd.execute(sender, label, args);
             } else {
-                args = new String[0];
+                this.messageSender.info(sender, "command.InvalidCommand",
+                                        '/' + Joiner.on(' ').join(label, args.length > 0 ? args[0] : cmd.getName()));
+
             }
-            cmd.execute(sender, args);
         } else {
-            this.messageSender.info(sender, "command.notFound", this.handleCommand, args.length > 0 ? args[0] : "");
+            this.messageSender.info(sender, "command.CommandNotFound",
+                                    '/' + Joiner.on(' ').skipNulls().join(label, args.length > 0 ? args[0] : null));
         }
         return true;
     }

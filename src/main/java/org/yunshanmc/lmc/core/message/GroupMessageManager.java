@@ -47,9 +47,9 @@ public class GroupMessageManager extends DefaultMessageManager {
     }
 
     @Override
-    protected Message getMessageFromResource(String key) {
+    protected Message getMessageFromResource(String key, MessageContext context) {
         // 根目录的messages.yml的优先级高于messages目录下的分组信息
-        Message msg = super.getMessageFromResource(key);
+        Message msg = super.getMessageFromResource(key, context);
         if (msg != null) return msg;
 
         String path = this.userMsgPath + File.separator + key;
@@ -59,17 +59,17 @@ public class GroupMessageManager extends DefaultMessageManager {
             char[] chars = path.toCharArray();
 
             String cfgPath = path.indexOf('.') > 0 ? new String(chars, 0, path.indexOf('.')) : path;
-            cfg = configManager.getUserConfig(cfgPath + ".yml");
+            cfg = this.configManager.getUserConfig(cfgPath + ".yml");
 
             if (cfg != null
                     // 去除key的组路径部分
                     && cfg.isString(key.substring(path.indexOf('.') - this.userMsgPath.length()))) {
                 // 在用户配置中找到
-                return new Message(cfg.getString(key.substring(path.indexOf('.') - this.userMsgPath.length())), this.context);
+                return new Message(cfg.getString(key.substring(path.indexOf('.') - this.userMsgPath.length())), context);
             }
 
             // 用户配置中未找到，尝试在默认配置中查找
-            if ((firstSep = path.indexOf('.')) == -1) return this.defMsgGroup.getMessage(key);
+            if ((firstSep = path.indexOf('.')) == -1) return this.defMsgGroup.getMessage(key, context);
 
             chars[firstSep] = File.separatorChar;
             path = new String(chars);
@@ -88,17 +88,17 @@ public class GroupMessageManager extends DefaultMessageManager {
             this.subGroups = subGroups;
         }
 
-        public Message getMessage(String key) {
+        public Message getMessage(String key, MessageContext context) {
             Message msg = null;
             if (this.cfg != null && this.cfg.isString(key)) {
-                msg = new Message(cfg.getString(key), GroupMessageManager.this.context);
+                msg = new Message(cfg.getString(key), context);
             } else {// 搜索子组
                 int groupSep = key.indexOf('.');
                 if (groupSep > 0) {
                     String group = key.substring(0, groupSep);
                     MessageGroup sub = this.subGroups.get(group);
                     if (sub != null) {
-                        msg = sub.getMessage(key.substring(groupSep + 1));
+                        msg = sub.getMessage(key.substring(groupSep + 1), context);
                     }
                 }
             }

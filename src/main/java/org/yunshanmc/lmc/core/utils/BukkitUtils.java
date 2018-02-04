@@ -10,10 +10,7 @@ import org.yunshanmc.lmc.core.resource.Resource;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -28,10 +25,11 @@ public class BukkitUtils {
      *
      * @param stackTrace 调用栈
      * @param duplicate  连续插件是否重复，如果多个连续调用栈是同一个插件时是否重复记录插件(注意：同插件在不连续的调用栈上不会去重)
+     * @param reverse    由于调用栈是倒序的，该参数指定是否将倒序转为正序，true即转为正序，false即保持倒序
      * @return 追踪到的插件列表
      */
-    public static List<Plugin> tracePlugins(StackTraceElement[] stackTrace, boolean duplicate) {
-        List<Resource> resList = ReflectUtils.traceResources(stackTrace, "plugin.yml");
+    public static List<Plugin> tracePlugins(StackTraceElement[] stackTrace, boolean duplicate, boolean reverse) {
+        List<Resource> resList = ReflectUtils.traceResources(stackTrace, "plugin.yml", reverse);
         if (!resList.isEmpty()) {
             PluginManager pm = Bukkit.getPluginManager();
             List<Plugin> result = new ArrayList<>();
@@ -41,7 +39,7 @@ public class BukkitUtils {
                             new InputStreamReader(res.getInputStream(), StandardCharsets.UTF_8));
                     Plugin plugin = pm.getPlugin(yml.getString("name"));
                     if (plugin != null &&
-                        (!duplicate || (result.isEmpty() || plugin != result.get(result.size() - 1))))
+                            (!duplicate || (result.isEmpty() || plugin != result.get(result.size() - 1))))
                         result.add(plugin);
                 } catch (IOException e) {
                     ExceptionHandler.handle(e);
@@ -57,10 +55,10 @@ public class BukkitUtils {
      * 会通过每个调用栈Class尝试获取插件，直到获取到第一个插件为止
      *
      * @param stackTrace 调用栈
-     * @return 追踪到的调用栈上的第一个插件
+     * @return 追踪到的调用栈上的第一个插件，获取失败或调用栈中没有插件时返回null
      */
     public static Plugin traceFirstPlugin(StackTraceElement[] stackTrace) {
-        List<Resource> resList = ReflectUtils.traceResources(stackTrace, "plugin.yml");
+        List<Resource> resList = ReflectUtils.traceResources(stackTrace, "plugin.yml", false);
         if (!resList.isEmpty()) {
             try {
                 YamlConfiguration yml = YamlConfiguration.loadConfiguration(

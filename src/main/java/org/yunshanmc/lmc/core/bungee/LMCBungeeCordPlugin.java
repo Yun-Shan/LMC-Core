@@ -74,7 +74,6 @@ public abstract class LMCBungeeCordPlugin extends Plugin implements LMCPlugin {
          */
         if (this.exceptionHandler == null) this.exceptionHandler = ExceptionHandler.DEFAULT_HANDLER;
         ExceptionHandler.setHandler(this, this.exceptionHandler);
-        ExceptionHandler.start();
         return true;
     }
 

@@ -4,6 +4,8 @@
  */
 package org.yunshanmc.lmc.core.bukkit;
 
+import org.yunshanmc.lmc.core.internal.Utils;
+
 /**
  * //TODO
  */
@@ -16,6 +18,6 @@ public class LMCCoreBukkitPlugin extends LMCBukkitPlugin {
 
     @Override
     public void onEnable() {
-
+        Utils.setLMCCorePlugin(this);
     }
 }

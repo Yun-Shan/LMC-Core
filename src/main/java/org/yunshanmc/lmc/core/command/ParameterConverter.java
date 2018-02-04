@@ -12,6 +12,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public abstract class ParameterConverter<T> {
 

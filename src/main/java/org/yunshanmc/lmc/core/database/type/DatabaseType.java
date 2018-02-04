@@ -1,15 +1,18 @@
 package org.yunshanmc.lmc.core.database.type;
 
 import org.bukkit.configuration.ConfigurationSection;
+import org.yunshanmc.lmc.core.LMCPlugin;
 import org.yunshanmc.lmc.core.message.MessageSender;
 
 public abstract class DatabaseType {
 
+    protected final LMCPlugin plugin;
     protected final MessageSender messageSender;
     private final String name;
     private final String driverClass;
 
-    protected DatabaseType(String name, String driverClass, MessageSender messageSender) {
+    protected DatabaseType(LMCPlugin plugin, String name, String driverClass, MessageSender messageSender) {
+        this.plugin = plugin;
         this.name = name;
         this.driverClass = driverClass;
         this.messageSender = messageSender;
@@ -48,12 +51,12 @@ public abstract class DatabaseType {
      */
     public abstract String getTestSQL();
 
-    public static DatabaseType matchType(String type, MessageSender messageSender) {
+    public static DatabaseType matchType(String type, LMCPlugin plugin,  MessageSender messageSender) {
         switch (type.toLowerCase()) {
             case "mysql":
-                return new MySQLDatabaseType(messageSender);
+                return new MySQLDatabaseType(plugin, messageSender);
             case "sqlite":
-                return new SQLiteDatabaseType(messageSender);
+                return new SQLiteDatabaseType(plugin, messageSender);
             default:
                 return null;
         }

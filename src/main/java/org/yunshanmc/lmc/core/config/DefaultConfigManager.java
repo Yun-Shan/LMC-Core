@@ -1,6 +1,7 @@
 package org.yunshanmc.lmc.core.config;
 
 import com.google.common.collect.Maps;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
@@ -41,7 +42,9 @@ public class DefaultConfigManager implements ConfigManager {
     @Override
     public FileConfiguration getConfig(String path) {
         FileConfiguration cfg = this.getUserConfig(path);
-        if (cfg == null) cfg = this.getDefaultConfig(path);
+        FileConfiguration def = this.getDefaultConfig(path);
+        if (cfg == null && def != null) cfg = def;
+        else if (cfg != null && def != null) cfg.addDefaults(def);
         return cfg;
     }
 
@@ -62,7 +65,14 @@ public class DefaultConfigManager implements ConfigManager {
     @Override
     public Map<String, FileConfiguration> getConfigs(String path, boolean deep) {
         Map<String, FileConfiguration> cfgs = this.getUserConfigs(path, deep);
-        if (cfgs == null) cfgs = this.getDefaultConfigs(path, deep);
+        if (cfgs != null) {
+            cfgs.forEach((k, v) -> {
+                FileConfiguration def = this.getDefaultConfig(k);
+                if (def != null) v.addDefaults(def);
+            });
+        } else {
+            cfgs = this.getDefaultConfigs(path, deep);
+        }
         return cfgs;
     }
 
@@ -75,11 +85,12 @@ public class DefaultConfigManager implements ConfigManager {
 
     @Override
     public FileConfiguration readConfig(Resource resource) {
+        YamlConfiguration cfg = new YamlConfiguration();
         try {
-            return YamlConfiguration.loadConfiguration(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8));
-        } catch (IOException e) {
+            cfg.load(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8));
+        } catch (IOException | InvalidConfigurationException e) {
             ExceptionHandler.handle(e);
-            return null;
         }
+        return cfg;
     }
 }

@@ -1,7 +1,7 @@
 package org.yunshanmc.lmc.core.database;
 
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.yunshanmc.lmc.core.LMCPlugin;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.message.MessageSender;
 
@@ -13,8 +13,8 @@ public class JdbcDatabase extends Database {
 
     private Connection connection;
 
-    public JdbcDatabase(FileConfiguration pluginConfig, MessageSender messageSender) {
-        super(pluginConfig, messageSender);
+    public JdbcDatabase(LMCPlugin plugin, FileConfiguration pluginConfig, MessageSender messageSender) {
+        super(plugin, pluginConfig, messageSender);
     }
 
     @Override
@@ -24,6 +24,18 @@ public class JdbcDatabase extends Database {
         // MySQL
         // this.connection.createStatement().execute("SELECT 1;");
         return true;
+    }
+
+    @Override
+    public void close() {
+        super.close();
+        try {
+            if (this.connection != null) this.connection.close();
+        } catch (SQLException e) {
+            ExceptionHandler.handle(e);
+        } finally {
+            this.connection = null;
+        }
     }
 
     public Connection getConnection() {

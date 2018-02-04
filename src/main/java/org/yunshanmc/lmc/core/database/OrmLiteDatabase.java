@@ -19,6 +19,7 @@ import org.yunshanmc.lmc.core.utils.BukkitUtils;
 import org.yunshanmc.lmc.core.utils.BungeeUtils;
 import org.yunshanmc.lmc.core.utils.PlatformUtils;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -36,18 +37,31 @@ public class OrmLiteDatabase extends Database {
     private ConnectionSource connectionSource;
 
     public OrmLiteDatabase(LMCPlugin plugin, FileConfiguration pluginConfig, MessageSender messageSender) {
-        super(pluginConfig, messageSender);
+        super(plugin, pluginConfig, messageSender);
 
-        String levelStr = this.dbConfig.getString("logLevel", "");
-        Log.Level level;
-        try {
-            level = Log.Level.valueOf(levelStr);
-        } catch (IllegalArgumentException ex) {
-            messageSender.errorConsole("database.UnknownOrmLiteLogLevel", levelStr);
-            level = Log.Level.INFO;
+        if (this.dbConfig != null) {
+            String levelStr = this.dbConfig.getString("logLevel", "");
+            Log.Level level;
+            try {
+                level = Log.Level.valueOf(levelStr);
+            } catch (IllegalArgumentException ex) {
+                messageSender.warningConsole("database.UnknownOrmLiteLogLevel", levelStr);
+                level = Log.Level.INFO;
+            }
+            CreateLoggerInterceptor.setLevel(plugin.getName(), level);
         }
-        CreateLoggerInterceptor.setLevel(plugin.getName(), level);
+    }
 
+    @Override
+    public void close() {
+        super.close();
+        try {
+            if (this.connectionSource != null) this.connectionSource.close();
+        } catch (IOException e) {
+            ExceptionHandler.handle(e);
+        } finally {
+            this.connectionSource = null;
+        }
     }
 
     @Override
@@ -56,10 +70,9 @@ public class OrmLiteDatabase extends Database {
 
         // 连接测试
         DatabaseConnection conn = this.connectionSource.getReadWriteConnection("");
-        // TODO: 测试连接语句 各类型数据库适配
-        // MySQL
-        // conn.executeStatement("SELECT 1;", DatabaseConnection.DEFAULT_RESULT_FLAGS);
-        // this.connectionSource.releaseConnection(conn);
+
+        conn.executeStatement(this.dbType.getTestSQL(), DatabaseConnection.DEFAULT_RESULT_FLAGS);
+        this.connectionSource.releaseConnection(conn);
         return true;
     }
 

@@ -72,7 +72,7 @@ public class StandardResourceManagerTest {
         resourceManager.updateJar();
         resourceManager.getSelfResources("e", null, true).values().forEach(resource -> {
             try {
-                System.out.println(new String(ByteStreams.toByteArray(resource.getInputStream())));
+                assertEquals("TEST a", new String(ByteStreams.toByteArray(resource.getInputStream())));
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -1,0 +1,45 @@
+ConnectSuccess: "成功连接数据库！"
+ConnectFail: "连接数据库失败！请检查数据库是否开启及网络连接是否正常！"
+
+MissingAllConfig: "无法找到数据库配置信息，请检查是否有配置数据库信息(配置节点：database)！"
+MissingTypeConfig: "未配置数据库类型！"
+UnsupportedDatabaseType: "暂不支持该数据库类型：{1}！"
+MissingSubConfig: "无法找到{1}数据库配置信息，请检查是否有配置数据库信息(配置节点：database.{2})!"
+MySQL:
+  buildURL:
+    MissingConfig: |
+      MySQL数据库配置信息不全，当前配置信息为：
+      host: {1}
+      port: {2}
+      databse-name: {3}
+      user: {4}
+      password: {5}
+      请补充未配置的信息！
+    JDBC_URL: |
+      正在构造连接MySQL数据库的JDBC URL，当前配置信息为：
+      host: {1}
+      port: {2}
+      databse-name: {3}
+      user: {4}
+      password: {5}
+SQLite:
+  buildURL:
+    MKDirsFail: "创建数据库文件失败，无法创建父目录！({1})"
+    MissingConfig: |
+      SQLite数据库配置信息不全，当前配置信息为：
+      path: {1}
+      请补充未配置的信息！
+    JDBC_URL: |
+      正在构造连接SQLite数据库的JDBC URL，当前配置信息为：
+      path: {1}
+
+
+UnknownOrmLiteLogLevel: "未配置日志级别或日志级别无效，将默认设为INFO！"
+
+OrmLiteLog:
+  trace: "{1}"
+  debuf: "{1}"
+  info: "{1}"
+  warning: "{1}"
+  error: "{1}"
+  fatal: "{1}"

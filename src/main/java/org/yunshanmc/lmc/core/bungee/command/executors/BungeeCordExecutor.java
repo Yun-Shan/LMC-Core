@@ -34,16 +34,16 @@ public class BungeeCordExecutor extends CommandExecutor {
         LMCCommand cmd = super.resolveCommand(args);
 
         if (cmd != null) {
-            if (!cmd.isValid()) {
-                this.messageSender.info(sender, "command.invalid", this.handleCommand, cmd.getName());
-                return;
-            }
-            if (args.length >= 2) {
-                args = Arrays.copyOfRange(args, 1, args.length);
+            if (cmd.isValid()) {
+                if (args.length >= 2) {
+                    args = Arrays.copyOfRange(args, 1, args.length);
+                } else {
+                    args = new String[0];
+                }
+                cmd.execute(sender, this.handleCommand, args);
             } else {
-                args = new String[0];
+                this.messageSender.info(sender, "command.invalid", this.handleCommand, cmd.getName());
             }
-            cmd.execute(sender, args);
         } else {
             this.messageSender.info(sender, "command.notFound", this.handleCommand, args.length > 0 ? args[0] : "");
         }

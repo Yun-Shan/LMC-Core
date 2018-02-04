@@ -5,11 +5,18 @@
 package org.yunshanmc.lmc.core.exception;
 
 import com.google.common.base.Strings;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.Plugin;
 import org.yunshanmc.lmc.core.LMCPlugin;
 import org.yunshanmc.lmc.core.internal.BuiltinMessage;
 import org.yunshanmc.lmc.core.resource.Resource;
+import org.yunshanmc.lmc.core.utils.BukkitUtils;
+import org.yunshanmc.lmc.core.utils.BungeeUtils;
+import org.yunshanmc.lmc.core.utils.PlatformUtils;
 import org.yunshanmc.lmc.core.utils.ReflectUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -17,11 +24,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -36,7 +39,7 @@ public final class ExceptionHandler {
 
     private static final AtomicBoolean STOP_FLAG = new AtomicBoolean(false);
 
-    public static void start() {
+    static {
         for (int i = 0; i < 3; i++) {
             new ExceptionHandlerThread(i + 1, STOP_FLAG).start();
         }
@@ -59,15 +62,15 @@ public final class ExceptionHandler {
         err.printStackTrace(writer);
         writer.flush();
         writer.close();
-
-        Bukkit.getConsoleSender().sendMessage(
-                BuiltinMessage.getMessage("DefaultErrorHandler",
-                        info.getPlugin(),
-                        err.getClass().getName(),
-                        Strings.nullToEmpty(desc),
-                        new String(buffer.toByteArray())
-                )
-        );
+        String msg = BuiltinMessage.getMessage("DefaultErrorHandler", info.getPlugin(), err.getClass().getName(),
+                                               Strings.nullToEmpty(desc), new String(buffer.toByteArray()));
+        if (PlatformUtils.isTest()) {
+            System.out.println(msg);
+        } else if (PlatformUtils.isBukkit()) {
+            Bukkit.getConsoleSender().sendMessage(msg.split("\\n"));
+        } else if (PlatformUtils.isBungeeCord()) {
+            ProxyServer.getInstance().getConsole().sendMessage(TextComponent.fromLegacyText(msg));
+        }
     };
 
     private static final Queue<ExceptionInfo> QUEUE = new ConcurrentLinkedQueue<>();
@@ -84,7 +87,11 @@ public final class ExceptionHandler {
     }
 
     public static void handle(Throwable t, String description) {
-        QUEUE.offer(new ExceptionInfo(t, description));
+        if (PlatformUtils.isTest()) {
+            DEFAULT_HANDLER.accept(new ExceptionInfo(t, description));
+        } else {
+            QUEUE.offer(new ExceptionInfo(t, description));
+        }
     }
 
     private static class ExceptionHandlerThread extends Thread {
@@ -99,29 +106,42 @@ public final class ExceptionHandler {
         @Override
         public void run() {
             ExceptionInfo err;
-            while ((err = QUEUE.poll()) != null) {
+            while (true) {
+                err = QUEUE.poll();
                 try {
-                    Thread.sleep(1000);
+                    if (err == null) {
+                        if (this.stopFlag.get()) break;
+                        Thread.sleep(100);
+                        continue;
+                    }
                 } catch (InterruptedException e) {
                     ExceptionHandler.handle(e);
+                    continue;
                 }
                 if (this.stopFlag.get()) break;
-
-                List<Resource> resList = ReflectUtils.traceResources(err.getThrowable().getStackTrace(), "plugin.yml");
+                String pluginName = null;
+                if (PlatformUtils.isBukkit()) {
+                    Plugin plugin = BukkitUtils.traceFirstPlugin(err.getThrowable().getStackTrace());
+                    if (plugin != null) {
+                        pluginName = plugin.getName();
+                    }
+                } else if (PlatformUtils.isBungeeCord()) {
+                    net.md_5.bungee.api.plugin.Plugin plugin = BungeeUtils.traceFirstPlugin(err.getThrowable().getStackTrace());
+                    if (plugin != null) {
+                        pluginName = plugin.getDescription().getName();
+                    }
+                }
+                if (pluginName == null)
+                    pluginName = BuiltinMessage.getMessage("InExceptionHandler_ExceptionDescription");
                 Consumer<ExceptionInfo> handler = DEFAULT_HANDLER;
 
-                if (!resList.isEmpty()) {
-                    try {
-                        if (this.stopFlag.get()) break;
-                        YamlConfiguration yml = YamlConfiguration.loadConfiguration(
-                                new InputStreamReader(resList.get(0).getInputStream(),
-                                        StandardCharsets.UTF_8));
-                        String plugin = yml.getString("name");
-                        err.setPlugin(plugin);
-                        handler = HANDLERS.get(plugin);
-                    } catch (IOException e) {
-                        DEFAULT_HANDLER.accept(new ExceptionInfo(e, BuiltinMessage.getMessage("InExceptionHandler_ExceptionDescription")));
-                    }
+                try {
+                    if (this.stopFlag.get()) break;
+                    err.setPlugin(pluginName);
+                    handler = HANDLERS.getOrDefault(pluginName, DEFAULT_HANDLER);
+                } catch (Exception e) {
+                    DEFAULT_HANDLER.accept(new ExceptionInfo(e, BuiltinMessage.getMessage(
+                            "InExceptionHandler_ExceptionDescription")));
                 }
 
                 if (this.stopFlag.get()) break;
