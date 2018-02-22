@@ -9,6 +9,7 @@ import org.yunshanmc.lmc.core.resource.Resource;
 import org.yunshanmc.lmc.core.resource.URLResource;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -65,13 +66,15 @@ public final class ReflectUtils {
                 // 使用特殊方法(如JVMTI)加载的类没有ProtectionDomain或CodeSource
                 if (cls.getProtectionDomain() == null || cls.getProtectionDomain().getCodeSource() == null) break;
                 CodeSource codeSource = cls.getProtectionDomain().getCodeSource();
+                if (codeSource.equals(beCalled.getProtectionDomain().getCodeSource())) {// 正式环境
+                    return;
+                }
                 File file = Resource.urlToFile(codeSource.getLocation());
-                if (
-                        // 测试环境
-                        (file.isDirectory() && file.getPath().replace('\\', '/').endsWith("test/classes"))
-                        // 正式环境
-                        || codeSource.equals(beCalled.getProtectionDomain().getCodeSource())
-                        ) return;
+                if (file.isDirectory()) {// 测试环境
+                    String path = file.getPath().replace('\\', '/');
+                    if (path.endsWith("test/classes")/* IDEA Test */
+                            || path.endsWith("build/classes/java/test")/* Gradle Test */) return;
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 break;
