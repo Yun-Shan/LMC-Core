@@ -8,7 +8,10 @@ import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.resource.Resource;
 import org.yunshanmc.lmc.core.resource.URLResource;
 
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -38,9 +41,10 @@ public final class ReflectUtils {
             try {
                 Class<?> cls = Class.forName(stack.getClassName());
                 URL url = cls.getResource(resPath);
-                if (url != null) ress.add(new URLResource(url));
+                if (url != null) ress.add(new URLResource(new URL(URLDecoder.decode(url.toString(), "UTF-8"))));
             } catch (ClassNotFoundException e) {
                 ExceptionHandler.handle(e);
+            } catch (MalformedURLException | UnsupportedEncodingException ignored) {
             }
         }
         if (reverse) Collections.reverse(ress);
