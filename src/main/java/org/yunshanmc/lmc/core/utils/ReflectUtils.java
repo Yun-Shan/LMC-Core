@@ -8,13 +8,16 @@ import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.resource.Resource;
 import org.yunshanmc.lmc.core.resource.URLResource;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.security.CodeSource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.jar.JarFile;
 
 /**
  * 反射相关工具
@@ -53,17 +56,27 @@ public final class ReflectUtils {
 
     public static void checkSafeCall() {
         StackTraceElement[] elements = new Throwable().getStackTrace();
-        try {
-            Class<?> beCalled = Class.forName(elements[1].getClassName());
-            Class cls = Class.forName(elements[2].getClassName());
-            if (// 测试环境(测试环境代码不在jar中)
-                !cls.getProtectionDomain().getCodeSource().getLocation().getFile().contains(".jar")
-                // 正式环境
-                || cls.getProtectionDomain().getCodeSource().equals(beCalled.getProtectionDomain().getCodeSource())
-                ) return;
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+
+        //noinspection ConstantConditions
+        do {
+            try {
+                Class<?> beCalled = Class.forName(elements[1].getClassName());
+                Class cls = Class.forName(elements[2].getClassName());
+                // 使用特殊方法(如JVMTI)加载的类没有ProtectionDomain或CodeSource
+                if (cls.getProtectionDomain() == null || cls.getProtectionDomain().getCodeSource() == null) break;
+                CodeSource codeSource = cls.getProtectionDomain().getCodeSource();
+                File file = Resource.urlToFile(codeSource.getLocation());
+                if (
+                        // 测试环境
+                        (file.isDirectory() && file.getPath().replace('\\', '/').endsWith("test/classes"))
+                        // 正式环境
+                        || codeSource.equals(beCalled.getProtectionDomain().getCodeSource())
+                        ) return;
+            } catch (Exception e) {
+                e.printStackTrace();
+                break;
+            }
+        } while (false);
         throw new Error("unsafe call");
     }
 
