@@ -10,14 +10,15 @@ public final class PlatformUtils {
     private static final PlatformType PLATFORM;
 
     static {
+        PlatformType type = null;
         LMCPlugin lmc = Utils.getLMCCorePlugin();
-        PlatformType type;
-        switch (lmc.getClass().getName()) {
-            case "org.yunshanmc.lmc.core.bukkit.LMCCoreBukkitPlugin": type = PlatformType.Bukkit; break;
-            case "org.yunshanmc.lmc.core.bungee.LMCCoreBungeeCordPlugin": type = PlatformType.BungeeCord; break;
-            case "org.yunshanmc.lmc.core.MockPlugin": type = PlatformType.Test; break;
-            default: type = PlatformType.Unknown;
+        if (lmc != null) {
+            switch (lmc.getClass().getName()) {
+                case "org.yunshanmc.lmc.core.bukkit.LMCCoreBukkitPlugin": type = PlatformType.Bukkit; break;
+                case "org.yunshanmc.lmc.core.bungee.LMCCoreBungeeCordPlugin": type = PlatformType.BungeeCord; break;
+            }
         }
+        if (type == null) type = PlatformType.Unknown;
         PLATFORM = type;
     }
 
@@ -29,10 +30,6 @@ public final class PlatformUtils {
         return PlatformType.BungeeCord.equals(PLATFORM);
     }
 
-    public static boolean isTest() {
-        return PlatformType.Test.equals(PLATFORM);
-    }
-
     public static PlatformType getPlatform() {
         return PLATFORM;
     }
@@ -40,7 +37,6 @@ public final class PlatformUtils {
     public enum PlatformType {
         Bukkit,
         BungeeCord,
-        Test,
 
         Unknown
     }

@@ -66,17 +66,20 @@ public final class ReflectUtils {
                 // 使用特殊方法(如JVMTI)加载的类没有ProtectionDomain或CodeSource
                 if (cls.getProtectionDomain() == null || cls.getProtectionDomain().getCodeSource() == null) break;
                 CodeSource codeSource = cls.getProtectionDomain().getCodeSource();
-                if (codeSource.equals(beCalled.getProtectionDomain().getCodeSource())) {// 正式环境
+
+                // 正式环境
+                if (codeSource.equals(beCalled.getProtectionDomain().getCodeSource())) {
                     return;
                 }
-                if (PlatformUtils.isTest()) {// 测试环境
-                    File file = Resource.urlToFile(codeSource.getLocation());
-                    if (file.isDirectory()) {
-                        String path = file.getPath().replace('\\', '/');
-                        if (path.endsWith("test/classes")/* IDEA Test */
-                                || path.endsWith("build/classes/java/test")/* Gradle Test */) return;
-                    }
+
+                // TODO 测试环境
+                File file = Resource.urlToFile(codeSource.getLocation());
+                if (file.isDirectory()) {
+                    String path = file.getPath().replace('\\', '/');
+                    if (path.endsWith("test/classes")/* IDEA Test */
+                            || path.endsWith("build/classes/java/test")/* Gradle Test */) return;
                 }
+
             } catch (Exception e) {
                 e.printStackTrace();
                 break;

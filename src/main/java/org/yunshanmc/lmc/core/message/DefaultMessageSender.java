@@ -120,8 +120,6 @@ public class DefaultMessageSender implements MessageSender {
             return this.getMessage(msgKey, FAKE_PLAYER_BUKKIT, args);
         } else if (PlatformUtils.isBungeeCord()) {
             return this.getMessage(msgKey, FAKE_PLAYER_BUNGEE, args);
-        } else if (PlatformUtils.isTest()) {
-            return this.messageManager.getMessage(msgKey).getMessage(args);
         } else {
             throw new UnsupportedOperationException("Unsupported Platform");
         }
@@ -172,13 +170,6 @@ public class DefaultMessageSender implements MessageSender {
             this.message(Bukkit.getConsoleSender(), type, msgKey, args);
         } else if (PlatformUtils.isBungeeCord()) {
             this.message(ProxyServer.getInstance().getConsole(), type, msgKey, args);
-        } else if (PlatformUtils.isTest()) {
-            String[] msgs = this.messageManager.getMessage(msgKey).getMessages(args);
-            for (String msg : msgs) {
-                // 将信息放入类型模板
-                msg = this.messageManager.getMessage("message.type." + type).getMessage(msg);
-                System.out.println(msg);
-            }
         } else {
             throw new UnsupportedOperationException("Unsupported Platform");
         }

@@ -11,6 +11,7 @@ import org.yunshanmc.lmc.core.resource.MockResourceManager;
 import org.yunshanmc.lmc.core.resource.ResourceManager;
 
 import java.io.File;
+import java.lang.reflect.Field;
 
 public class MockPlugin implements LMCPlugin {
 
@@ -23,7 +24,13 @@ public class MockPlugin implements LMCPlugin {
     }
 
     private MockPlugin() {
-        Utils.setLMCCorePlugin(this);
+        try {
+            Field f = Utils.class.getDeclaredField("LMCCore");
+            f.setAccessible(true);
+            f.set(null, this);
+        } catch (ReflectiveOperationException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

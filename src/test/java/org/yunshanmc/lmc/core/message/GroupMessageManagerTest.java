@@ -1,6 +1,6 @@
 package org.yunshanmc.lmc.core.message;
 
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.yunshanmc.lmc.core.MockPlugin;
 
@@ -8,11 +8,11 @@ import static org.junit.Assert.assertEquals;
 
 public class GroupMessageManagerTest {
 
-    private GroupMessageManager messageManager;
+    private static GroupMessageManager messageManager;
 
-    @Before
-    public void setUp() {
-        this.messageManager = (GroupMessageManager) MockPlugin.newInstance().setGroupMessage(true).getMessageManager();
+    @BeforeClass
+    public static void setUp() {
+        messageManager = (GroupMessageManager) MockPlugin.newInstance().setGroupMessage(true).getMessageManager();
     }
 
     @Test
@@ -39,7 +39,7 @@ public class GroupMessageManagerTest {
     }
 
     private String getRawMessage(String key) {
-        return this.messageManager.getMessage(key).getRawMessage();
+        return messageManager.getMessage(key).getRawMessage();
     }
 
 }

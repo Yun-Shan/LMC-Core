@@ -12,11 +12,7 @@ public final class Utils {
     private static LMCPlugin LMCCore;
 
     public static synchronized void setLMCCorePlugin(LMCPlugin LMCCore) {
-        if (Utils.LMCCore != null) {
-            ReflectUtils.checkSafeCall();
-            if (!(PlatformUtils.isTest() && Utils.LMCCore.getClass().equals(LMCCore.getClass())))
-                throw new IllegalStateException();
-        }
+        if (Utils.LMCCore != null) throw new IllegalStateException();
         Utils.LMCCore = LMCCore;
     }
 

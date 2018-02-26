@@ -68,8 +68,6 @@ public final class ExceptionHandler {
             Bukkit.getConsoleSender().sendMessage(msg.split("\\n"));
         } else if (PlatformUtils.isBungeeCord()) {
             ProxyServer.getInstance().getConsole().sendMessage(TextComponent.fromLegacyText(msg));
-        } else if (PlatformUtils.isTest()) {
-            System.out.println(msg);
         }
     };
 
@@ -87,11 +85,7 @@ public final class ExceptionHandler {
     }
 
     public static void handle(Throwable t, String description) {
-        if (PlatformUtils.isTest()) {
-            DEFAULT_HANDLER.accept(new ExceptionInfo(t, description));
-        } else {
-            QUEUE.offer(new ExceptionInfo(t, description));
-        }
+        QUEUE.offer(new ExceptionInfo(t, description));
     }
 
     private static class ExceptionHandlerThread extends Thread {

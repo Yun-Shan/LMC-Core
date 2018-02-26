@@ -2,6 +2,7 @@ package org.yunshanmc.lmc.core.message;
 
 import org.bukkit.entity.Player;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.yunshanmc.lmc.core.MockPlugin;
 
@@ -9,11 +10,11 @@ import static org.junit.Assert.assertEquals;
 
 public class DefaultMessageManagerTest {
 
-    private DefaultMessageManager messageManager;
+    private static DefaultMessageManager messageManager;
 
-    @Before
-    public void setUp() {
-        this.messageManager = (DefaultMessageManager) MockPlugin.newInstance().setGroupMessage(false).getMessageManager();
+    @BeforeClass
+    public static void setUp() {
+        messageManager = (DefaultMessageManager) MockPlugin.newInstance().setGroupMessage(false).getMessageManager();
     }
 
     @Test
@@ -26,7 +27,7 @@ public class DefaultMessageManagerTest {
     }
 
     private String getRawMessage(String key) {
-        return this.messageManager.getMessage(key).getRawMessage();
+        return messageManager.getMessage(key).getRawMessage();
     }
 
 }

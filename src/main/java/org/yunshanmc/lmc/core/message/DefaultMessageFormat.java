@@ -50,9 +50,8 @@ public class DefaultMessageFormat implements MessageFormat {
                     val = message.getMessage(FAKE_PLAYER_BUKKIT);
                 } else if (PlatformUtils.isBungeeCord()) {
                     val = message.getMessage(FAKE_PLAYER_BUNGEE);
-                } else if (PlatformUtils.isTest()) {
-                    val = message.getMessage();
                 }
+
                 if (val != null) {
                     val = "§r" + val + "§r";
                 }

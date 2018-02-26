@@ -2,8 +2,10 @@ package org.yunshanmc.lmc.core.command;
 
 import org.bukkit.entity.Player;
 import org.junit.Test;
+import org.yunshanmc.lmc.core.EnvironmentUtil;
 import org.yunshanmc.lmc.core.MockPlugin;
 import org.yunshanmc.lmc.core.command.executors.CommandExecutor;
+import org.yunshanmc.lmc.core.utils.PlatformUtils;
 
 import java.lang.reflect.*;
 import java.util.Map;
@@ -17,6 +19,8 @@ public class DefaultCommandManagerTest {
     @SuppressWarnings("all")
     public void registerCommands() throws Exception {
         // TODO alias, label测试
+
+        EnvironmentUtil.setPlatform(PlatformUtils.PlatformType.Bukkit);
 
         MockPlugin plugin = MockPlugin.newInstance();
 
