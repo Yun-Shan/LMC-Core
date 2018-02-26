@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import org.yunshanmc.lmc.core.utils.PlatformUtils;
 
 /**
- * //TODO 注释
+ * PlaceholderAPI 格式化
  */
 public class PAPIMessageFormat extends DefaultMessageFormat {
 
