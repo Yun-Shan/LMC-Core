@@ -64,12 +64,12 @@ public final class ExceptionHandler {
         writer.close();
         String msg = BuiltinMessage.getMessage("DefaultErrorHandler", info.getPlugin(), err.getClass().getName(),
                                                Strings.nullToEmpty(desc), new String(buffer.toByteArray()));
-        if (PlatformUtils.isTest()) {
-            System.out.println(msg);
-        } else if (PlatformUtils.isBukkit()) {
+        if (PlatformUtils.isBukkit()) {
             Bukkit.getConsoleSender().sendMessage(msg.split("\\n"));
         } else if (PlatformUtils.isBungeeCord()) {
             ProxyServer.getInstance().getConsole().sendMessage(TextComponent.fromLegacyText(msg));
+        } else if (PlatformUtils.isTest()) {
+            System.out.println(msg);
         }
     };
 
@@ -126,7 +126,8 @@ public final class ExceptionHandler {
                         pluginName = plugin.getName();
                     }
                 } else if (PlatformUtils.isBungeeCord()) {
-                    net.md_5.bungee.api.plugin.Plugin plugin = BungeeUtils.traceFirstPlugin(err.getThrowable().getStackTrace());
+                    net.md_5.bungee.api.plugin.Plugin plugin = BungeeUtils.traceFirstPlugin(
+                            err.getThrowable().getStackTrace());
                     if (plugin != null) {
                         pluginName = plugin.getDescription().getName();
                     }

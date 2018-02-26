@@ -95,14 +95,14 @@ public class DefaultCommandManager implements CommandManager {
                         }
 
                         boolean allow = false;
-                        if (PlatformUtils.isTest()) {
-                            allow = true;
-                        }
                         if (!allow && PlatformUtils.isBukkit()) {
                             allow = CommandSender.class.isAssignableFrom(param.getType());
                         }
                         if (!allow && PlatformUtils.isBungeeCord()) {
                             allow = net.md_5.bungee.api.CommandSender.class.isAssignableFrom(param.getType());
+                        }
+                        if (!allow && PlatformUtils.isTest()) {
+                            allow = true;
                         }
                         if (!allow) {
                             // Sender参数类型必须是CommandSender/子接口/实现类
