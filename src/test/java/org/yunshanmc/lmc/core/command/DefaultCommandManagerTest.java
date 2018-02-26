@@ -1,21 +1,12 @@
 package org.yunshanmc.lmc.core.command;
 
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.junit.Test;
-import org.yunshanmc.lmc.core.LMCPlugin;
 import org.yunshanmc.lmc.core.MockPlugin;
 import org.yunshanmc.lmc.core.command.executors.CommandExecutor;
-import org.yunshanmc.lmc.core.message.DefaultMessageFormat;
-import org.yunshanmc.lmc.core.message.DefaultMessageSender;
-import org.yunshanmc.lmc.core.message.Message;
-import org.yunshanmc.lmc.core.message.MessageManager;
 
 import java.lang.reflect.*;
-import java.util.Arrays;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -27,7 +18,7 @@ public class DefaultCommandManagerTest {
     public void registerCommands() throws Exception {
         // TODO alias, label测试
 
-        MockPlugin plugin = MockPlugin.getInstance();
+        MockPlugin plugin = MockPlugin.newInstance();
 
         DefaultCommandManager manager = new DefaultCommandManager(plugin, "test");
 
