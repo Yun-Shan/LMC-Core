@@ -6,6 +6,7 @@ package org.yunshanmc.lmc.core.resource;
 
 import com.google.common.base.Strings;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -36,5 +37,17 @@ public interface Resource {
         if (Strings.isNullOrEmpty(path)) return "/";
         if (path.charAt(0) == '/') return path;
         return '/' + path;
+    }
+
+    static File urlToFile(URL url) {
+        switch (url.getProtocol()) {
+            case "file": return new File(url.getPath());
+            case "jar": {
+                String path = url.getPath();
+                int sep = path.indexOf("!/");
+                return new File(path.substring(6 /* file:/ */, sep));
+            }
+            default: throw new UnsupportedOperationException();
+        }
     }
 }
