@@ -18,7 +18,11 @@ public class MockPlugin implements LMCPlugin {
     private MockResourceManager resourceManager;
     private DefaultConfigManager configManager;
 
-    public MockPlugin() {
+    public static MockPlugin getInstance() {
+        return new MockPlugin();
+    }
+
+    private MockPlugin() {
         Utils.setLMCCorePlugin(this);
     }
 

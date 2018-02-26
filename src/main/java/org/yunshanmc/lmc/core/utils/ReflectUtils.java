@@ -69,11 +69,13 @@ public final class ReflectUtils {
                 if (codeSource.equals(beCalled.getProtectionDomain().getCodeSource())) {// 正式环境
                     return;
                 }
-                File file = Resource.urlToFile(codeSource.getLocation());
-                if (file.isDirectory()) {// 测试环境
-                    String path = file.getPath().replace('\\', '/');
-                    if (path.endsWith("test/classes")/* IDEA Test */
-                            || path.endsWith("build/classes/java/test")/* Gradle Test */) return;
+                if (PlatformUtils.isTest()) {// 测试环境
+                    File file = Resource.urlToFile(codeSource.getLocation());
+                    if (file.isDirectory()) {
+                        String path = file.getPath().replace('\\', '/');
+                        if (path.endsWith("test/classes")/* IDEA Test */
+                                || path.endsWith("build/classes/java/test")/* Gradle Test */) return;
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();

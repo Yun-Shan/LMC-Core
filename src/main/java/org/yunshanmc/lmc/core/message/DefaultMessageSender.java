@@ -120,6 +120,8 @@ public class DefaultMessageSender implements MessageSender {
             return this.getMessage(msgKey, FAKE_PLAYER_BUKKIT, args);
         } else if (PlatformUtils.isBungeeCord()) {
             return this.getMessage(msgKey, FAKE_PLAYER_BUNGEE, args);
+        } else if (PlatformUtils.isTest()) {
+            return msgKey;// TODO
         } else {
             throw new UnsupportedOperationException("Unsupported Platform");
         }
@@ -170,6 +172,8 @@ public class DefaultMessageSender implements MessageSender {
             this.message(Bukkit.getConsoleSender(), type, msgKey, args);
         } else if (PlatformUtils.isBungeeCord()) {
             this.message(ProxyServer.getInstance().getConsole(), type, msgKey, args);
+        } else if (PlatformUtils.isTest()) {
+            // TODO
         } else {
             throw new UnsupportedOperationException("Unsupported Platform");
         }

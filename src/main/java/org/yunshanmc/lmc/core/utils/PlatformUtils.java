@@ -1,51 +1,46 @@
 package org.yunshanmc.lmc.core.utils;
 
+import org.yunshanmc.lmc.core.LMCPlugin;
+import org.yunshanmc.lmc.core.internal.Utils;
+
 public final class PlatformUtils {
 
     private PlatformUtils(){}// 禁止实例化
 
-    private static PlatformType platform;
+    private static final PlatformType PLATFORM;
 
     static {
-        try {
-            Class.forName("org.bukkit.plugin.java.JavaPlugin");
-            platform = PlatformType.Bukkit;
-        } catch (ClassNotFoundException ignored) {
+        LMCPlugin lmc = Utils.getLMCCorePlugin();
+        PlatformType type;
+        switch (lmc.getClass().getName()) {
+            case "org.yunshanmc.lmc.core.bukkit.LMCCoreBukkitPlugin": type = PlatformType.Bukkit; break;
+            case "org.yunshanmc.lmc.core.bungee.LMCCoreBungeeCordPlugin": type = PlatformType.BungeeCord; break;
+            case "org.yunshanmc.lmc.core.MockPlugin": type = PlatformType.Test; break;
+            default: type = PlatformType.Unknown;
         }
-        if (platform == null) {
-            try {
-                Class.forName("net.md_5.bungee.api.plugin.Plugin");
-                platform = PlatformType.BungeeCord;
-            } catch (ClassNotFoundException ignored) {
-            }
-        }
-
-        if (platform == null) platform = PlatformType.Unknown;
+        PLATFORM = type;
     }
 
     public static boolean isBukkit() {
-        return platform == PlatformType.Bukkit;
+        return PlatformType.Bukkit.equals(PLATFORM);
     }
 
     public static boolean isBungeeCord() {
-        return platform == PlatformType.BungeeCord;
+        return PlatformType.BungeeCord.equals(PLATFORM);
     }
 
     public static boolean isTest() {
-        try {
-            return !PlatformUtils.class.getProtectionDomain().getCodeSource().getLocation().getFile().contains(".jar");
-        } catch (Throwable t) {
-            return false;
-        }
+        return PlatformType.Test.equals(PLATFORM);
     }
 
-    public static PlatformType getPlatformType() {
-        return platform;
+    public static PlatformType getPlatform() {
+        return PLATFORM;
     }
 
     public enum PlatformType {
         Bukkit,
         BungeeCord,
+        Test,
 
         Unknown
     }

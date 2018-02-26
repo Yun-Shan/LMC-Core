@@ -95,7 +95,10 @@ public class DefaultCommandManager implements CommandManager {
                         }
 
                         boolean allow = false;
-                        if (PlatformUtils.isBukkit()) {
+                        if (PlatformUtils.isTest()) {
+                            allow = true;
+                        }
+                        if (!allow && PlatformUtils.isBukkit()) {
                             allow = CommandSender.class.isAssignableFrom(param.getType());
                         }
                         if (!allow && PlatformUtils.isBungeeCord()) {

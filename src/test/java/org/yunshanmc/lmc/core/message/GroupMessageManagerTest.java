@@ -12,7 +12,7 @@ public class GroupMessageManagerTest {
 
     @Before
     public void setUp() {
-        this.messageManager = (GroupMessageManager) new MockPlugin().setGroupMessage(true).getMessageManager();
+        this.messageManager = (GroupMessageManager) MockPlugin.getInstance().setGroupMessage(true).getMessageManager();
     }
 
     @Test

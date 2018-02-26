@@ -13,7 +13,7 @@ public class DefaultMessageManagerTest {
 
     @Before
     public void setUp() {
-        this.messageManager = (DefaultMessageManager) new MockPlugin().setGroupMessage(false).getMessageManager();
+        this.messageManager = (DefaultMessageManager) MockPlugin.getInstance().setGroupMessage(false).getMessageManager();
     }
 
     @Test
