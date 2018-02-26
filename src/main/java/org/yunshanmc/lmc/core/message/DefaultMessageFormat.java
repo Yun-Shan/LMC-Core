@@ -26,16 +26,6 @@ public class DefaultMessageFormat implements MessageFormat {
         this.context = context;
     }
 
-    @Override
-    public String format(Player player, String msg, Object... args) {
-        return format(msg, args);
-    }
-
-    @Override
-    public String format(ProxiedPlayer player, String msg, Object... args) {
-        return format(msg, args);
-    }
-
     private static final Pattern VARIABLE_PATTERN =
             Pattern.compile("" +
                                     "\\{(" +
@@ -45,7 +35,8 @@ public class DefaultMessageFormat implements MessageFormat {
                                     // "|(?<js>&[^}]+)" + // TODO js功能
                                     ")}");
 
-    private String format(String msg, Object... args) {
+    @Override
+    public String format(String msg, Object... args) {
         Matcher matcher = VARIABLE_PATTERN.matcher(msg);
         StringBuffer buffer = new StringBuffer();
         while (matcher.find()) {
@@ -59,6 +50,8 @@ public class DefaultMessageFormat implements MessageFormat {
                     val = message.getMessage(FAKE_PLAYER_BUKKIT);
                 } else if (PlatformUtils.isBungeeCord()) {
                     val = message.getMessage(FAKE_PLAYER_BUNGEE);
+                } else if (PlatformUtils.isTest()) {
+                    val = message.getMessage();
                 }
                 if (val != null) {
                     val = "§r" + val + "§r";

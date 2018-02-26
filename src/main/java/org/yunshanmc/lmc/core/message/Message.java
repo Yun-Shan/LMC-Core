@@ -104,6 +104,18 @@ public class Message {
         }
     }
 
+    public String getMessage(Object... args) {
+        return this.format.format(this.msg, args);
+    }
+
+    public String[] getMessages(Object... args) {
+        String[] msgs = this.msg.split("\n");
+        for (int i = 0; i < msgs.length; i++) {
+            msgs[i] = this.format.format(msgs[i], args);
+        }
+        return msgs;
+    }
+
     public static class MissingMessage extends Message {
 
         public MissingMessage(String msg) {
