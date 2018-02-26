@@ -4,9 +4,14 @@
  */
 package org.yunshanmc.lmc.core.message;
 
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.yunshanmc.lmc.core.utils.PlatformUtils;
+
+import java.util.UUID;
 
 /**
  * //TODO 注释
@@ -57,6 +62,46 @@ public class Message {
             msgs[i] = this.format.format(player, msgs[i], args);
         }
         return msgs;
+    }
+
+    public String getMessage(UUID playerId, Object... args) {
+        if (PlatformUtils.isBukkit()) {
+            Player p = Bukkit.getPlayer(playerId);
+            if (p != null) {
+                return this.getMessage(p, args);
+            } else {
+                return null;
+            }
+        } else if (PlatformUtils.isBungeeCord()) {
+            ProxiedPlayer p = ProxyServer.getInstance().getPlayer(playerId);
+            if (p != null) {
+                return this.getMessage(p, args);
+            } else {
+                return null;
+            }
+        } else {
+            throw new UnsupportedOperationException("Unsupported Platform");
+        }
+    }
+
+    public String[] getMessages(UUID playerId, Object... args) {
+        if (PlatformUtils.isBukkit()) {
+            Player p = Bukkit.getPlayer(playerId);
+            if (p != null) {
+                return this.getMessages(p, args);
+            } else {
+                return null;
+            }
+        } else if (PlatformUtils.isBungeeCord()) {
+            ProxiedPlayer p = ProxyServer.getInstance().getPlayer(playerId);
+            if (p != null) {
+                return this.getMessages(p, args);
+            } else {
+                return null;
+            }
+        } else {
+            throw new UnsupportedOperationException("Unsupported Platform");
+        }
     }
 
     public static class MissingMessage extends Message {

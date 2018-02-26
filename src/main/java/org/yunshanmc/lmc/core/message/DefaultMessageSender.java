@@ -15,7 +15,7 @@ import org.bukkit.entity.Player;
 import org.yunshanmc.lmc.core.utils.PlatformUtils;
 
 import java.lang.reflect.Proxy;
-import java.util.Arrays;
+import java.util.UUID;
 
 /**
  * //TODO
@@ -96,6 +96,7 @@ public class DefaultMessageSender implements MessageSender {
 
     public DefaultMessageSender(MessageManager messageManager) {
         this.messageManager = messageManager;
+        this.debugLevel = messageManager.getDebugLevel();
     }
 
     @Override
@@ -106,6 +107,11 @@ public class DefaultMessageSender implements MessageSender {
     @Override
     public String getMessage(String msgKey, ProxiedPlayer player, Object... args) {
         return this.messageManager.getMessage(msgKey).getMessage(player, args);
+    }
+
+    @Override
+    public String getMessage(String msgKey, UUID playerId, Object... args) {
+        return this.messageManager.getMessage(msgKey).getMessage(playerId, args);
     }
 
     @Override
@@ -120,101 +126,133 @@ public class DefaultMessageSender implements MessageSender {
     }
 
     @Override
-    public MessageSender message(CommandSender receiver, String type, String msgKey, Object... args) {
+    public void message(CommandSender receiver, String type, String msgKey, Object... args) {
         Player player = receiver instanceof Player ? (Player) receiver : FAKE_PLAYER_BUKKIT;
-        String[] msgs = this.messageManager.getMessage(msgKey).getMessage(player, args).split("\n");
+        String[] msgs = this.messageManager.getMessage(msgKey).getMessages(player, args);
         // 将信息放入类型模板
         for (int i = 0; i < msgs.length; i++) {
             msgs[i] = this.messageManager.getMessage("message.type." + type).getMessage(player, msgs[i]);
         }
         receiver.sendMessage(msgs);
-        return this;
     }
 
     @Override
-    public MessageSender message(net.md_5.bungee.api.CommandSender receiver, String type, String msgKey, Object... args) {
-        ProxiedPlayer player = receiver instanceof ProxiedPlayer ? (ProxiedPlayer)receiver : FAKE_PLAYER_BUNGEE;
+    public void message(net.md_5.bungee.api.CommandSender receiver, String type, String msgKey, Object... args) {
+        ProxiedPlayer player = receiver instanceof ProxiedPlayer ? (ProxiedPlayer) receiver : FAKE_PLAYER_BUNGEE;
         String[] msgs = this.messageManager.getMessage(msgKey).getMessages(player, args);
         for (String msg : msgs) {
             // 将信息放入类型模板
             msg = this.messageManager.getMessage("message.type." + type).getMessage(player, msg);
             receiver.sendMessage(TextComponent.fromLegacyText(msg));
         }
-        return this;
     }
 
     @Override
-    public MessageSender messageConsole(String type, String msgKey, Object... args) {
-        this.message(FAKE_PLAYER_BUKKIT, type, msgKey, args);
-        return this;
+    public void message(UUID playerId, String type, String msgKey, Object... args) {
+        if (PlatformUtils.isBukkit()) {
+            Player p = Bukkit.getPlayer(playerId);
+            if (p != null) {
+                this.message(p, type, msgKey, args);
+            }
+        } else if (PlatformUtils.isBungeeCord()) {
+            ProxiedPlayer p = ProxyServer.getInstance().getPlayer(playerId);
+            if (p != null) {
+                this.message(p, type, msgKey, args);
+            }
+        } else {
+            throw new UnsupportedOperationException("Unsupported Platform");
+        }
     }
 
     @Override
-    public MessageSender info(CommandSender receiver, String msgKey, Object... args) {
+    public void messageConsole(String type, String msgKey, Object... args) {
+        if (PlatformUtils.isBukkit()) {
+            this.message(Bukkit.getConsoleSender(), type, msgKey, args);
+        } else if (PlatformUtils.isBungeeCord()) {
+            this.message(ProxyServer.getInstance().getConsole(), type, msgKey, args);
+        } else {
+            throw new UnsupportedOperationException("Unsupported Platform");
+        }
+    }
+
+    @Override
+    public void info(CommandSender receiver, String msgKey, Object... args) {
         this.message(receiver, "info", msgKey, args);
-        return this;
     }
 
     @Override
-    public MessageSender info(net.md_5.bungee.api.CommandSender receiver, String msgKey, Object... args) {
-        return null;
+    public void info(net.md_5.bungee.api.CommandSender receiver, String msgKey, Object... args) {
+        this.message(receiver, "info", msgKey, args);
     }
 
     @Override
-    public MessageSender infoConsole(String msgKey, Object... args) {
+    public void info(UUID playerId, String msgKey, Object... args) {
+        this.message(playerId, "info", msgKey, args);
+    }
+
+    @Override
+    public void infoConsole(String msgKey, Object... args) {
         this.messageConsole("info", msgKey, args);
-        return this;
     }
 
     @Override
-    public MessageSender warning(CommandSender receiver, String msgKey, Object... args) {
+    public void warning(CommandSender receiver, String msgKey, Object... args) {
         this.message(receiver, "warning", msgKey, args);
-        return this;
     }
 
     @Override
-    public MessageSender warning(net.md_5.bungee.api.CommandSender receiver, String msgKey, Object... args) {
-        return null;
+    public void warning(net.md_5.bungee.api.CommandSender receiver, String msgKey, Object... args) {
+        this.message(receiver, "warning", msgKey, args);
     }
 
     @Override
-    public MessageSender warningConsole(String msgKey, Object... args) {
+    public void warning(UUID playerId, String msgKey, Object... args) {
+        this.message(playerId, "warning", msgKey, args);
+    }
+
+    @Override
+    public void warningConsole(String msgKey, Object... args) {
         this.messageConsole("warning", msgKey, args);
-        return this;
     }
 
     @Override
-    public MessageSender error(CommandSender receiver, String msgKey, Object... args) {
+    public void error(CommandSender receiver, String msgKey, Object... args) {
         this.message(receiver, "error", msgKey, args);
-        return this;
     }
 
     @Override
-    public MessageSender error(net.md_5.bungee.api.CommandSender receiver, String msgKey, Object... args) {
-        return null;
+    public void error(net.md_5.bungee.api.CommandSender receiver, String msgKey, Object... args) {
+        this.message(receiver, "error", msgKey, args);
     }
 
     @Override
-    public MessageSender errorConsole(String msgKey, Object... args) {
+    public void error(UUID playerId, String msgKey, Object... args) {
+        this.message(playerId, "error", msgKey, args);
+    }
+
+    @Override
+    public void errorConsole(String msgKey, Object... args) {
         this.messageConsole("error", msgKey, args);
-        return this;
     }
 
     @Override
-    public MessageSender debug(int debugLevel, CommandSender receiver, String msgKey, Object... args) {
+    public void debug(int debugLevel, CommandSender receiver, String msgKey, Object... args) {
         if (this.getDebugLevel() >= debugLevel) this.message(receiver, "debug", msgKey, args);
-        return this;
     }
 
     @Override
-    public MessageSender debug(int debugLevel, net.md_5.bungee.api.CommandSender receiver, String msgKey, Object... args) {
-        return null;
+    public void debug(int debugLevel, net.md_5.bungee.api.CommandSender receiver, String msgKey, Object... args) {
+        if (this.getDebugLevel() >= debugLevel) this.message(receiver, "debug", msgKey, args);
     }
 
     @Override
-    public MessageSender debugConsole(int debugLevel, String msgKey, Object... args) {
+    public void debug(int debugLevel, UUID playerId, String msgKey, Object... args) {
+        if (this.getDebugLevel() >= debugLevel) this.message(playerId, "debug", msgKey, args);
+    }
+
+    @Override
+    public void debugConsole(int debugLevel, String msgKey, Object... args) {
         if (this.getDebugLevel() >= debugLevel) this.messageConsole("debug", msgKey, args);
-        return this;
     }
 
     @Override
@@ -227,6 +265,4 @@ public class DefaultMessageSender implements MessageSender {
     public int getDebugLevel() {
         return this.debugLevel;
     }
-
-
 }

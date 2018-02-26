@@ -8,15 +8,28 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.UUID;
+
 /**
  * 信息发送者，用于向后台/玩家发送信息
  */
 public interface MessageSender {
 
     /**
-     * 获取信息字符串(BungeeCode)
+     * 获取信息字符串(根据平台自适应)
      *
      * @param msgKey 信息key
+     * @param playerId 玩家ID(根据平台自适应)，用于玩家相关变量的格式化
+     * @param args   信息文本中的参数列表
+     * @return 格式化后的信息字符串
+     */
+    String getMessage(String msgKey, UUID playerId, Object... args);
+
+    /**
+     * 获取信息字符串(BungeeCord)
+     *
+     * @param msgKey 信息key
+     * @param player 玩家(BungeeCord)，用于玩家相关变量的格式化
      * @param args   信息文本中的参数列表
      * @return 格式化后的信息字符串
      */
@@ -26,6 +39,7 @@ public interface MessageSender {
      * 获取信息字符串(Bukkit)
      *
      * @param msgKey 信息key
+     * @param player 玩家(Bukkit)，用于玩家相关变量的格式化
      * @param args   信息文本中的参数列表
      * @return 格式化后的信息字符串
      */
@@ -41,24 +55,34 @@ public interface MessageSender {
     String getMessage(String msgKey, Object... args);
 
     /**
-     * 向玩家发送信息
+     * 发送信息(Bukkit)
      *
-     * @param receiver 信息接收者
+     * @param receiver 信息接收者(Bukkit)
      * @param type     信息类型
      * @param msgKey   信息key
      * @param args     信息文本中的参数列表
      */
-    MessageSender message(CommandSender receiver, String type, String msgKey, Object... args);
+    void message(CommandSender receiver, String type, String msgKey, Object... args);
 
     /**
-     * 向玩家发送信息
+     * 发送信息(BungeeCord)
      *
-     * @param receiver 信息接收者
+     * @param receiver 信息接收者(BungeeCord)
      * @param type     信息类型
      * @param msgKey   信息key
      * @param args     信息文本中的参数列表
      */
-    MessageSender message(net.md_5.bungee.api.CommandSender receiver, String type, String msgKey, Object... args);
+    void message(net.md_5.bungee.api.CommandSender receiver, String type, String msgKey, Object... args);
+
+    /**
+     * 发送信息(根据平台自适应)
+     *
+     * @param playerId 信息接收玩家的ID(根据平台自适应)
+     * @param type     信息类型
+     * @param msgKey   信息key
+     * @param args     信息文本中的参数列表
+     */
+    void message(UUID playerId, String type, String msgKey, Object... args);
 
     /**
      * 向后台发送信息
@@ -67,25 +91,34 @@ public interface MessageSender {
      * @param msgKey 信息key
      * @param args   信息文本中的参数列表
      */
-    MessageSender messageConsole(String type, String msgKey, Object... args);
+    void messageConsole(String type, String msgKey, Object... args);
 
     /**
-     * 向玩家发送普通信息
+     * 发送普通信息(Bukkit)
      *
-     * @param receiver 信息接收者
+     * @param receiver 信息接收者(Bukkit)
      * @param msgKey   信息key
      * @param args     信息文本中的参数列表
      */
-    MessageSender info(CommandSender receiver, String msgKey, Object... args);
+    void info(CommandSender receiver, String msgKey, Object... args);
 
     /**
-     * 向玩家发送普通信息
+     * 发送普通信息(BungeeCord)
      *
-     * @param receiver 信息接收者
+     * @param receiver 信息接收者(BungeeCord)
      * @param msgKey   信息key
      * @param args     信息文本中的参数列表
      */
-    MessageSender info(net.md_5.bungee.api.CommandSender receiver, String msgKey, Object... args);
+    void info(net.md_5.bungee.api.CommandSender receiver, String msgKey, Object... args);
+
+    /**
+     * 向玩家发送普通信息(根据平台自适应)
+     *
+     * @param playerId 信息接收玩家的ID(根据平台自适应)
+     * @param msgKey   信息key
+     * @param args     信息文本中的参数列表
+     */
+    void info(UUID playerId, String msgKey, Object... args);
 
     /**
      * 向后台发送普通信息
@@ -93,25 +126,34 @@ public interface MessageSender {
      * @param msgKey 信息key
      * @param args   信息文本中的参数列表
      */
-    MessageSender infoConsole(String msgKey, Object... args);
+    void infoConsole(String msgKey, Object... args);
 
     /**
-     * 向玩家发送警告信息
+     * 发送警告信息(Bukkit)
      *
-     * @param receiver 信息接收者
+     * @param receiver 信息接收者(Bukkit)
      * @param msgKey   信息key
      * @param args     信息文本中的参数列表
      */
-    MessageSender warning(CommandSender receiver, String msgKey, Object... args);
+    void warning(CommandSender receiver, String msgKey, Object... args);
 
     /**
-     * 向玩家发送警告信息
+     * 发送警告信息(BungeeCord)
      *
-     * @param receiver 信息接收者
+     * @param receiver 信息接收者(BungeeCord)
      * @param msgKey   信息key
      * @param args     信息文本中的参数列表
      */
-    MessageSender warning(net.md_5.bungee.api.CommandSender receiver, String msgKey, Object... args);
+    void warning(net.md_5.bungee.api.CommandSender receiver, String msgKey, Object... args);
+
+    /**
+     * 向玩家发送警告信息(根据平台自适应)
+     *
+     * @param playerId 信息接收玩家的ID(根据平台自适应)
+     * @param msgKey   信息key
+     * @param args     信息文本中的参数列表
+     */
+    void warning(UUID playerId, String msgKey, Object... args);
 
     /**
      * 向后台发送警告信息
@@ -119,25 +161,34 @@ public interface MessageSender {
      * @param msgKey 信息key
      * @param args   信息文本中的参数列表
      */
-    MessageSender warningConsole(String msgKey, Object... args);
+    void warningConsole(String msgKey, Object... args);
 
     /**
-     * 向玩家发送错误信息
+     * 发送错误信息(Bukkit)
      *
-     * @param receiver 信息接收者
+     * @param receiver 信息接收者(Bukkit)
      * @param msgKey   信息key
      * @param args     信息文本中的参数列表
      */
-    MessageSender error(CommandSender receiver, String msgKey, Object... args);
+    void error(CommandSender receiver, String msgKey, Object... args);
 
     /**
-     * 向玩家发送错误信息
+     * 发送错误信息(BungeeCord)
      *
-     * @param receiver 信息接收者
+     * @param receiver 信息接收者(BungeeCord)
      * @param msgKey   信息key
      * @param args     信息文本中的参数列表
      */
-    MessageSender error(net.md_5.bungee.api.CommandSender receiver, String msgKey, Object... args);
+    void error(net.md_5.bungee.api.CommandSender receiver, String msgKey, Object... args);
+
+    /**
+     * 向玩家发送错误信息(根据平台自适应)
+     *
+     * @param playerId 接收信息玩家的ID(根据平台自适应)
+     * @param msgKey   信息key
+     * @param args     信息文本中的参数列表
+     */
+    void error(UUID playerId, String msgKey, Object... args);
 
     /**
      * 向后台发送错误信息
@@ -145,39 +196,46 @@ public interface MessageSender {
      * @param msgKey 信息key
      * @param args   信息文本中的参数列表
      */
-    MessageSender errorConsole(String msgKey, Object... args);
+    void errorConsole(String msgKey, Object... args);
 
     /**
-     * 向玩家发送调试信息
+     * 发送调试信息(Bukkit)
      *
-     * @param debugLevel 调试等级，仅当传入的调试等级小于等于设置的调试等级时才会发生调试信息
-     * @param receiver   信息接收者
+     * @param debugLevel 调试等级，当且仅当传入的调试等级小于等于设置的调试等级时才会发生调试信息
+     * @param receiver   信息接收者(Bukkit)
      * @param msgKey     信息key
      * @param args       信息文本中的参数列表
-     * @return 自身实例
      */
-    MessageSender debug(int debugLevel, CommandSender receiver, String msgKey, Object... args);
+    void debug(int debugLevel, CommandSender receiver, String msgKey, Object... args);
 
     /**
-     * 向玩家发送调试信息
+     * 发送调试信息(BungeeCord)
      *
-     * @param debugLevel 调试等级，仅当传入的调试等级小于等于设置的调试等级时才会发生调试信息
-     * @param receiver   信息接收者
+     * @param debugLevel 调试等级，当且仅当传入的调试等级小于等于设置的调试等级时才会发生调试信息
+     * @param receiver   信息接收者(BungeeCord)
      * @param msgKey     信息key
      * @param args       信息文本中的参数列表
-     * @return 自身实例
      */
-    MessageSender debug(int debugLevel, net.md_5.bungee.api.CommandSender receiver, String msgKey, Object... args);
+    void debug(int debugLevel, net.md_5.bungee.api.CommandSender receiver, String msgKey, Object... args);
+
+    /**
+     * 向玩家发送调试信息(根据平台自适应)
+     *
+     * @param debugLevel 调试等级，当且仅当传入的调试等级小于等于设置的调试等级时才会发生调试信息
+     * @param playerId   接收信息玩家的ID(根据平台自适应)
+     * @param msgKey     信息key
+     * @param args       信息文本中的参数列表
+     */
+    void debug(int debugLevel, UUID playerId, String msgKey, Object... args);
 
     /**
      * 向后台发送调试信息
      *
-     * @param debugLevel 调试等级，仅当传入的调试等级小于等于设置的调试等级时才会发生调试信息
+     * @param debugLevel 调试等级，当且仅当传入的调试等级小于等于设置的调试等级时才会发生调试信息
      * @param msgKey     信息key
      * @param args       信息文本中的参数列表
-     * @return 自身实例
      */
-    MessageSender debugConsole(int debugLevel, String msgKey, Object... args);
+    void debugConsole(int debugLevel, String msgKey, Object... args);
 
     /**
      * 设置调试等级
