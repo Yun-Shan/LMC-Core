@@ -124,12 +124,47 @@ public class Message {
 
         @Override
         public String getMessage(Player player, Object... args) {
-            return "§cMissingLanguage: " + getRawMessage();
+            return this.missingMessage();
         }
 
         @Override
         public String[] getMessages(Player player, Object... args) {
-            return new String[]{ this.getMessage(player, args) };
+            return new String[]{ this.missingMessage() };
+        }
+
+        @Override
+        public String getMessage(ProxiedPlayer player, Object... args) {
+            return this.missingMessage();
+        }
+
+        @Override
+        public String[] getMessages(ProxiedPlayer player, Object... args) {
+            return new String[]{ this.missingMessage() };
+        }
+
+        @Override
+        public String getMessage(UUID playerId, Object... args) {
+            return this.missingMessage();
+        }
+
+        @Override
+        public String[] getMessages(UUID playerId, Object... args) {
+            return new String[]{ this.missingMessage() };
+        }
+
+        @Override
+        public String getMessage(Object... args) {
+            return this.missingMessage();
+        }
+
+        @Override
+        public String[] getMessages(Object... args) {
+            return new String[]{ this.missingMessage() };
+        }
+
+
+        private String missingMessage() {
+            return "§cMissingLanguage: " + getRawMessage();
         }
     }
 

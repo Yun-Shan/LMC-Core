@@ -143,8 +143,7 @@ public class DefaultCommandManagerTest {
         commands.get("test0").execute(fakePlayer, "test", "1");
         commands.get("test1").execute(fakePlayer, "test");
         commands.get("test2").execute(fakePlayer, "test", "qwq", "233");
-        commands.get("test3")
-                .execute(fakePlayer, "test");
+        commands.get("test3").execute(fakePlayer, "test");
         commands.get("test4").execute(fakePlayer, "test", "owo");
         commands.get("test5").execute(fakePlayer, "test", "owo", "hhh");
         commands.get("test6").execute(fakePlayer, "test", "666", "hhh");

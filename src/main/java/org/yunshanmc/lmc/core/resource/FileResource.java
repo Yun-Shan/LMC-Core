@@ -37,7 +37,7 @@ public class FileResource implements Resource {
     }
     
     @Override
-    public InputStream getInputStream() throws IOException {
+    public InputStream getInputStream() {
         try {
             return new FileInputStream(this.file);
         } catch (IOException e) {

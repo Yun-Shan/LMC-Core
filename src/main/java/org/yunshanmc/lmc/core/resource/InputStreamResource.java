@@ -27,7 +27,7 @@ public class InputStreamResource implements Resource {
     }
     
     @Override
-    public InputStream getInputStream() throws IOException {
+    public InputStream getInputStream() {
         return this.stream;
     }
 
