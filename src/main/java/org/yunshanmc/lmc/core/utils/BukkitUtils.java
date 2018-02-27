@@ -45,6 +45,7 @@ public class BukkitUtils {
                     ExceptionHandler.handle(e);
                 }
             }
+            return result;
         }
         return Collections.emptyList();
     }
@@ -57,17 +58,10 @@ public class BukkitUtils {
      * @param stackTrace 调用栈
      * @return 追踪到的调用栈上的第一个插件，获取失败或调用栈中没有插件时返回null
      */
-    public static Plugin traceFirstPlugin(StackTraceElement[] stackTrace) {
-        List<Resource> resList = ReflectUtils.traceResources(stackTrace, "plugin.yml", false);
-        if (!resList.isEmpty()) {
-            try {
-                YamlConfiguration yml = YamlConfiguration.loadConfiguration(
-                        new InputStreamReader(resList.get(0).getInputStream(), StandardCharsets.UTF_8));
-                String plugin = yml.getString("name");
-                return Bukkit.getPluginManager().getPlugin(plugin);
-            } catch (IOException e) {
-                ExceptionHandler.handle(e);
-            }
+    public static Plugin traceFirstPlugin(StackTraceElement[] stackTrace, boolean skipSelf) {
+        List<Plugin> resList = BukkitUtils.tracePlugins(stackTrace, false, false);
+        if (!resList.isEmpty() && (!skipSelf || resList.size() > 1)) {
+            return resList.get(skipSelf ? 1 : 0);
         }
         return null;
     }

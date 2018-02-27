@@ -16,6 +16,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.security.CodeSource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.jar.JarFile;
@@ -53,6 +54,12 @@ public final class ReflectUtils {
         }
         if (reverse) Collections.reverse(ress);
         return ress;
+    }
+
+    public static StackTraceElement[] captureStackTrace() {
+        @SuppressWarnings("ThrowableNotThrown")
+        StackTraceElement[] stack = new Throwable().getStackTrace();
+        return Arrays.copyOfRange(stack, 1, stack.length);
     }
 
     public static void checkSafeCall() {

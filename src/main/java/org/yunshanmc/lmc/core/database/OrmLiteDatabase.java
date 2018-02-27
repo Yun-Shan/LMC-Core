@@ -18,6 +18,7 @@ import org.yunshanmc.lmc.core.message.MessageSender;
 import org.yunshanmc.lmc.core.utils.BukkitUtils;
 import org.yunshanmc.lmc.core.utils.BungeeUtils;
 import org.yunshanmc.lmc.core.utils.PlatformUtils;
+import org.yunshanmc.lmc.core.utils.ReflectUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -123,7 +124,7 @@ public class OrmLiteDatabase extends Database {
                         String pluginName = null;
                         MessageSender sender = null;
                         if (PlatformUtils.isBukkit()) {
-                            Plugin plugin = BukkitUtils.traceFirstPlugin(new Throwable().getStackTrace());
+                            Plugin plugin = BukkitUtils.traceFirstPlugin(ReflectUtils.captureStackTrace(), true);
                             if (plugin instanceof LMCBukkitPlugin) {
                                 pluginName = plugin.getName();
                                 sender = ((LMCBukkitPlugin) plugin).getMessageManager().getMessageSender();

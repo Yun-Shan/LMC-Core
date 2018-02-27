@@ -115,7 +115,7 @@ public final class ExceptionHandler {
                 if (this.stopFlag.get()) break;
                 String pluginName = null;
                 if (PlatformUtils.isBukkit()) {
-                    Plugin plugin = BukkitUtils.traceFirstPlugin(err.getThrowable().getStackTrace());
+                    Plugin plugin = BukkitUtils.traceFirstPlugin(err.getThrowable().getStackTrace(), false);
                     if (plugin != null) {
                         pluginName = plugin.getName();
                     }

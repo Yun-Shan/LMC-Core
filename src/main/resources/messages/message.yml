@@ -1,5 +1,6 @@
 name: "&a{$PluginName}"
 type:
+  raw: "{1}"
   info: "&e[{##message.name}&e]&a{1}"
   warning: "&e[{##message.name}&e]&4WARNING：{1}"
   error: "&e[{##message.name}&e]&c错误信息：{1}"
