@@ -25,7 +25,6 @@ import java.util.function.Predicate;
 
 /**
  * 标准资源管理器
- * // TODO 提取重复代码
  */
 public class StandardResourceManager implements ResourceManager {
 
