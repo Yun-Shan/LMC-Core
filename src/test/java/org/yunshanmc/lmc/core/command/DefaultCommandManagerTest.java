@@ -20,7 +20,7 @@ public class DefaultCommandManagerTest {
     public void registerCommands() throws Exception {
         // TODO alias, label测试
 
-        EnvironmentUtil.setPlatform(PlatformUtils.PlatformType.Bukkit);
+        EnvironmentUtil.mockBukkit();
 
         MockPlugin plugin = MockPlugin.newInstance();
 
@@ -121,6 +121,15 @@ public class DefaultCommandManagerTest {
                 assertEquals(11, counter.get());
                 counter.incrementAndGet();
             }
+
+            @SimpleCommand(name = "test11")
+            public void test11(@SimpleCommand.Sender LMCCommandSender sender, String str1, @SimpleCommand.OptionalStart int int1) {
+                assertEquals("[$Test$]", ((Player)sender.getHandle()).getName());
+                assertEquals("qwq", str1);
+                assertEquals(777, int1);
+                assertEquals(12, counter.get());
+                counter.incrementAndGet();
+            }
         };
         manager.registerCommands(simpleCommand);
 
@@ -155,7 +164,8 @@ public class DefaultCommandManagerTest {
         commands.get("test8").execute(fakePlayer, "t1");
         commands.get("test9").execute(fakePlayer, "t2", "777", "l77");
         commands.get("test10").execute(fakePlayer, "ttt", "777");
-        assertEquals(12, counter.get());
+        commands.get("test11").execute(fakePlayer, "test", "qwq", "777");
+        assertEquals(13, counter.get());
     }
 
 }
