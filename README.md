@@ -1,3 +1,7 @@
+# LMC-Core
+[![Build Status](https://ci.yunshanmc.org/job/LMC-Core/badge/icon)](https://ci.yunshanmc.org/job/LMC-Core)
+---
+
 # Lightning-MC核心库
 ---
 - 用于Bukkit, BungeeCord插件
