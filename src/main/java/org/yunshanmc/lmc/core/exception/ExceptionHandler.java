@@ -81,6 +81,7 @@ public final class ExceptionHandler {
     }
 
     public static void handle(Throwable t) {
+        assert false;// 测试环境的错误不能被错误处理器掩盖
         handle(t, t.getMessage());
     }
 

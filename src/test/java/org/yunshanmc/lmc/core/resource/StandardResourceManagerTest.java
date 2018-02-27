@@ -35,6 +35,7 @@ public class StandardResourceManagerTest {
         if (!testDir.exists()) assertTrue(testDir.mkdirs());
 
         testJar = new File(testDir, "standardRM.jar");
+        if (testJar.exists()) assertTrue(testJar.delete());
         JarOutputStream out = new JarOutputStream(new FileOutputStream(testJar));
         out.putNextEntry(new JarEntry("a"));
         out.write("TEST a".getBytes(StandardCharsets.UTF_8));
@@ -42,6 +43,7 @@ public class StandardResourceManagerTest {
         out.putNextEntry(new JarEntry("b/c"));
         out.write("TEST a-b-c".getBytes(StandardCharsets.UTF_8));
         out.closeEntry();
+        out.flush();
         out.close();
         Constructor<StandardResourceManager> c = StandardResourceManager.class.getDeclaredConstructor(File.class,
                                                                                                       Path.class);
@@ -57,34 +59,37 @@ public class StandardResourceManagerTest {
         assertNotNull(resourceManager.getSelfResource("b/c"));
         assertArrayEquals(ByteStreams.toByteArray(resourceManager.getSelfResource("b/c").getInputStream()),
                           "TEST a-b-c".getBytes(StandardCharsets.UTF_8));
-
         // Jar文件更新，并通知资源管理器
         JarOutputStream out = new JarOutputStream(new FileOutputStream(testJar));
         out.putNextEntry(new JarEntry("a"));
         out.write("TEST a".getBytes(StandardCharsets.UTF_8));
         out.closeEntry();
         out.putNextEntry(new JarEntry("e/f/g"));
-        out.write("TEST a".getBytes(StandardCharsets.UTF_8));
+        out.write("TEST e-f-g".getBytes(StandardCharsets.UTF_8));
         out.closeEntry();
         out.putNextEntry(new JarEntry("q"));
         out.write("TEST a-b-c".getBytes(StandardCharsets.UTF_8));
         out.closeEntry();
+        out.putNextEntry(new JarEntry("b/c"));
+        out.write("TEST a-b-c-d".getBytes(StandardCharsets.UTF_8));
+        out.closeEntry();
+        out.flush();
         out.close();
         resourceManager.updateJar();
-        resourceManager.getSelfResources("e", null, true).values().forEach(resource -> {
-            try {
-                assertEquals("TEST a", new String(ByteStreams.toByteArray(resource.getInputStream())));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-        assertNotNull(resourceManager.getSelfResource("e/f/g"));
-        assertArrayEquals(ByteStreams.toByteArray(resourceManager.getSelfResource("e/f/g").getInputStream()),
-                          "TEST a".getBytes(StandardCharsets.UTF_8));
-        assertNotNull(resourceManager.getSelfResource("q"));
-        assertArrayEquals(ByteStreams.toByteArray(resourceManager.getSelfResource("q").getInputStream()),
+        assertEquals(4, resourceManager.getSelfResources("/", null, true).values().size());
+        System.out.println(resourceManager.getSelfResources("/", null, true));
+        Resource res = resourceManager.getSelfResource("b/c");
+        assertNotNull(res);
+        assertArrayEquals(ByteStreams.toByteArray(res.getInputStream()),
+                          "TEST a-b-c-d".getBytes(StandardCharsets.UTF_8));
+        res = resourceManager.getSelfResource("e/f/g");
+        assertNotNull(res);
+        assertArrayEquals(ByteStreams.toByteArray(res.getInputStream()),
+                          "TEST e-f-g".getBytes(StandardCharsets.UTF_8));
+        res = resourceManager.getSelfResource("q");
+        assertNotNull(res);
+        assertArrayEquals(ByteStreams.toByteArray(res.getInputStream()),
                           "TEST a-b-c".getBytes(StandardCharsets.UTF_8));
-
     }
 
     @Test
@@ -100,9 +105,12 @@ public class StandardResourceManagerTest {
     public void writeResource() throws Exception {
         Resource res = resourceManager.getSelfResource("a");
         assertNotNull(res);
-        assertTrue(resourceManager.writeResource("a", res, true));
-        assertTrue(new File(testDir, "a").exists());
-        assertEquals(new String(ByteStreams.toByteArray(Files.newInputStream(new File(testDir, "a").toPath())),
+        assertArrayEquals(ByteStreams.toByteArray(res.getInputStream()), "TEST a".getBytes(StandardCharsets.UTF_8));
+        File f = new File(testDir, "a");
+        if (f.exists()) assertTrue(f.delete());
+        assertTrue(resourceManager.writeResource("a", resourceManager.getSelfResource("a"), true));
+        assertTrue(f.exists());
+        assertEquals(new String(ByteStreams.toByteArray(Files.newInputStream(f.toPath())),
                                 StandardCharsets.UTF_8), "TEST a");
     }
 
@@ -110,7 +118,7 @@ public class StandardResourceManagerTest {
     @Test
     public void resolvePath() throws Exception {
         assertEquals(null, resolvePath(null, FileSystems.getDefault()));
-        assertEquals(null, resolvePath("", FileSystems.getDefault()));
+        assertEquals(Paths.get("/"), resolvePath("/", FileSystems.getDefault()));
         assertEquals(Paths.get("a"), resolvePath("a", FileSystems.getDefault()));
     }
 
