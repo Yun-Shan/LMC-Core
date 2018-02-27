@@ -13,11 +13,11 @@ public class LMCCoreBukkitPlugin extends LMCBukkitPlugin {
 
     @Override
     protected void init() {
+        Utils.setLMCCorePlugin(this);
         this.useGroupMessage = true;
     }
 
     @Override
     public void onEnable() {
-        Utils.setLMCCorePlugin(this);
     }
 }
