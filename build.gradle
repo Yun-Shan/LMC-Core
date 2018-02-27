@@ -1,3 +1,5 @@
+import java.util.jar.JarFile
+
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 
@@ -33,10 +35,26 @@ artifacts {
 
 jar {
     from {
-        configurations.compile.collect {
-            if (it.name.matches("(guava)-.+\\.jar\$")) return null
+        def c1 = configurations.compile.collect {
+            if (it.name.matches(/^(guava)-.+\.jar$/)) return null
             it.isDirectory() ? it : zipTree(it)
         }.stream().filter({ it != null }).collect()
+        def dir = file('build/tmp/dependencies')
+        configurations.compileOnly.forEach {
+            if (it.name.matches(/^(bungeecord-api)-.+\.jar$/)) {
+                def jar = new JarFile(it)
+                def path = 'net/md_5/bungee/api/CommandSender.class'
+                def input = jar.getInputStream(jar.getEntry(path))
+                def f = new File(dir, path)
+                f.getParentFile().mkdirs()
+                f.withOutputStream { output ->
+                    output << input
+                }
+            }
+        }
+        def c2 = dir
+        c1.addAll(c2)
+        return c1
     }
 }
 
