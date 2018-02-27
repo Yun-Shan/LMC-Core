@@ -13,8 +13,13 @@ repositories {
     }
 }
 
+static def getJenkinsBuild() {
+    def buildNumber = System.getenv().BUILD_NUMBER?.toInteger()
+    return buildNumber ?: 0
+}
+
 group = 'org.yunshanmc'
-version = '1.0.0-SNAPSHOT'
+version = '1.0.0.' + getJenkinsBuild() + '-SNAPSHOT'
 
 targetCompatibility = 1.8
 sourceCompatibility = 1.8
