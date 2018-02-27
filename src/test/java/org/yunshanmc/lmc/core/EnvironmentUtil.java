@@ -26,7 +26,16 @@ public final class EnvironmentUtil {
             throw new RuntimeException(e);
         }
     }
-    public static void setPlatform(PlatformUtils.PlatformType platform) {
+
+    public static void mockBukkit() {
+        setPlatform(PlatformUtils.PlatformType.Bukkit);
+    }
+
+    public static void mockBungeeCord() {
+        setPlatform(PlatformUtils.PlatformType.BungeeCord);
+    }
+
+    private static void setPlatform(PlatformUtils.PlatformType platform) {
         try {
             f_platform.set(null, platform);
         } catch (IllegalAccessException e) {
