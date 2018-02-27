@@ -39,7 +39,7 @@ public class BukkitUtils {
                             new InputStreamReader(res.getInputStream(), StandardCharsets.UTF_8));
                     Plugin plugin = pm.getPlugin(yml.getString("name"));
                     if (plugin != null &&
-                            (!duplicate || (result.isEmpty() || plugin != result.get(result.size() - 1))))
+                            (duplicate || (result.isEmpty() || plugin != result.get(result.size() - 1))))
                         result.add(plugin);
                 } catch (IOException e) {
                     ExceptionHandler.handle(e);
