@@ -24,7 +24,7 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 /**
- * 标准资源管理器
+ * 标准资源管理器.
  */
 public class StandardResourceManager implements ResourceManager {
 
