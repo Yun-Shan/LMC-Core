@@ -19,7 +19,7 @@ static def getJenkinsBuild() {
 }
 
 group = 'org.yunshanmc'
-version = '1.0.0.' + getJenkinsBuild() + '-SNAPSHOT'
+version = pluginVersion + '.' + getJenkinsBuild() + '-' + pluginVersionType
 
 targetCompatibility = 1.8
 sourceCompatibility = 1.8
