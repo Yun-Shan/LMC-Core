@@ -2,21 +2,27 @@ package org.yunshanmc.lmc.core.command;
 
 import com.google.common.base.Strings;
 import org.bukkit.command.CommandSender;
+import org.yunshanmc.lmc.core.utils.ReflectUtils;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
-import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public abstract class LMCCommand {
 
+    @SuppressWarnings("MismatchedReadAndWriteOfArray")
     private static final String[] EMPTY_STRINGS = new String[0];
 
+    private CommandManager commandManager;
+
     private final String name;
-    private String[] aliases;
+    private List<String> aliases;
     private String usage;
     private String description;
-    private String[] permissions;
+    private List<String> permissions;
+    private boolean useDefaultPermission;
 
     private boolean valid;
 
@@ -47,10 +53,11 @@ public abstract class LMCCommand {
         this.name = name;
         this.usage = Strings.nullToEmpty(usage);
         this.description = Strings.nullToEmpty(description);
-        BiFunction<String[], Boolean, String[]> filter = (arr, admitEmpty) -> Arrays.stream(aliases != null ? aliases : EMPTY_STRINGS)
+        BiFunction<String[], Boolean, List<String>> filter = (arr, admitEmpty) -> Arrays.stream(
+                arr != null ? arr : EMPTY_STRINGS)
                 .distinct()
                 .filter(alias -> admitEmpty ? alias != null : !Strings.isNullOrEmpty(alias))
-                .toArray(String[]::new);
+                .collect(Collectors.toList());
         this.aliases = filter.apply(aliases, true);
         this.permissions = filter.apply(permissions, false);
 
@@ -71,7 +78,7 @@ public abstract class LMCCommand {
      *
      * @return 命令别名
      */
-    public String[] getAliases() {
+    public List<String> getAliases() {
         return aliases;
     }
 
@@ -100,7 +107,7 @@ public abstract class LMCCommand {
      *
      * @return 命令描述
      */
-    public String[] getPermissions() {
+    public List<String> getPermissions() {
         return this.permissions;
     }
 
@@ -189,6 +196,24 @@ public abstract class LMCCommand {
      * @param sender 显示命令帮助的对象
      */
     public void showHelp(net.md_5.bungee.api.CommandSender sender) {
+        // TODO
+    }
 
+    public CommandManager getCommandManager() {
+        return this.commandManager;
+    }
+
+    public void setCommandManager(CommandManager commandManager) {
+        ReflectUtils.checkSafeCall();
+        if (commandManager != null && this.commandManager != null) throw new IllegalArgumentException();
+        this.commandManager = commandManager;
+    }
+
+    public boolean isUseDefaultPermission() {
+        return this.useDefaultPermission;
+    }
+
+    public void setUseDefaultPermission(boolean useDefaultPermission) {
+        this.useDefaultPermission = useDefaultPermission;
     }
 }

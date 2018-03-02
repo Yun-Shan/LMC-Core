@@ -29,6 +29,12 @@ public class BukkitExecutor extends org.yunshanmc.lmc.core.command.executors.Com
         LMCCommand cmd = super.resolveCommand(args);
 
         if (cmd != null) {
+            for (String perm : cmd.getPermissions()) {
+                if (!sender.hasPermission(perm)) {
+                    this.messageSender.info(sender, "command.NeedPermission");
+                    return true;
+                }
+            }
             if (cmd.isValid()) {
                 if (args.length >= 2) {
                     args = Arrays.copyOfRange(args, 1, args.length);

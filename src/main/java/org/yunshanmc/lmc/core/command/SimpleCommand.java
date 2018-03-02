@@ -15,8 +15,8 @@ public @interface SimpleCommand {
     /**
      * 命令权限
      * <p>
-     * 留空视为无需任何权限即可执行；<br>
-     * 以"<code>.</code>"开头且插件名由英文/数字/下划线/连字符组成，则自动在最前面加上小写插件名；<br>
+     * 留空视为无需任何权限即可执行<br>
+     * 以"<code>.</code>"开头则自动在最前面加上主命令名<br>
      * 其它情况视为完整权限名
      */
     String[] permissions() default {};
@@ -44,6 +44,14 @@ public @interface SimpleCommand {
      * 命令别名
      */
     String[] aliases() default {};
+
+    /**
+     * 是否给命令增加默认权限
+     * <p>
+     * 权限格式为: 主命令.子命令<br>
+     * 比如主命令为lmc，子命令为reload，默认权限即为lmc.reload
+     */
+    boolean useDefaultPermission() default false;
 
     /**
      * 命令发送者，只能有一个

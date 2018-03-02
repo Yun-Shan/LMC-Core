@@ -1,5 +1,6 @@
 package org.yunshanmc.lmc.core.bungee.command.executors;
 
+import com.google.common.base.Joiner;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -34,6 +35,12 @@ public class BungeeCordExecutor extends CommandExecutor {
         LMCCommand cmd = super.resolveCommand(args);
 
         if (cmd != null) {
+            for (String perm : cmd.getPermissions()) {
+                if (!sender.hasPermission(perm)) {
+                    this.messageSender.info(sender, "command.NeedPermission");
+                    return;
+                }
+            }
             if (cmd.isValid()) {
                 if (args.length >= 2) {
                     args = Arrays.copyOfRange(args, 1, args.length);
@@ -42,10 +49,13 @@ public class BungeeCordExecutor extends CommandExecutor {
                 }
                 cmd.execute(sender, this.handleCommand, args);
             } else {
-                this.messageSender.info(sender, "command.invalid", this.handleCommand, cmd.getName());
+                this.messageSender.info(sender, "command.InvalidCommand",
+                                        '/' + Joiner.on(' ').join(this.handleCommand, args.length > 0 ? args[0] : cmd.getName()));
+
             }
         } else {
-            this.messageSender.info(sender, "command.notFound", this.handleCommand, args.length > 0 ? args[0] : "");
+            this.messageSender.info(sender, "command.CommandNotFound",
+                                    '/' + Joiner.on(' ').skipNulls().join(this.handleCommand, args.length > 0 ? args[0] : null));
         }
     }
 

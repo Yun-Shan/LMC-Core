@@ -303,7 +303,9 @@ public final class SimpleCommandFactory {
                         cmdInfo.setDescription(cmdAnno.description());
                     }
                 }
-                return new SimpleCommandImpl(cmdInfo, messageSender, handle, m, senderType, minArgCount, maxArgCount);
+                SimpleCommandImpl cmd = new SimpleCommandImpl(cmdInfo, messageSender, handle, m, senderType, minArgCount, maxArgCount);
+                cmd.setUseDefaultPermission(cmdAnno.useDefaultPermission());
+                return cmd;
             } catch (Throwable t) {
                 ExceptionHandler.handle(t);
                 messageSender.warningConsole("bug.SimpleCommandRegister", cmdAnno.name(),
