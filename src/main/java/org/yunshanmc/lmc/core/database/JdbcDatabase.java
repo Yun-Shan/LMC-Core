@@ -20,9 +20,8 @@ public class JdbcDatabase extends Database {
     @Override
     protected boolean connect(String jdbcUrl) throws SQLException {
         this.connection = DriverManager.getConnection(jdbcUrl);
-        // TODO: 测试连接语句 各类型数据库适配
-        // MySQL
-        // this.connection.createStatement().execute("SELECT 1;");
+
+        this.connection.createStatement().execute(this.dbType.getTestSQL());
         return true;
     }
 
