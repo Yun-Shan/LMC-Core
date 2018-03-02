@@ -37,9 +37,9 @@ SQLite:
 UnknownOrmLiteLogLevel: "未配置日志级别或日志级别无效，将默认设为INFO！"
 
 OrmLiteLog:
-  trace: "{1}"
-  debuf: "{1}"
-  info: "{1}"
-  warning: "{1}"
-  error: "{1}"
-  fatal: "{1}"
+  trace: "[Database Trace Log]{1}"
+  debug: "[Database Debug Log]{1}"
+  info: "[Database Info Log]{1}"
+  warning: "[Database Warning Log]{1}"
+  error: "[Database Error Log]{1}"
+  fatal: "[Database Fatal Log]{1}"

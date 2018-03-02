@@ -25,6 +25,10 @@ public abstract class Database {
         this.messageSender = messageSender;
     }
 
+    public DatabaseType getDbType() {
+        return this.dbType;
+    }
+
     public boolean init() {
         if (this.inited) return true;
         if (this.dbConfig == null) return fail("MissingAllConfig");

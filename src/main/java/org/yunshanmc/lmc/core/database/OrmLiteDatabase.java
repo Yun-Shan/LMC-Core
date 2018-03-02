@@ -44,7 +44,7 @@ public class OrmLiteDatabase extends Database {
             String levelStr = this.dbConfig.getString("logLevel", "");
             Log.Level level;
             try {
-                level = Log.Level.valueOf(levelStr);
+                level = Log.Level.valueOf(levelStr.toUpperCase());
             } catch (IllegalArgumentException ex) {
                 messageSender.warningConsole("database.UnknownOrmLiteLogLevel", levelStr);
                 level = Log.Level.INFO;
@@ -70,7 +70,7 @@ public class OrmLiteDatabase extends Database {
         this.connectionSource = new JdbcConnectionSource(jdbcUrl);
 
         // 连接测试
-        DatabaseConnection conn = this.connectionSource.getReadWriteConnection("");
+        DatabaseConnection conn = this.connectionSource.getReadOnlyConnection("");
 
         conn.executeStatement(this.dbType.getTestSQL(), DatabaseConnection.DEFAULT_RESULT_FLAGS);
         this.connectionSource.releaseConnection(conn);
@@ -146,6 +146,7 @@ public class OrmLiteDatabase extends Database {
                             if (proxyArgs.length == 3) {
                                 ExceptionHandler.handle((Throwable) proxyArgs[2]);
                             }
+                            return null;
                         }
                     }
                     return proxyMethod.invoke(logger, proxyArgs);
