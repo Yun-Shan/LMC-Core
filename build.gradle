@@ -1,101 +1,70 @@
 import java.util.jar.JarFile
 
-apply plugin: 'java'
-apply plugin: 'maven-publish'
-
-repositories {
-    jcenter()
-    maven {// SpigotMC
-        url 'https://hub.spigotmc.org/nexus/content/groups/public/'
-    }
-    maven {// For PlaceholderAPI
-        url 'http://repo.extendedclip.com/content/repositories/placeholderapi/'
-    }
-}
-
 static def getJenkinsBuild() {
     def buildNumber = System.getenv().BUILD_NUMBER?.toInteger()
     return buildNumber ?: 0
 }
 
-group = 'org.yunshanmc'
-version = pluginVersion + '.' + getJenkinsBuild() + '-' + pluginVersionType
+ext.jenkinsBuildNumber = getJenkinsBuild()
 
-targetCompatibility = 1.8
-sourceCompatibility = 1.8
+subprojects {
+    apply plugin: 'java'
 
-tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
-    options.compilerArgs = ['-parameters']
-}
+    group = 'org.yunshanmc'
+    version = "$pluginVersion.${rootProject.ext.jenkinsBuildNumber}-$pluginVersionType"
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
+    targetCompatibility = 1.8
+    sourceCompatibility = 1.8
 
-artifacts {
-    archives sourcesJar
-}
-
-jar {
-    from {
-        def c1 = configurations.compile.collect {
-            if (it.name.matches(/^(guava)-.+\.jar$/)) return null
-            it.isDirectory() ? it : zipTree(it)
-        }.stream().filter({ it != null }).collect()
-        def dir = file('build/tmp/dependencies')
-        configurations.compileOnly.forEach {
-            if (it.name.matches(/^(bungeecord-api)-.+\.jar$/)) {
-                def jar = new JarFile(it)
-                def path = 'net/md_5/bungee/api/CommandSender.class'
-                def input = jar.getInputStream(jar.getEntry(path))
-                def f = new File(dir, path)
-                f.getParentFile().mkdirs()
-                f.withOutputStream { output ->
-                    output << input
-                }
-            }
-        }
-        def c2 = dir
-        c1.addAll(c2)
-        return c1
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+        options.compilerArgs = ['-parameters', '-Xlint:deprecation']
     }
-}
 
-dependencies {
-    compileOnly 'org.spigotmc:spigot-api:1.12.1-R0.1-SNAPSHOT'
-    compileOnly 'net.md-5:bungeecord-api:1.12-SNAPSHOT'
-    compileOnly 'me.clip:placeholderapi:2.0.8'
-    compileOnly 'org.yaml:snakeyaml:1.18'
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
 
-    // ORM
-    compile 'com.j256.ormlite:ormlite-core:5.0'
-    compile 'com.j256.ormlite:ormlite-jdbc:5.0'
-    // CGLIB
-    compile 'cglib:cglib:3.2.5'
-
-    testCompile 'junit:junit:4.12'
-    testCompile 'com.google.guava:guava:22.0'
-    testCompile 'org.spigotmc:spigot-api:1.12.1-R0.1-SNAPSHOT'
-    testCompile 'net.md-5:bungeecord-api:1.12-SNAPSHOT'
-}
-
-publishing {
-    publications {
-        Plugin(MavenPublication) {
-            groupId project.group
-            artifactId project.name
-            version project.version
-
-            from components.java
+    jar {
+        from {
+            configurations.compile.collect {
+                if (it.name.matches(/^(guava)-.+\.jar$/)) return null
+                it.isDirectory() ? it : zipTree(it)
+            }.stream().filter({ it != null }).collect()
         }
+    }
 
-        Source(MavenPublication) {
-            groupId project.group
-            artifactId project.name
-            version project.version
-            artifact sourcesJar
+    repositories {
+        maven {
+            name 'Aliyun Maven Center'
+            url 'http://maven.aliyun.com/nexus/content/groups/public/'
         }
+        maven {
+            name 'Aliyun JCenter'
+            url 'http://maven.aliyun.com/nexus/content/repositories/jcenter'
+        }
+        maven {
+            name 'SpigotMC'
+            url 'https://hub.spigotmc.org/nexus/content/groups/public/'
+        }
+        maven {
+            name 'For PlaceholderAPI'
+            url 'http://repo.extendedclip.com/content/repositories/placeholderapi/'
+        }
+    }
+
+    dependencies {
+        compileOnly 'com.google.guava:guava:22.0'
+        compileOnly 'org.yaml:snakeyaml:1.18'
+        // ORM
+        compile 'com.j256.ormlite:ormlite-core:5.0'
+        compile 'com.j256.ormlite:ormlite-jdbc:5.0'
+        // CGLIB
+        compile 'cglib:cglib:3.2.5'
+
+        testCompile 'junit:junit:4.12'
+        testCompile 'org.yaml:snakeyaml:1.18'
+        testCompile 'com.google.guava:guava:22.0'
     }
 }

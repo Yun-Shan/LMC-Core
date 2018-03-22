@@ -1,0 +1,30 @@
+apply plugin: 'maven-publish'
+
+ext.type = 'BungeeCord'
+archivesBaseName = "${rootProject.name}-${ext.type}"
+
+dependencies {
+    compile project(':common')
+    compileOnly 'net.md-5:bungeecord-api:1.12-SNAPSHOT'
+
+    testCompile 'net.md-5:bungeecord-api:1.12-SNAPSHOT'
+}
+
+publishing {
+    publications {
+        Plugin(MavenPublication) {
+            groupId project.group
+            artifactId archivesBaseName
+            version project.version
+
+            from components.java
+        }
+
+        Source(MavenPublication) {
+            groupId project.group
+            artifactId archivesBaseName
+            version project.version
+            artifact sourcesJar
+        }
+    }
+}

@@ -1,0 +1,31 @@
+apply plugin: 'maven-publish'
+
+ext.type = 'Bukkit'
+archivesBaseName = "${rootProject.name}-${ext.type}"
+
+dependencies {
+    compile project(':common')
+    compileOnly 'org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT'
+    compileOnly 'me.clip:placeholderapi:2.0.8'
+
+    testCompile 'org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT'
+}
+
+publishing {
+    publications {
+        Plugin(MavenPublication) {
+            groupId project.group
+            artifactId archivesBaseName
+            version project.version
+
+            from components.java
+        }
+
+        Source(MavenPublication) {
+            groupId project.group
+            artifactId archivesBaseName
+            version project.version
+            artifact sourcesJar
+        }
+    }
+}

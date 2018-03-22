@@ -1,2 +1,9 @@
+include 'common'
+include 'bukkit'
+include 'bungeecord'
+
 rootProject.name = 'LMC-Core'
 
+rootProject.children.each {
+    it.buildFileName = it.name + '.gradle'
+}
