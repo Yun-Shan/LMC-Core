@@ -7,7 +7,7 @@ package org.yunshanmc.lmc.core.bukkit;
 import org.yunshanmc.lmc.core.internal.LMCCoreUtils;
 
 /**
- * //TODO
+ * LMCCore插件 BungeeCord端主类
  */
 public class LMCCoreBukkitPlugin extends LMCBukkitPlugin {
 

@@ -7,7 +7,7 @@ package org.yunshanmc.lmc.core.bungee;
 import org.yunshanmc.lmc.core.internal.LMCCoreUtils;
 
 /**
- * //TODO
+ * LMCCore插件 BungeeCord端主类
  */
 public class LMCCoreBungeeCordPlugin extends LMCBungeeCordPlugin {
 

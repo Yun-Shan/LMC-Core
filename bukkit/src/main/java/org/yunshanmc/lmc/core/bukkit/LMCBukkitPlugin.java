@@ -83,7 +83,6 @@ public abstract class LMCBukkitPlugin extends JavaPlugin implements LMCPlugin {
         ExceptionHandler.stop();
     }
 
-    // TODO 注释
     public LocaleManager getLocaleManager() {
         return this.localeManager;
     }

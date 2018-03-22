@@ -4,13 +4,12 @@
  */
 package org.yunshanmc.lmc.core.resource;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Objects;
 
 /**
- * //TODO
+ * 输入流资源
  */
 public class InputStreamResource implements Resource {
     

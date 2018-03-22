@@ -83,7 +83,6 @@ public abstract class LMCBungeeCordPlugin extends Plugin implements LMCPlugin {
         ExceptionHandler.stop();
     }
 
-    // TODO 注释
     public LocaleManager getLocaleManager() {
         return localeManager;
     }
