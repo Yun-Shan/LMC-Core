@@ -29,9 +29,8 @@ subprojects {
     jar {
         from {
             configurations.compile.collect {
-                if (it.name.matches(/^(guava)-.+\.jar$/)) return null
                 it.isDirectory() ? it : zipTree(it)
-            }.stream().filter({ it != null }).collect()
+            }
         }
     }
 
@@ -61,7 +60,9 @@ subprojects {
         compile 'com.j256.ormlite:ormlite-core:5.0'
         compile 'com.j256.ormlite:ormlite-jdbc:5.0'
         // CGLIB
-        compile 'cglib:cglib:3.2.5'
+        compile ('cglib:cglib:3.2.6') {
+            exclude group: 'org.apache.ant', module: 'ant'
+        }
 
         testCompile 'junit:junit:4.12'
         testCompile 'org.yaml:snakeyaml:1.18'
