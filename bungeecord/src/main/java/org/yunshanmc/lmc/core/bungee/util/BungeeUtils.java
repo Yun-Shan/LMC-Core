@@ -56,9 +56,13 @@ public class BungeeUtils {
                         YamlConfiguration yml = YamlConfiguration.loadConfiguration(
                             new InputStreamReader(res.getInputStream(), StandardCharsets.UTF_8));
                         Plugin plugin = pm.getPlugin(yml.getString("name"));
-                        if (plugin != null &&
-                            (!duplicate || (result.isEmpty() || plugin != result.get(result.size() - 1))))
+                        boolean canAdd = true;
+                        if (!duplicate) {
+                            canAdd = result.isEmpty() || !plugin.equals(result.get(result.size() - 1));
+                        }
+                        if (plugin != null && canAdd) {
                             result.add(plugin);
+                        }
                     } catch (IOException e) {
                         ExceptionHandler.handle(e);
                     }
@@ -68,8 +72,12 @@ public class BungeeUtils {
         };
 
         List<Plugin> result = fetcher.apply("bungee.yml");
-        if (result == null) fetcher.apply("plugin.yml");
-        if (result == null) result = Collections.emptyList();
+        if (result == null) {
+            fetcher.apply("plugin.yml");
+        }
+        if (result == null) {
+            result = Collections.emptyList();
+        }
         return result;
     }
 
@@ -79,7 +87,6 @@ public class BungeeUtils {
      * 会通过每个调用栈Class尝试获取插件，直到获取到第一个插件为止
      *
      * @param stackTrace 调用栈
-     * @param skipSelf   是否要跳过调用者
      * @return 追踪到的调用栈上的第一个插件
      */
     public static Plugin traceFirstPlugin(StackTraceElement[] stackTrace) {
@@ -101,7 +108,9 @@ public class BungeeUtils {
         };
 
         Plugin result = fetcher.apply("bungee.yml");
-        if (result == null) fetcher.apply("plugin.yml");
+        if (result == null) {
+            fetcher.apply("plugin.yml");
+        }
         return result;
     }
 }

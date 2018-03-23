@@ -54,9 +54,13 @@ public class BukkitUtils {
                     YamlConfiguration yml = YamlConfiguration.loadConfiguration(
                             new InputStreamReader(res.getInputStream(), StandardCharsets.UTF_8));
                     Plugin plugin = pm.getPlugin(yml.getString("name"));
-                    if (plugin != null &&
-                            (duplicate || (result.isEmpty() || plugin != result.get(result.size() - 1))))
+                    boolean canAdd = true;
+                    if (!duplicate) {
+                        canAdd = result.isEmpty() || !plugin.equals(result.get(result.size() - 1));
+                    }
+                    if (plugin != null && canAdd) {
                         result.add(plugin);
+                    }
                 } catch (IOException e) {
                     ExceptionHandler.handle(e);
                 }
