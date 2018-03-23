@@ -1,6 +1,7 @@
 package org.yunshanmc.lmc.core.util;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import org.yunshanmc.lmc.core.LMCPlugin;
 import org.yunshanmc.lmc.core.config.bukkitcfg.file.YamlConfiguration;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
@@ -183,11 +184,14 @@ public final class PlatformUtils {
                         YamlConfiguration yml = YamlConfiguration.loadConfiguration(
                             new InputStreamReader(res.getInputStream(), StandardCharsets.UTF_8));
                         String plugin = yml.getString("name");
+                        if (Strings.isNullOrEmpty(plugin)) {
+                            continue;
+                        }
                         boolean canAdd = true;
                         if (!duplicate) {
                             canAdd = result.isEmpty() || !plugin.equals(result.get(result.size() - 1));
                         }
-                        if (plugin != null && canAdd) {
+                        if (canAdd) {
                             result.add(plugin);
                         }
                     } catch (IOException e) {

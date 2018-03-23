@@ -1,5 +1,6 @@
 package org.yunshanmc.lmc.core.bungee.util;
 
+import com.google.common.base.Strings;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -43,24 +44,33 @@ public class BungeeUtils {
      *
      * @param stackTrace 调用栈
      * @param duplicate  连续插件是否重复，如果多个连续调用栈是同一个插件时是否重复记录插件(注意：同插件在不连续的调用栈上不会去重)
+     * @param reverse    由于调用栈是倒序的，该参数指定是否将倒序转为正序，true即转为正序，false即保持倒序
      * @return 追踪到的插件列表
      */
-    public static List<Plugin> tracePlugins(StackTraceElement[] stackTrace, boolean duplicate) {
+    public static List<Plugin> tracePlugins(StackTraceElement[] stackTrace, boolean duplicate, boolean reverse) {
         PluginManager pm = ProxyServer.getInstance().getPluginManager();
         Function<String, List<Plugin>> fetcher = fileName -> {
-            List<Resource> resList = ReflectUtils.traceResources(stackTrace, fileName, false);
+            List<Resource> resList = ReflectUtils.traceResources(stackTrace, fileName, reverse);
             if (!resList.isEmpty()) {
                 List<Plugin> result = new ArrayList<>();
+                //noinspection Duplicates
                 for (Resource res : resList) {
                     try {
                         YamlConfiguration yml = YamlConfiguration.loadConfiguration(
                             new InputStreamReader(res.getInputStream(), StandardCharsets.UTF_8));
-                        Plugin plugin = pm.getPlugin(yml.getString("name"));
+                        String name = yml.getString("name");
+                        if (Strings.isNullOrEmpty(name)) {
+                            continue;
+                        }
+                        Plugin plugin = pm.getPlugin(name);
+                        if (plugin == null) {
+                            continue;
+                        }
                         boolean canAdd = true;
                         if (!duplicate) {
                             canAdd = result.isEmpty() || !plugin.equals(result.get(result.size() - 1));
                         }
-                        if (plugin != null && canAdd) {
+                        if (canAdd) {
                             result.add(plugin);
                         }
                     } catch (IOException e) {
@@ -87,30 +97,15 @@ public class BungeeUtils {
      * 会通过每个调用栈Class尝试获取插件，直到获取到第一个插件为止
      *
      * @param stackTrace 调用栈
+     * @param skipSelf   是否要跳过调用者
      * @return 追踪到的调用栈上的第一个插件
      */
-    public static Plugin traceFirstPlugin(StackTraceElement[] stackTrace) {
-        PluginManager pm = ProxyServer.getInstance().getPluginManager();
-        Function<String, Plugin> fetcher = fileName -> {
-            List<Resource> resList = ReflectUtils.traceResources(stackTrace, fileName, false);
-            if (!resList.isEmpty()) {
-                try {
-                    YamlConfiguration yml = YamlConfiguration.loadConfiguration(
-                        new InputStreamReader(resList.get(0).getInputStream(), StandardCharsets.UTF_8));
-                    String plugin = yml.getString("name");
-                    return pm.getPlugin(plugin);
-                } catch (IOException e) {
-                    ExceptionHandler.handle(e);
-                    return null;
-                }
-            }
-            return null;
-        };
-
-        Plugin result = fetcher.apply("bungee.yml");
-        if (result == null) {
-            fetcher.apply("plugin.yml");
+    public static Plugin traceFirstPlugin(StackTraceElement[] stackTrace, boolean skipSelf) {
+        List<Plugin> resList = BungeeUtils.tracePlugins(stackTrace, false, false);
+        boolean hasValid = !resList.isEmpty() && (!skipSelf || resList.size() > 1);
+        if (hasValid) {
+            return resList.get(skipSelf ? 1 : 0);
         }
-        return result;
+        return null;
     }
 }

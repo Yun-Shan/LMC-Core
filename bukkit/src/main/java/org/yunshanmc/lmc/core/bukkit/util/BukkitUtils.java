@@ -1,5 +1,6 @@
 package org.yunshanmc.lmc.core.bukkit.util;
 
+import com.google.common.base.Strings;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
@@ -49,16 +50,24 @@ public class BukkitUtils {
         if (!resList.isEmpty()) {
             PluginManager pm = Bukkit.getPluginManager();
             List<Plugin> result = new ArrayList<>();
+            //noinspection Duplicates
             for (Resource res : resList) {
                 try {
                     YamlConfiguration yml = YamlConfiguration.loadConfiguration(
                             new InputStreamReader(res.getInputStream(), StandardCharsets.UTF_8));
-                    Plugin plugin = pm.getPlugin(yml.getString("name"));
+                    String name = yml.getString("name");
+                    if (Strings.isNullOrEmpty(name)) {
+                        continue;
+                    }
+                    Plugin plugin = pm.getPlugin(name);
+                    if (plugin == null) {
+                        continue;
+                    }
                     boolean canAdd = true;
                     if (!duplicate) {
                         canAdd = result.isEmpty() || !plugin.equals(result.get(result.size() - 1));
                     }
-                    if (plugin != null && canAdd) {
+                    if (canAdd) {
                         result.add(plugin);
                     }
                 } catch (IOException e) {
@@ -81,7 +90,8 @@ public class BukkitUtils {
      */
     public static Plugin traceFirstPlugin(StackTraceElement[] stackTrace, boolean skipSelf) {
         List<Plugin> resList = BukkitUtils.tracePlugins(stackTrace, false, false);
-        if (!resList.isEmpty() && (!skipSelf || resList.size() > 1)) {
+        boolean hasValid = !resList.isEmpty() && (!skipSelf || resList.size() > 1);
+        if (hasValid) {
             return resList.get(skipSelf ? 1 : 0);
         }
         return null;

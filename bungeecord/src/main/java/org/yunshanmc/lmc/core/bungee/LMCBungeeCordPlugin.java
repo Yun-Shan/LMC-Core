@@ -58,11 +58,15 @@ public abstract class LMCBungeeCordPlugin extends Plugin implements LMCPlugin {
             this.localeManager = new DefaultLocaleManager();
         }
 
+        //noinspection Duplicates
         try {
             if (this.resourceManager == null) {
                 // 由于使用三元操作符导致自动格式化太难看，且懒得调整，故使用if-else
-                if (this.useI18n) this.resourceManager = new I18nResourceManager(this, this.localeManager);
-                else this.resourceManager = new StandardResourceManager(this);
+                if (this.useI18n) {
+                    this.resourceManager = new I18nResourceManager(this, this.localeManager);
+                } else {
+                    this.resourceManager = new StandardResourceManager(this);
+                }
             }
         } catch (IOException e) {
             ExceptionHandler.handle(e);
