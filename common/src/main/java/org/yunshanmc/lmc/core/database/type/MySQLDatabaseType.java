@@ -27,24 +27,25 @@ public class MySQLDatabaseType extends AbstractDatabaseType {
         String user = config.getString("user", "");
         String password = config.getString("password", "");
         List<String> require = Stream
-                .of(host, port, dbName, user)
-                .filter(Strings::isNullOrEmpty)
-                .collect(Collectors.toList());
+            .of(host, port, dbName, user)
+            .filter(Strings::isNullOrEmpty)
+            .collect(Collectors.toList());
         if (!require.isEmpty()) {
             messageSender.errorConsole("database.MySQL.buildURL.MissingConfig",
-                                       host, port, dbName, user, password);
+                host, port, dbName, user, password);
             return null;
         }
         String url = MessageFormat.format(
-                "jdbc:mysql://{0}:{1}/{2}" +
-                        "?user={3}" +
-                        "&password={4}" +
-                        "&createDatabaseIfNotExist=true" +
-                        "&autoReconnect=true" +
-                        "&useUnicode=true" +
-                        "&characterEncoding=UTF-8" +
-                        "&useSSL=false",
-                host, port, dbName, user, password);
+            "jdbc:mysql://{0}:{1}/{2}" +
+                "?user={3}" +
+                "&password={4}" +
+                "&createDatabaseIfNotExist=true" +
+                "&autoReconnect=true" +
+                "&useUnicode=true" +
+                "&characterEncoding=UTF-8" +
+                "&serverTimezone=UTC" +
+                "&useSSL=false",
+            host, port, dbName, user, password);
         messageSender.debugConsole(2, "database.MySQL.buildURL.JDBC_URL", host, port, dbName, user, password, url);
         return url;
     }
