@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 import org.yunshanmc.lmc.core.message.BaseMessageSender;
 import org.yunshanmc.lmc.core.message.DefaultMessageFormat;
 import org.yunshanmc.lmc.core.message.MessageManager;
-import org.yunshanmc.lmc.core.utils.PlatformUtils;
+import org.yunshanmc.lmc.core.util.PlatformUtils;
 
 import java.lang.reflect.Proxy;
 import java.util.UUID;

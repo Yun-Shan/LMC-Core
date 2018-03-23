@@ -1,4 +1,4 @@
-package org.yunshanmc.lmc.core.bungee.utils;
+package org.yunshanmc.lmc.core.bungee.util;
 
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -9,8 +9,8 @@ import org.yunshanmc.lmc.core.command.AbstractParameterConverter;
 import org.yunshanmc.lmc.core.config.bukkitcfg.file.YamlConfiguration;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.resource.Resource;
-import org.yunshanmc.lmc.core.utils.PlatformUtils;
-import org.yunshanmc.lmc.core.utils.ReflectUtils;
+import org.yunshanmc.lmc.core.util.PlatformUtils;
+import org.yunshanmc.lmc.core.util.ReflectUtils;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

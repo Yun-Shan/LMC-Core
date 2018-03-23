@@ -2,7 +2,7 @@
  * Author: Yun-Shan
  * Date: 2017/06/11
  */
-package org.yunshanmc.lmc.core.utils;
+package org.yunshanmc.lmc.core.util;
 
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.resource.Resource;

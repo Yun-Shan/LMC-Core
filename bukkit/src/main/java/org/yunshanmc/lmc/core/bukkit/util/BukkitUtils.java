@@ -1,4 +1,4 @@
-package org.yunshanmc.lmc.core.bukkit.utils;
+package org.yunshanmc.lmc.core.bukkit.util;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -8,8 +8,8 @@ import org.yunshanmc.lmc.core.bukkit.command.BukkitLMCCommandSender;
 import org.yunshanmc.lmc.core.command.AbstractParameterConverter;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.resource.Resource;
-import org.yunshanmc.lmc.core.utils.PlatformUtils;
-import org.yunshanmc.lmc.core.utils.ReflectUtils;
+import org.yunshanmc.lmc.core.util.PlatformUtils;
+import org.yunshanmc.lmc.core.util.ReflectUtils;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

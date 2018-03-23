@@ -1,4 +1,4 @@
-package org.yunshanmc.lmc.core.utils;
+package org.yunshanmc.lmc.core.util;
 
 import com.google.common.base.Preconditions;
 import org.yunshanmc.lmc.core.LMCPlugin;

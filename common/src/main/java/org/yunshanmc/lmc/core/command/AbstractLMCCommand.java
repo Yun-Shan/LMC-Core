@@ -1,7 +1,7 @@
 package org.yunshanmc.lmc.core.command;
 
 import com.google.common.base.Strings;
-import org.yunshanmc.lmc.core.utils.ReflectUtils;
+import org.yunshanmc.lmc.core.util.ReflectUtils;
 
 import java.util.Arrays;
 import java.util.List;

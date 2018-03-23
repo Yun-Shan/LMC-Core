@@ -7,7 +7,7 @@ package org.yunshanmc.lmc.core.exception;
 import com.google.common.base.Strings;
 import org.yunshanmc.lmc.core.LMCPlugin;
 import org.yunshanmc.lmc.core.internal.BuiltinMessage;
-import org.yunshanmc.lmc.core.utils.PlatformUtils;
+import org.yunshanmc.lmc.core.util.PlatformUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;

@@ -1,6 +1,6 @@
 package org.yunshanmc.lmc.core.internal;
 
-import org.yunshanmc.lmc.core.utils.ReflectUtils;
+import org.yunshanmc.lmc.core.util.ReflectUtils;
 
 import java.util.HashMap;
 import java.util.Locale;

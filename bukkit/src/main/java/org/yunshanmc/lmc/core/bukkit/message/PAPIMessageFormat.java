@@ -9,7 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.yunshanmc.lmc.core.message.DefaultMessageFormat;
 import org.yunshanmc.lmc.core.message.MessageContext;
-import org.yunshanmc.lmc.core.utils.PlatformUtils;
+import org.yunshanmc.lmc.core.util.PlatformUtils;
 
 /**
  * PlaceholderAPI 格式化

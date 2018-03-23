@@ -1,18 +1,15 @@
 package org.yunshanmc.lmc.bungee;
 
-import com.j256.ormlite.logger.LoggerFactory;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.PluginManager;
 import net.sf.cglib.proxy.*;
-import org.yunshanmc.lmc.core.bungee.utils.BungeeUtils;
-import org.yunshanmc.lmc.core.utils.PlatformUtils;
+import org.yunshanmc.lmc.core.bungee.util.BungeeUtils;
+import org.yunshanmc.lmc.core.util.PlatformUtils;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.Proxy;
 import java.util.concurrent.atomic.AtomicReference;
 
 public final class EnvironmentUtil {

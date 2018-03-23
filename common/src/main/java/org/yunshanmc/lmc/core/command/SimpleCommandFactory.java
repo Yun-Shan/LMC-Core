@@ -4,7 +4,7 @@ import com.google.common.base.Strings;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.message.MessageManager;
 import org.yunshanmc.lmc.core.message.MessageSender;
-import org.yunshanmc.lmc.core.utils.PlatformUtils;
+import org.yunshanmc.lmc.core.util.PlatformUtils;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;

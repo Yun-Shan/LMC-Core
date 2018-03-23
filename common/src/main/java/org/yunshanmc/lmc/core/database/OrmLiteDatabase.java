@@ -12,8 +12,8 @@ import org.yunshanmc.lmc.core.LMCPlugin;
 import org.yunshanmc.lmc.core.config.bukkitcfg.file.FileConfiguration;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.message.MessageSender;
-import org.yunshanmc.lmc.core.utils.PlatformUtils;
-import org.yunshanmc.lmc.core.utils.ReflectUtils;
+import org.yunshanmc.lmc.core.util.PlatformUtils;
+import org.yunshanmc.lmc.core.util.ReflectUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Field;

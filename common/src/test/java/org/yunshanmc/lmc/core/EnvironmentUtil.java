@@ -1,6 +1,6 @@
 package org.yunshanmc.lmc.core;
 
-import org.yunshanmc.lmc.core.utils.PlatformUtils;
+import org.yunshanmc.lmc.core.util.PlatformUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;

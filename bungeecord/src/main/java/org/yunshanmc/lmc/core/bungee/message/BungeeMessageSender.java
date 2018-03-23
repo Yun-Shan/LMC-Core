@@ -9,7 +9,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.yunshanmc.lmc.core.message.BaseMessageSender;
 import org.yunshanmc.lmc.core.message.DefaultMessageFormat;
 import org.yunshanmc.lmc.core.message.MessageManager;
-import org.yunshanmc.lmc.core.utils.PlatformUtils;
+import org.yunshanmc.lmc.core.util.PlatformUtils;
 
 import java.lang.reflect.Proxy;
 import java.util.UUID;
