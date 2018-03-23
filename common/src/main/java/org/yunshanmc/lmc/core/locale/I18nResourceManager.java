@@ -19,13 +19,15 @@ import java.util.function.Predicate;
  * 国际化资源管理器
  * <p>
  * 自动提取属于当前区域({@link Locale})的资源，若当前区域没有相应的资源则提取默认资源
+ *
+ * @author Yun-Shan
  */
 public class I18nResourceManager extends StandardResourceManager {
-    
+
     private final LocaleManager localeManager;
-    
-    private Path[] localeTags = { Paths.get(Locale.ENGLISH.toLanguageTag()), Paths.get(Locale.ENGLISH.getLanguage()) };
-    
+
+    private Path[] localeTags = {Paths.get(Locale.ENGLISH.toLanguageTag()), Paths.get(Locale.ENGLISH.getLanguage())};
+
     /**
      * 通过Bukkit插件实例构造一个国际化资源管理器
      *
@@ -35,39 +37,47 @@ public class I18nResourceManager extends StandardResourceManager {
     public I18nResourceManager(LMCPlugin plugin, LocaleManager localeManager) throws IOException {
         super(plugin);
         this.localeManager = localeManager;
-        localeManager.addListener(locale -> this.localeTags = new Path[]{ Paths.get(locale.toLanguageTag()),
-                                                                          Paths.get(new Locale(locale.getLanguage(),
-                                                                                               locale.getCountry()).toLanguageTag()),
-                                                                          Paths.get(locale.getLanguage()),
-                                                                          Paths.get("")/* 空路径为资源未国际化时的默认路径 */});
+        localeManager.addListener((old, locale) -> this.localeTags = new Path[]{
+            Paths.get(locale.toLanguageTag()),
+            Paths.get(new Locale(locale.getLanguage(), locale.getCountry()).toLanguageTag()),
+            Paths.get(locale.getLanguage()),
+            /* 空路径为资源未国际化时的默认路径 */
+            Paths.get("")
+        });
     }
-    
+
     @Override
     protected Resource getSelfResource(Path resPath) {
         Resource res = null;
         for (Path locale : localeTags) {
-            if ((res = super.getSelfResource(locale.resolve(resPath))) != null) break;
+            if ((res = super.getSelfResource(locale.resolve(resPath))) != null) {
+                break;
+            }
         }
         return res;
     }
-    
+
     @Override
     protected Resource getFileResource(Path resPath) {
         Resource res = null;
         for (Path locale : localeTags) {
-            if ((res = super.getFileResource(locale.resolve(resPath))) != null) break;
+            if ((res = super.getFileResource(locale.resolve(resPath))) != null) {
+                break;
+            }
         }
         return res;
     }
-    
+
     @Override
     protected Map<String, Resource> getFolderResources(Path dirPath, Predicate<String> nameFilter, boolean deep) {
         Map<String, Resource> res = null;
         for (Path locale : localeTags) {
-            if ((res = super.getFolderResources(locale.resolve(dirPath), nameFilter, deep)) != null) break;
+            if ((res = super.getFolderResources(locale.resolve(dirPath), nameFilter, deep)) != null) {
+                break;
+            }
         }
         return res;
     }
-    
-    
+
+
 }

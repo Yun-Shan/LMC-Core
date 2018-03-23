@@ -3,13 +3,16 @@ package org.yunshanmc.lmc.core.database;
 import org.yunshanmc.lmc.core.LMCPlugin;
 import org.yunshanmc.lmc.core.config.bukkitcfg.ConfigurationSection;
 import org.yunshanmc.lmc.core.config.bukkitcfg.file.FileConfiguration;
-import org.yunshanmc.lmc.core.database.type.DatabaseType;
+import org.yunshanmc.lmc.core.database.type.AbstractDatabaseType;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.message.MessageSender;
 
 import java.sql.SQLException;
 
-public abstract class Database {
+/**
+ * @author Yun-Shan
+ */
+public abstract class BaseDatabase {
 
     protected final LMCPlugin plugin;
     protected final ConfigurationSection dbConfig;
@@ -17,15 +20,15 @@ public abstract class Database {
 
     private volatile boolean inited = false;
     private volatile boolean closed = false;
-    protected DatabaseType dbType;
+    protected AbstractDatabaseType dbType;
 
-    public Database(LMCPlugin plugin, FileConfiguration pluginConfig, MessageSender messageSender) {
+    public BaseDatabase(LMCPlugin plugin, FileConfiguration pluginConfig, MessageSender messageSender) {
         this.plugin = plugin;
         this.dbConfig = pluginConfig.getConfigurationSection("database");
         this.messageSender = messageSender;
     }
 
-    public DatabaseType getDbType() {
+    public AbstractDatabaseType getDbType() {
         return this.dbType;
     }
 
@@ -36,7 +39,7 @@ public abstract class Database {
         String type = this.dbConfig.getString("type");
         if (type == null) return fail("MissingTypeConfig");
         // 匹配支持的数据库类型
-        this.dbType = DatabaseType.matchType(type, this.plugin, this.messageSender);
+        this.dbType = AbstractDatabaseType.matchType(type, this.plugin, this.messageSender);
         if (this.dbType == null) return fail("UnsupportedDatabaseType", type);
         // 获取实际数据库配置
         ConfigurationSection dbCfg = this.dbConfig.getConfigurationSection(this.dbType.getName().toLowerCase());

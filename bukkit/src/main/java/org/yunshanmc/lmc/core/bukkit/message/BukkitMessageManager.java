@@ -8,6 +8,9 @@ import org.yunshanmc.lmc.core.message.Message;
 import org.yunshanmc.lmc.core.message.MessageContext;
 import org.yunshanmc.lmc.core.message.MessageSender;
 
+/**
+ * @author Yun-Shan
+ */
 public class BukkitMessageManager extends BaseMessageManager {
     public BukkitMessageManager(LMCPlugin plugin, ConfigManager configManager) {
         super(plugin, configManager);

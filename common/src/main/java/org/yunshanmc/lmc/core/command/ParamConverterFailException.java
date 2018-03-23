@@ -1,5 +1,8 @@
 package org.yunshanmc.lmc.core.command;
 
+/**
+ * @author Yun-Shan
+ */
 public class ParamConverterFailException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;

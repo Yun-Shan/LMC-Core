@@ -5,6 +5,9 @@ import org.yunshanmc.lmc.core.bungee.LMCBungeeCordPlugin;
 import org.yunshanmc.lmc.core.bungee.command.executors.BungeeCordExecutor;
 import org.yunshanmc.lmc.core.command.BaseCommandManager;
 
+/**
+ * @author Yun-Shan
+ */
 public class BungeeCommandManager extends BaseCommandManager {
 
     public BungeeCommandManager(LMCPlugin plugin, String handleCommand) {

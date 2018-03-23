@@ -15,30 +15,40 @@ import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * @author Yun-Shan
+ */
 public final class SimpleCommandFactory {
 
     private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
     private static final Class<?> DEFAULT_SENDER_CLS;
-    private static final MethodHandle LMC_SENDER_CONVERTER;
-
+    private static final Function<Class<?>, MethodHandle> SENDER_CONVERTER_SERVER_TO_LMC;
     static {
         Class<?> senderType;
-        MethodHandle lmcSenderConverter;
+        MethodHandle lmc2server;
+        final MethodHandle[] server2lmc = new MethodHandle[1];
         try {
             senderType = PlatformUtils.getCommandSenderClass();
-            lmcSenderConverter = LOOKUP.unreflectConstructor(
-                ParameterConverter.getLMCSenderClass().getDeclaredConstructor(senderType)
+            lmc2server = LOOKUP.unreflectConstructor(
+                AbstractParameterConverter.getLMCSenderClass().getDeclaredConstructor(senderType, MessageSender.class)
             );
-            MethodType methodType = lmcSenderConverter.type();
+            MethodType methodType = lmc2server.type();
             methodType = methodType.changeReturnType(methodType.returnType().getSuperclass());
-            lmcSenderConverter = lmcSenderConverter.asType(methodType);
+            lmc2server = lmc2server.asType(methodType);
+
+            server2lmc[0] = LOOKUP.unreflect(lmc2server.type().returnType().getMethod("getHandle"));
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }
         DEFAULT_SENDER_CLS = senderType;
-        LMC_SENDER_CONVERTER = lmcSenderConverter;
+        SENDER_CONVERTER_SERVER_TO_LMC = cls -> {
+            MethodType methodType = server2lmc[0].type();
+            methodType = methodType.changeReturnType(cls);
+            return server2lmc[0].asType(methodType);
+        };
     }
 
 
@@ -47,8 +57,7 @@ public final class SimpleCommandFactory {
         throw new Error();
     }
 
-    // TODO 拆分过长方法
-    public static List<LMCCommand> build(SimpleLMCCommand rawCmd, MessageSender messageSender, String handleCommand, MessageManager messageManager) {
+    static List<AbstractLMCCommand> build(SimpleLMCCommand rawCmd, MessageSender messageSender, String handleCommand, MessageManager messageManager) {
         String msgPath = "simplecommand.register.";
         return Arrays.stream(rawCmd.getClass().getDeclaredMethods()).filter(
             m -> m.isAnnotationPresent(SimpleCommand.class)).map(m -> {
@@ -75,7 +84,7 @@ public final class SimpleCommandFactory {
 
                         boolean allow;
                         // 使用LMCCommandSender的实现类不优雅，故只判断LMCCommandSender类本身
-                        allow = LMCCommandSender.class.equals(param.getType());
+                        allow = BaseLMCCommandSender.class.equals(param.getType());
                         if (!allow) {
                             allow = PlatformUtils.getCommandSenderClass().isAssignableFrom(param.getType());
                         }
@@ -130,12 +139,20 @@ public final class SimpleCommandFactory {
                 boolean needRawInfo = rawInfoIdx != -1;
                 // 获取参数转换器
                 int convertersLen = paramCount;
-                if (needSender) convertersLen -= 1;
-                if (needRawInfo) convertersLen -= 1;
+                if (needSender) {
+                    convertersLen -= 1;
+                }
+                if (needRawInfo) {
+                    convertersLen -= 1;
+                }
                 MethodHandle[] converters = new MethodHandle[convertersLen];
                 for (int i = 0; i < paramCount; i++) {
-                    if ((needSender && i == senderIdx) || (needRawInfo && i == rawInfoIdx)) continue;
-                    ParameterConverter<?> converter = ParameterConverter.getConverter(parameters[i].getType());
+                    boolean currentIsSender = needSender && i == senderIdx;
+                    boolean currentIsRawInfo = needRawInfo && i == rawInfoIdx;
+                    if (currentIsSender || currentIsRawInfo) {
+                        continue;
+                    }
+                    AbstractParameterConverter<?> converter = AbstractParameterConverter.getConverter(parameters[i].getType());
                     if (converter == null) {
                         // 未注册相应类型的参数转换器
                         messageSender.warningConsole(msgPath + "fail.CanNotFoundParamConverter",
@@ -146,8 +163,12 @@ public final class SimpleCommandFactory {
                     }
 
                     int idx = i;
-                    if (needSender && i > senderIdx) idx -= 1;
-                    if (needRawInfo && i > rawInfoIdx) idx -= 1;
+                    if (needSender && i > senderIdx) {
+                        idx -= 1;
+                    }
+                    if (needRawInfo && i > rawInfoIdx) {
+                        idx -= 1;
+                    }
                     converters[idx] = converter.toMethodHandle();
                 }
 
@@ -155,27 +176,38 @@ public final class SimpleCommandFactory {
                 // 必须最先绑定，后续处理都忽略了此方法句柄的this参数
                 handle = handle.bindTo(rawCmd);
 
-                if (needRawInfo || needSender) {// 移动参数位置
+                // 移动参数位置
+                if (needRawInfo || needSender) {
                     Class<?>[] args = m.getParameterTypes();
                     Class<?> senderType = null;
-                    if (needSender) senderType = args[senderIdx];
+                    if (needSender) {
+                        senderType = args[senderIdx];
+                    }
                     Class<?> rawInfoType = null;
-                    if (needRawInfo) rawInfoType = args[rawInfoIdx];
+                    if (needRawInfo) {
+                        rawInfoType = args[rawInfoIdx];
+                    }
 
                     int right = Math.max(rawInfoIdx, senderIdx);
                     int left = Math.min(rawInfoIdx, senderIdx);
 
-                    if (left >= 0 && args.length > 2) {
+                    boolean bothSenderAndRawInfo = args.length > 2;
+                    if (left >= 0 && bothSenderAndRawInfo) {
                         System.arraycopy(args, left, args, left + 1, right - left);
-                        if (left > 0) System.arraycopy(args, 0, args, 2, left);
-                        else if (right > 1) args[2] = args[1];
+                        if (left > 0) {
+                            System.arraycopy(args, 0, args, 2, left);
+                        } else if (right > 1) {
+                            args[2] = args[1];
+                        }
                     } else if (args.length > 1) {
                         System.arraycopy(args, 0, args, 1, right);
                     }
 
                     if (needSender) {
                         args[0] = senderType;
-                        if (needRawInfo) args[1] = rawInfoType;
+                        if (needRawInfo) {
+                            args[1] = rawInfoType;
+                        }
                     } else {
                         args[0] = rawInfoType;
                     }
@@ -229,10 +261,10 @@ public final class SimpleCommandFactory {
                 }
 
                 Class<?> senderType = handle.type().parameterType(0);
-                if (LMCCommandSender.class.equals(senderType)) {
-                    handle = MethodHandles.filterArguments(handle, 0, LMC_SENDER_CONVERTER);
-                    senderType = handle.type().parameterType(0);
+                if (!BaseLMCCommandSender.class.equals(senderType)) {
+                    handle = MethodHandles.filterArguments(handle, 0, SENDER_CONVERTER_SERVER_TO_LMC.apply(senderType));
                 }
+
                 // 过滤参数
                 handle = MethodHandles.filterArguments(handle, 2, converters);
                 // 字符串数组转为参数列表
@@ -240,17 +272,25 @@ public final class SimpleCommandFactory {
 
                 // 参数最大数量，忽略Sender和RawInfo参数
                 int maxArgCount = paramCount;
-                if (needSender) maxArgCount -= 1;
-                if (needRawInfo) maxArgCount -= 1;
+                if (needSender) {
+                    maxArgCount -= 1;
+                }
+                if (needRawInfo) {
+                    maxArgCount -= 1;
+                }
 
                 // 参数最小数量，有可选参数时是optionalStartIds，无可选参数时是最大参数数量
                 int minArgCount = optionalStartIds > 0 ? optionalStartIds : paramCount;
                 // 没有可选参数，或者Sender参数的位置在optionalStartIds前面时，忽略Sender参数
-                if (needSender && (optionalStartIds <= 0 || senderIdx < optionalStartIds))
+                boolean ignoreSender = optionalStartIds <= 0 || senderIdx < optionalStartIds;
+                if (needSender && ignoreSender) {
                     minArgCount -= 1;
+                }
                 // 没有可选参数，或者RawInfo参数的位置在optionalStartIds前面时，忽略RawInfo参数
-                if (needRawInfo && (optionalStartIds <= 0 || rawInfoIdx < optionalStartIds))
+                boolean ignoreRawInfo = optionalStartIds <= 0 || rawInfoIdx < optionalStartIds;
+                if (needRawInfo && ignoreRawInfo) {
                     minArgCount -= 1;
+                }
 
                 SimpleCommandInfo cmdInfo = new SimpleCommandInfo();
                 cmdInfo.setName(cmdAnno.name());
@@ -262,12 +302,20 @@ public final class SimpleCommandFactory {
                     if (messageManager.getMessage(path).isMissingMessage()) {
                         StringBuilder msg = new StringBuilder();
                         for (int i = 0; i < parameters.length; i++) {
-                            if (i == senderIdx || i == rawInfoIdx) continue;
-                            if (i >= optionalStartIds) msg.append('[');
-                            else msg.append('<');
+                            if (i == senderIdx || i == rawInfoIdx) {
+                                continue;
+                            }
+                            if (i >= optionalStartIds) {
+                                msg.append('[');
+                            } else {
+                                msg.append('<');
+                            }
                             msg.append(parameters[i].getName());
-                            if (i >= optionalStartIds) msg.append(']');
-                            else msg.append('>');
+                            if (i >= optionalStartIds) {
+                                msg.append(']');
+                            } else {
+                                msg.append('>');
+                            }
                             msg.append(' ');
                         }
                         if (msg.length() > 0) {
@@ -284,7 +332,8 @@ public final class SimpleCommandFactory {
                 if (Strings.isNullOrEmpty(cmdAnno.description())) {
                     cmdInfo.setDescription(messageSender.getMessage("command.description." + cmdAnno.name()));
                 } else {
-                    if (cmdAnno.description().charAt(0) == '#' && cmdAnno.description().length() > 1) {
+                    char msgFlag = '#';
+                    if (cmdAnno.description().charAt(0) == msgFlag && cmdAnno.description().length() > 1) {
                         cmdInfo.setDescription(messageSender.getMessage(cmdAnno.description().substring(1)));
                     } else {
                         cmdInfo.setDescription(cmdAnno.description());
@@ -302,7 +351,8 @@ public final class SimpleCommandFactory {
         }).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
-    static class SimpleCommandImpl extends LMCCommand {
+    static class SimpleCommandImpl extends AbstractLMCCommand {
+        // TODO cmdInfo 信息读取 命令执行时进行相应处理
 
         private final MethodHandle handle;
         private final Method rawMethod;
@@ -312,7 +362,6 @@ public final class SimpleCommandFactory {
 
         private MessageSender messageSender;
 
-        // TODO cmdInfo 信息读取 命令执行时进行相应处理
         private SimpleCommandImpl(SimpleCommandInfo cmdInfo, MessageSender messageSender, MethodHandle handle,
                                   Method rawMethod, Class<?> senderType, int minArgCount, int maxArgCount) {
             super(cmdInfo.getName(), cmdInfo.getUsage(),
@@ -328,8 +377,8 @@ public final class SimpleCommandFactory {
         }
 
         @Override
-        public void execute(LMCCommandSender sender, String label, String... args) {
-            if (!this.senderType.isInstance(sender.getHandle())) {
+        public void execute(BaseLMCCommandSender sender, String label, String... args) {
+            if (!this.senderType.equals(BaseLMCCommandSender.class) && !this.senderType.isInstance(sender.getHandle())) {
                 this.failTip(sender, "command.simpleCommand.senderTypeRequire."
                     + this.senderType.getName().replace('.', '-'));
                 return;
@@ -344,20 +393,24 @@ public final class SimpleCommandFactory {
                 args = Arrays.copyOf(args, this.maxArgCount);
             }
             try {
-                this.handle.invoke(sender.getHandle(), new SimpleCommand.CommandRawInfo(label, args), args);
+                this.handle.invoke(sender, new SimpleCommand.CommandRawInfo(label, args), args);
             } catch (ParamConverterFailException e) {
                 this.failTip(sender, "command.simpleCommand.ConvertFail", e.getArg());
             } catch (WrongMethodTypeException | ClassCastException e) {
                 // 该项错误不应该出现，若出现则是SimpleCommandFactory有bug
+
                 ExceptionHandler.handle(e);
                 this.messageSender.warningConsole("bug.SimpleCommandRegister",
                     e.getClass().getName(), e.getMessage(),
                     this.getName(),
                     this.rawMethod.getDeclaringClass(), this.rawMethod.toGenericString());
                 this.failTip(sender, "command.simpleCommand.SimpleCommandBug");
-            } catch (Throwable e) {// 该项为命令处理方法抛出的异常
+            } catch (Throwable e) {
+                // 该项为命令处理方法抛出的异常
+
                 if (e instanceof Error) {
-                    throw (Error) e;// Error是程序无法处理的，不应掩盖，故原样抛出
+                    // Error是程序无法处理的，不应掩盖，故原样抛出
+                    throw (Error) e;
                 }
                 ExceptionHandler.handle(e);
                 this.failTip(sender, "command.simpleCommand.DeveloperCommandError",
@@ -366,11 +419,11 @@ public final class SimpleCommandFactory {
         }
 
         @Override
-        public void showHelp(LMCCommandSender sender) {
+        public void showHelp(BaseLMCCommandSender sender) {
             // TODO
         }
 
-        private void failTip(LMCCommandSender sender, String msgKey, Object... args) {
+        private void failTip(BaseLMCCommandSender sender, String msgKey, Object... args) {
             sender.warning(msgKey, args);
         }
     }

@@ -7,6 +7,9 @@ import org.yunshanmc.lmc.core.message.Message;
 import org.yunshanmc.lmc.core.message.MessageContext;
 import org.yunshanmc.lmc.core.message.MessageSender;
 
+/**
+ * @author Yun-Shan
+ */
 public class BungeeMessageManager extends BaseMessageManager {
     public BungeeMessageManager(LMCPlugin plugin, ConfigManager configManager) {
         super(plugin, configManager);

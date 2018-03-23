@@ -9,7 +9,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class JdbcDatabase extends Database {
+/**
+ * @author Yun-Shan
+ */
+public class JdbcDatabase extends BaseDatabase {
 
     private Connection connection;
 
@@ -29,7 +32,9 @@ public class JdbcDatabase extends Database {
     public void close() {
         super.close();
         try {
-            if (this.connection != null) this.connection.close();
+            if (this.connection != null) {
+                this.connection.close();
+            }
         } catch (SQLException e) {
             ExceptionHandler.handle(e);
         } finally {

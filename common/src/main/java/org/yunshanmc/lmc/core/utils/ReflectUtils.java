@@ -9,7 +9,6 @@ import org.yunshanmc.lmc.core.resource.Resource;
 import org.yunshanmc.lmc.core.resource.URLResource;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -19,14 +18,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.jar.JarFile;
 
 /**
- * 反射相关工具
+ * 反射相关工具.
+ * <p>
+ *
+ * @author Yun-Shan
  */
 public final class ReflectUtils {
 
     private ReflectUtils() {
+        // 禁止实例化
     }
 
     /**
@@ -46,13 +48,17 @@ public final class ReflectUtils {
             try {
                 Class<?> cls = Class.forName(stack.getClassName());
                 URL url = cls.getResource(resPath);
-                if (url != null) ress.add(new URLResource(new URL(URLDecoder.decode(url.toString(), "UTF-8"))));
+                if (url != null) {
+                    ress.add(new URLResource(new URL(URLDecoder.decode(url.toString(), "UTF-8"))));
+                }
             } catch (ClassNotFoundException e) {
                 ExceptionHandler.handle(e);
             } catch (MalformedURLException | UnsupportedEncodingException ignored) {
             }
         }
-        if (reverse) Collections.reverse(ress);
+        if (reverse) {
+            Collections.reverse(ress);
+        }
         return ress;
     }
 
@@ -61,6 +67,9 @@ public final class ReflectUtils {
         StackTraceElement[] stack = new Throwable().getStackTrace();
         return Arrays.copyOfRange(stack, 1, stack.length);
     }
+
+    private static final String GRADLE_TEST_PATH_TEST = "build/classes/java/test";
+    private static final String GRADLE_TEST_PATH_MAIN = "build/classes/java/main";
 
     public static void checkSafeCall() {
         StackTraceElement[] elements = new Throwable().getStackTrace();
@@ -71,7 +80,9 @@ public final class ReflectUtils {
                 Class<?> beCalled = Class.forName(elements[1].getClassName());
                 Class cls = Class.forName(elements[2].getClassName());
                 // 使用特殊方法(如JVMTI)加载的类没有ProtectionDomain或CodeSource
-                if (cls.getProtectionDomain() == null || cls.getProtectionDomain().getCodeSource() == null) break;
+                if (cls.getProtectionDomain() == null || cls.getProtectionDomain().getCodeSource() == null) {
+                    break;
+                }
                 CodeSource codeSource = cls.getProtectionDomain().getCodeSource();
 
                 // 正式环境
@@ -79,12 +90,12 @@ public final class ReflectUtils {
                     return;
                 }
 
-                // TODO 测试环境
                 File file = Resource.urlToFile(codeSource.getLocation());
                 if (file.isDirectory()) {
                     String path = file.getPath().replace('\\', '/');
-                    if (path.endsWith("test/classes")/* IDEA Test */
-                            || path.endsWith("build/classes/java/test")/* Gradle Test */) return;
+                    if (path.endsWith(GRADLE_TEST_PATH_TEST) || path.endsWith(GRADLE_TEST_PATH_MAIN)) {
+                        return;
+                    }
                 }
 
             } catch (Exception e) {

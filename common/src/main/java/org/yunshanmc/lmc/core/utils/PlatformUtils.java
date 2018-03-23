@@ -16,47 +16,76 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+/**
+ * 平台相关工具.
+ * <p>
+ *
+ * @author Yun-Shan
+ */
 public final class PlatformUtils {
 
-    private PlatformUtils(){}// 禁止实例化
+    private PlatformUtils() {
+        // 禁止实例化
+    }
 
     private static final PlatformType PLATFORM;
+
     static {
         PlatformType type;
         LMCPlugin lmc = LMCCoreUtils.getLMCCorePlugin();
         if (lmc != null) {
             switch (lmc.getClass().getName()) {
-                case "org.yunshanmc.lmc.core.bukkit.LMCCoreBukkitPlugin": type = PlatformType.Bukkit; break;
-                case "org.yunshanmc.lmc.core.bungee.LMCCoreBungeeCordPlugin": type = PlatformType.BungeeCord; break;
-                default: type = PlatformType.Unknown; break;
+                case "org.yunshanmc.lmc.core.bukkit.LMCCoreBukkitPlugin":
+                    type = PlatformType.Bukkit;
+                    break;
+                case "org.yunshanmc.lmc.core.bungee.LMCCoreBungeeCordPlugin":
+                    type = PlatformType.BungeeCord;
+                    break;
+                default:
+                    type = PlatformType.Unknown;
+                    break;
             }
         } else {
             type = PlatformType.Unknown;
         }
         PLATFORM = type;
     }
+
     private static final Class<?> SENDER_CLASS;
+
     static {
         Class<?> senderCls;
         try {
             switch (PLATFORM) {
-                case Bukkit: senderCls = Class.forName("org.bukkit.command.CommandSender"); break;
-                case BungeeCord: senderCls = Class.forName("net.md_5.bungee.api.CommandSender"); break;
-                default: senderCls = null;
+                case Bukkit:
+                    senderCls = Class.forName("org.bukkit.command.CommandSender");
+                    break;
+                case BungeeCord:
+                    senderCls = Class.forName("net.md_5.bungee.api.CommandSender");
+                    break;
+                default:
+                    senderCls = null;
             }
         } catch (ClassNotFoundException ignored) {
             senderCls = null;
         }
         SENDER_CLASS = senderCls;
     }
+
     private static final Class<?> PLAYER_CLASS;
+
     static {
         Class<?> playerCls;
         try {
             switch (PLATFORM) {
-                case Bukkit: playerCls = Class.forName("org.bukkit.entity.Player"); break;
-                case BungeeCord: playerCls = Class.forName("net.md_5.bungee.api.connection.ProxiedPlayer"); break;
-                default: playerCls = null;
+                case Bukkit:
+                    playerCls = Class.forName("org.bukkit.entity.Player");
+                    break;
+                case BungeeCord:
+                    playerCls = Class.forName("net.md_5.bungee.api.connection.ProxiedPlayer");
+                    break;
+                default:
+                    playerCls = null;
             }
         } catch (ClassNotFoundException ignored) {
             playerCls = null;
@@ -95,13 +124,17 @@ public final class PlatformUtils {
 
     public static synchronized void setConsoleRawMessageSender(Consumer<String> consoleRawMessageSender) {
         ReflectUtils.checkSafeCall();
-        if (PlatformUtils.ConsoleRawMessageSender != null) throw new IllegalStateException();
+        if (PlatformUtils.ConsoleRawMessageSender != null) {
+            throw new IllegalStateException();
+        }
         PlatformUtils.ConsoleRawMessageSender = consoleRawMessageSender;
     }
 
     public static void setPluginGetter(Function<String, Object> pluginGetter) {
         ReflectUtils.checkSafeCall();
-        if (PlatformUtils.PluginGetter != null) throw new IllegalStateException();
+        if (PlatformUtils.PluginGetter != null) {
+            throw new IllegalStateException();
+        }
         PlatformUtils.PluginGetter = pluginGetter;
     }
 
@@ -110,9 +143,22 @@ public final class PlatformUtils {
     }
 
     public enum PlatformType {
+        /**
+         * 基于Bukkit的服务端.
+         * <p>
+         * CraftBukkit, Cauldron及所有基于这些服务端开发的服务端(Spigot, PaperSpigot, KCauldron等)
+         */
         Bukkit,
+        /**
+         * BungeeCord服务端.
+         */
         BungeeCord,
 
+        /**
+         * 未知服务端.
+         * <p>
+         * 若获取到的平台是Unknown则说明出现了bug
+         */
         Unknown
     }
 
@@ -136,9 +182,13 @@ public final class PlatformUtils {
                         YamlConfiguration yml = YamlConfiguration.loadConfiguration(
                             new InputStreamReader(res.getInputStream(), StandardCharsets.UTF_8));
                         String plugin = yml.getString("name");
-                        if (plugin != null &&
-                            (!duplicate || (result.isEmpty() || !plugin.equals(result.get(result.size() - 1)))))
+                        boolean canAdd = true;
+                        if (!duplicate) {
+                            canAdd = result.isEmpty() || !plugin.equals(result.get(result.size() - 1));
+                        }
+                        if (plugin != null && canAdd) {
                             result.add(plugin);
+                        }
                     } catch (IOException e) {
                         ExceptionHandler.handle(e);
                     }
@@ -151,8 +201,12 @@ public final class PlatformUtils {
         if (isBungeeCord()) {
             result = fetcher.apply("bungee.yml");
         }
-        if (result == null) fetcher.apply("plugin.yml");
-        if (result == null) result = Collections.emptyList();
+        if (result == null) {
+            fetcher.apply("plugin.yml");
+        }
+        if (result == null) {
+            result = Collections.emptyList();
+        }
         return result;
     }
 
@@ -166,7 +220,8 @@ public final class PlatformUtils {
      */
     public static String traceFirstPluginName(StackTraceElement[] stackTrace, boolean skipSelf) {
         List<String> resList = PlatformUtils.tracePluginsName(stackTrace, false, false);
-        if (!resList.isEmpty() && (!skipSelf || resList.size() > 1)) {
+        boolean hasValid = !resList.isEmpty() && (!skipSelf || resList.size() > 1);
+        if (hasValid) {
             return resList.get(skipSelf ? 1 : 0);
         }
         return null;
@@ -191,9 +246,13 @@ public final class PlatformUtils {
                         YamlConfiguration yml = YamlConfiguration.loadConfiguration(
                             new InputStreamReader(res.getInputStream(), StandardCharsets.UTF_8));
                         Object plugin = getPlugin(yml.getString("name"));
-                        if (plugin != null &&
-                            (!duplicate || (result.isEmpty() || !plugin.equals(result.get(result.size() - 1)))))
+                        boolean canAdd = true;
+                        if (!duplicate) {
+                            canAdd = result.isEmpty() || !plugin.equals(result.get(result.size() - 1));
+                        }
+                        if (plugin != null && canAdd) {
                             result.add(plugin);
+                        }
                     } catch (IOException e) {
                         ExceptionHandler.handle(e);
                     }
@@ -206,8 +265,12 @@ public final class PlatformUtils {
         if (isBungeeCord()) {
             result = fetcher.apply("bungee.yml");
         }
-        if (result == null) fetcher.apply("plugin.yml");
-        if (result == null) result = Collections.emptyList();
+        if (result == null) {
+            fetcher.apply("plugin.yml");
+        }
+        if (result == null) {
+            result = Collections.emptyList();
+        }
         return result;
     }
 
@@ -221,7 +284,8 @@ public final class PlatformUtils {
      */
     public static Object traceFirstPlugin(StackTraceElement[] stackTrace, boolean skipSelf) {
         List<String> resList = PlatformUtils.tracePluginsName(stackTrace, false, false);
-        if (!resList.isEmpty() && (!skipSelf || resList.size() > 1)) {
+        boolean hasValid = !resList.isEmpty() && (!skipSelf || resList.size() > 1);
+        if (hasValid) {
             return resList.get(skipSelf ? 1 : 0);
         }
         return null;

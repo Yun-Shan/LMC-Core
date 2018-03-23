@@ -9,11 +9,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 分组信息管理器
+ * 分组信息管理器.
+ * <p>
+ *
+ * @author Yun-Shan
  */
 public abstract class BaseGroupMessageManager extends BaseMessageManager {
 
     private static final String MESSAGE_DIR = "messages";
+    private static final String YML_EXT = ".yml";
+    private static final String PATH_REGEX = "(/)|(\\\\)";
+    private static final char CFG_PATH_SEPARATOR = '.';
 
     private MessageGroup defMsgGroup;
     private String userMsgPath;
@@ -28,13 +34,16 @@ public abstract class BaseGroupMessageManager extends BaseMessageManager {
         // init default message name
         Map<String, FileConfiguration> cfgs = configManager.getDefaultConfigs(defMsgPath, true);
         MessageGroup msgGroup = new MessageGroup("", cfgs.remove(""), new HashMap<>());
-        int startIdx = defMsgPath.length() + 1;// "xxx" + "/"
+        // "xxx" + "/"
+        int startIdx = defMsgPath.length() + 1;
         cfgs.forEach((path, cfg) -> {
             MessageGroup group = msgGroup;
             MessageGroup sub;
-            if (path.endsWith(".yml")) path = path.substring(startIdx, path.length() - 4);
+            if (path.endsWith(YML_EXT)) {
+                path = path.substring(startIdx, path.length() - 4);
+            }
 
-            for (String key : path.split("(/)|(\\\\)")) {
+            for (String key : path.split(PATH_REGEX)) {
                 sub = group.subGroups.get(key);
                 if (sub == null) {
                     sub = new MessageGroup(key, cfg, new HashMap<>());
@@ -50,7 +59,9 @@ public abstract class BaseGroupMessageManager extends BaseMessageManager {
     protected Message getMessageFromResource(String key, MessageContext context) {
         // 根目录的messages.yml的优先级高于messages目录下的分组信息
         Message msg = super.getMessageFromResource(key, context);
-        if (msg != null) return msg;
+        if (msg != null) {
+            return msg;
+        }
 
         String path = this.userMsgPath + File.separator + key;
         int firstSep;
@@ -69,7 +80,9 @@ public abstract class BaseGroupMessageManager extends BaseMessageManager {
             }
 
             // 用户配置中未找到，尝试在默认配置中查找
-            if ((firstSep = path.indexOf('.')) == -1) return this.defMsgGroup.getMessage(key, context);
+            if ((firstSep = path.indexOf(CFG_PATH_SEPARATOR)) == -1) {
+                return this.defMsgGroup.getMessage(key, context);
+            }
 
             chars[firstSep] = File.separatorChar;
             path = new String(chars);

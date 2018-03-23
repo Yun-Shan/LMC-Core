@@ -1,12 +1,15 @@
-package org.yunshanmc.lmc.core.bungee.command;
+package org.yunshanmc.lmc.core.bukkit.command;
 
-import net.md_5.bungee.api.CommandSender;
-import org.yunshanmc.lmc.core.command.LMCCommandSender;
+import org.bukkit.command.CommandSender;
+import org.yunshanmc.lmc.core.command.BaseLMCCommandSender;
 import org.yunshanmc.lmc.core.message.MessageSender;
 
-public class LMCCommandSenderImpl extends LMCCommandSender {
+/**
+ * @author Yun-Shan
+ */
+public class BukkitLMCCommandSender extends BaseLMCCommandSender {
 
-    public LMCCommandSenderImpl(CommandSender handle, MessageSender messageSender) {
+    public BukkitLMCCommandSender(CommandSender handle, MessageSender messageSender) {
         super(handle, messageSender);
     }
 

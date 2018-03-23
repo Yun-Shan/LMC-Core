@@ -8,7 +8,10 @@ import org.yunshanmc.lmc.core.message.MessageSender;
 import java.io.File;
 import java.nio.file.Paths;
 
-public class SQLiteDatabaseType extends DatabaseType {
+/**
+ * @author Yun-Shan
+ */
+public class SQLiteDatabaseType extends AbstractDatabaseType {
 
     protected SQLiteDatabaseType(LMCPlugin plugin, MessageSender messageSender) {
         super(plugin, "SQLite", "org.sqlite.JDBC", messageSender);

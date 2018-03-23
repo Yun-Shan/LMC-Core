@@ -12,9 +12,11 @@ import java.io.InputStream;
 import java.net.URL;
 
 /**
- * 表示一个资源
+ * 表示一个资源.
  * <p>
  * 通常是文件
+ *
+ * @author Yun-Shan
  */
 public interface Resource {
     
@@ -32,20 +34,41 @@ public interface Resource {
      * @throws IOException 打开输入流失败时抛出
      */
     InputStream getInputStream() throws IOException;
-    
+
+    /**
+     * 将非根目录的路径变成根目录路径(前加'/').
+     * <p>
+     *
+     * @param path 原始路径
+     * @return 转换后的路径
+     */
     static String pathToRoot(String path) {
-        if (Strings.isNullOrEmpty(path)) return "/";
-        if (path.charAt(0) == '/') return path;
-        return '/' + path;
+        if (Strings.isNullOrEmpty(path)) {
+            return "/";
+        }
+        char pathSep = '/';
+        if (path.charAt(0) == pathSep) {
+            return path;
+        }
+        return pathSep + path;
     }
 
+    /**
+     * 获取URL对应的文件.
+     * <p>
+     * 只支持file, jar协议的url
+     *
+     * @param url 要获取文件的URL
+     * @return 获取到的文件
+     */
     static File urlToFile(URL url) {
         switch (url.getProtocol()) {
             case "file": return new File(url.getPath());
             case "jar": {
                 String path = url.getPath();
                 int sep = path.indexOf("!/");
-                return new File(path.substring(6 /* file:/ */, sep));
+                /* file:/ */
+                return new File(path.substring(6, sep));
             }
             default: throw new UnsupportedOperationException();
         }

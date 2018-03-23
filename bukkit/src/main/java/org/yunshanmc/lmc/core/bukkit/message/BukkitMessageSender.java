@@ -11,6 +11,9 @@ import org.yunshanmc.lmc.core.utils.PlatformUtils;
 import java.lang.reflect.Proxy;
 import java.util.UUID;
 
+/**
+ * @author Yun-Shan
+ */
 public class BukkitMessageSender extends BaseMessageSender {
 
     private static final Player FAKE_PLAYER_BUKKIT;
@@ -22,10 +25,13 @@ public class BukkitMessageSender extends BaseMessageSender {
             (proxy, method, args) -> {
                 switch (method.getName()) {
                     case "sendMessage":
-                        if (args[0] instanceof String) Bukkit.getConsoleSender().sendMessage(
-                            (String) args[0]);
-                        else if (args[0] instanceof String[]) Bukkit.getConsoleSender().sendMessage(
-                            (String[]) args[0]);
+                        if (args[0] instanceof String) {
+                            Bukkit.getConsoleSender().sendMessage(
+                                (String) args[0]);
+                        } else if (args[0] instanceof String[]) {
+                            Bukkit.getConsoleSender().sendMessage(
+                                (String[]) args[0]);
+                        }
                         return null;
                     case "getName":
                     case "getDisplayName":
@@ -94,7 +100,9 @@ public class BukkitMessageSender extends BaseMessageSender {
 
     @Override
     public void debug(int debugLevel, Object receiver, String msgKey, Object... args) {
-        if (this.getDebugLevel() >= debugLevel) this.message(receiver, "debug", msgKey, args);
+        if (this.getDebugLevel() >= debugLevel) {
+            this.message(receiver, "debug", msgKey, args);
+        }
     }
 
 }

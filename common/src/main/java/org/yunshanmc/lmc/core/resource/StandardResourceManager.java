@@ -24,7 +24,10 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 /**
- * 标准资源管理器
+ * 标准资源管理器.
+ * <p>
+ *
+ * @author Yun-Shan
  */
 public class StandardResourceManager implements ResourceManager {
 
@@ -42,8 +45,8 @@ public class StandardResourceManager implements ResourceManager {
      */
     public StandardResourceManager(LMCPlugin plugin) throws IOException {
         this(new File(URLDecoder.decode(plugin.getClass().getProtectionDomain().getCodeSource().getLocation().getFile(),
-                                        "UTF-8")),
-             plugin.getDataFolder().toPath());
+            "UTF-8")),
+            plugin.getDataFolder().toPath());
     }
 
     private StandardResourceManager(File jarFile, Path pluginFolder) throws IOException {
@@ -85,7 +88,9 @@ public class StandardResourceManager implements ResourceManager {
     }
 
     protected Resource getSelfResource(Path resPath) {
-        if (Files.notExists(resPath) || Files.isDirectory(resPath)) return null;
+        if (Files.notExists(resPath) || Files.isDirectory(resPath)) {
+            return null;
+        }
         try {
             return new InputStreamResource(Files.newInputStream(resPath));
         } catch (IOException e) {
@@ -95,16 +100,20 @@ public class StandardResourceManager implements ResourceManager {
     }
 
     protected Map<String, Resource> getSelfResources(Path dirPath, Predicate<String> nameFilter, boolean deep) {
-        if (!Files.isDirectory(dirPath, LinkOption.NOFOLLOW_LINKS)) return null;
+        if (!Files.isDirectory(dirPath, LinkOption.NOFOLLOW_LINKS)) {
+            return null;
+        }
         try {
             Map<String, Resource> allRes = Maps.newLinkedHashMap();
-            ResourceFileVisitor visitor = deep ? new DeepFileVisitor(nameFilter) : new NotDeepFileVisitor(nameFilter);
+            BaseResourceFileVisitor visitor = deep ? new DeepFileVisitor(nameFilter) : new NotDeepFileVisitor(nameFilter);
             Files.walkFileTree(dirPath, visitor);
             List<Path> resPaths = visitor.getResourcePaths();
             for (Path resPath : resPaths) {
                 allRes.put(resPath.toString().substring(1), new InputStreamResource(Files.newInputStream(resPath)));
             }
-            if (!allRes.isEmpty()) return allRes;
+            if (!allRes.isEmpty()) {
+                return allRes;
+            }
         } catch (IOException e) {
             ExceptionHandler.handle(e);
         }
@@ -121,16 +130,20 @@ public class StandardResourceManager implements ResourceManager {
 
     protected Map<String, Resource> getFolderResources(Path dirPath, Predicate<String> nameFilter, boolean deep) {
         dirPath = this.pluginFolder.resolve(dirPath);
-        if (!Files.isDirectory(dirPath, LinkOption.NOFOLLOW_LINKS)) return null;
+        if (!Files.isDirectory(dirPath, LinkOption.NOFOLLOW_LINKS)) {
+            return null;
+        }
         try {
             Map<String, Resource> allRes = Maps.newLinkedHashMap();
-            ResourceFileVisitor visitor = deep ? new DeepFileVisitor(nameFilter) : new NotDeepFileVisitor(nameFilter);
+            BaseResourceFileVisitor visitor = deep ? new DeepFileVisitor(nameFilter) : new NotDeepFileVisitor(nameFilter);
             Files.walkFileTree(dirPath, visitor);
             List<Path> resPaths = visitor.getResourcePaths();
             for (Path resPath : resPaths) {
                 allRes.put(this.pluginFolder.relativize(resPath).toString(), new FileResource(resPath.toFile()));
             }
-            if (!allRes.isEmpty()) return allRes;
+            if (!allRes.isEmpty()) {
+                return allRes;
+            }
         } catch (IOException e) {
             ExceptionHandler.handle(e);
         }
@@ -142,20 +155,30 @@ public class StandardResourceManager implements ResourceManager {
         Path resPath = this.checkResourcePath(path, false);
         resPath = this.pluginFolder.resolve(resPath);
         if (!force && Files.exists(resPath, LinkOption.NOFOLLOW_LINKS)) {
-            return true;// 资源已存在，且参数force设为不覆盖，直接返回
+            // 资源已存在，且参数force设为不覆盖，直接返回
+            return true;
         }
         try {
             File f = resPath.toFile();
-            if (f.exists() // 文件存在
-                || (// 文件不存在时尝试创建文件
-                        (f.getParentFile().exists() || f.getParentFile().mkdirs())
-                        && f.createNewFile()
-                )) {
-                InputStream stream = resource.getInputStream();
-                if (stream == null) return false;
-                Files.copy(stream, resPath, StandardCopyOption.REPLACE_EXISTING);
+            boolean validFile = f.exists();
+            if (!validFile) {
+                // 文件不存在时尝试创建文件
+                boolean createParent = f.getParentFile().exists() || f.getParentFile().mkdirs();
+                if (createParent && f.createNewFile()) {
+                    validFile = true;
+                }
             }
-            return true;
+
+            if (validFile) {
+                InputStream stream = resource.getInputStream();
+                if (stream == null) {
+                    return false;
+                }
+                Files.copy(stream, resPath, StandardCopyOption.REPLACE_EXISTING);
+                return true;
+            } else {
+                return false;
+            }
         } catch (IOException e) {
             ExceptionHandler.handle(e);
             return false;
@@ -180,12 +203,19 @@ public class StandardResourceManager implements ResourceManager {
      */
     protected Path checkResourcePath(String path, boolean isJar) {
         Path resPath = resolvePath(path, isJar ? this.jarRoot.getFileSystem() : this.pluginFolder.getFileSystem());
-        if (resPath == null) throw new IllegalArgumentException("Invalid Path: " + path); // TODO I18n
+        if (resPath == null) {
+            // TODO I18n
+            throw new IllegalArgumentException("Invalid Path: " + path);
+        }
         return resPath;
     }
 
+    private static final String PARENT_DIR_NAME = "..";
+
     private static Path resolvePath(String path, FileSystem fs) {
-        if (Strings.isNullOrEmpty(path))  return null;
+        if (Strings.isNullOrEmpty(path)) {
+            return null;
+        }
         path = path.replace('\\', '/');
         List<String> subs = Lists.newArrayList();
         Splitter.on('/').omitEmptyStrings().split(path).forEach(subs::add);
@@ -194,15 +224,18 @@ public class StandardResourceManager implements ResourceManager {
         }
         int size = subs.size();
         Path resPath = size == 1 ? fs.getPath(subs.get(0)) : fs.getPath(subs.get(0),
-                                                                        Arrays.copyOfRange(
-                                                                                subs.toArray(new String[size]),
-                                                                                1,
-                                                                                size));
+            Arrays.copyOfRange(
+                subs.toArray(new String[size]),
+                1,
+                size));
         resPath = resPath.normalize();
-        if (resPath.startsWith("..")) {// 禁止切到父级目录
+        if (resPath.startsWith(PARENT_DIR_NAME)) {
+            // 禁止切到父级目录
             resPath = resPath.subpath(1, resPath.getNameCount());
         }
-        if (resPath.toString().length() == 0) return null;
+        if (resPath.toString().length() == 0) {
+            return null;
+        }
         return resPath;
     }
 
@@ -217,14 +250,14 @@ public class StandardResourceManager implements ResourceManager {
         this.jarRoot = this.jarFileSystem.getPath(Strings.nullToEmpty(jarRootPath)).normalize();
     }
 
-    private static abstract class ResourceFileVisitor extends SimpleFileVisitor<Path> {
+    private static abstract class BaseResourceFileVisitor extends SimpleFileVisitor<Path> {
 
         private static final Predicate<String> DEFAULT_NAME_FILTER = name -> true;
 
         private final Predicate<String> nameFilter;
         private final List<Path> resPaths = Lists.newLinkedList();
 
-        protected ResourceFileVisitor(Predicate<String> nameFilter) {
+        protected BaseResourceFileVisitor(Predicate<String> nameFilter) {
             if (nameFilter != null) {
                 this.nameFilter = nameFilter;
             } else {
@@ -247,7 +280,7 @@ public class StandardResourceManager implements ResourceManager {
         }
     }
 
-    private static class NotDeepFileVisitor extends ResourceFileVisitor {
+    private static class NotDeepFileVisitor extends BaseResourceFileVisitor {
 
         protected NotDeepFileVisitor(Predicate<String> nameFilter) {
             super(nameFilter);
@@ -259,7 +292,7 @@ public class StandardResourceManager implements ResourceManager {
         }
     }
 
-    private static class DeepFileVisitor extends ResourceFileVisitor {
+    private static class DeepFileVisitor extends BaseResourceFileVisitor {
 
         protected DeepFileVisitor(Predicate<String> nameFilter) {
             super(nameFilter);

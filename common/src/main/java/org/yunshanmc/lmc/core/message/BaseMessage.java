@@ -5,7 +5,9 @@
 package org.yunshanmc.lmc.core.message;
 
 /**
- * //TODO 注释
+ * TODO 注释
+ *
+ * @author Yun-Shan
  */
 public abstract class BaseMessage implements Message {
 
@@ -23,6 +25,13 @@ public abstract class BaseMessage implements Message {
         this.format = format;
     }
 
+    /**
+     * 转换颜色字符(& -> §).
+     * <p>
+     *
+     * @param msg 原始信息
+     * @return 转换颜色字符后的信息
+     */
     protected abstract String translateAlternateColorCodes(String msg);
 
     @Override
@@ -34,6 +43,7 @@ public abstract class BaseMessage implements Message {
         return this.context;
     }
 
+    @Override
     public String getRawMessage() {
         return this.msg;
     }

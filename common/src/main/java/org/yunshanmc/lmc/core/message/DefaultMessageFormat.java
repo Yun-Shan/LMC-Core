@@ -8,7 +8,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * //TODO 注释
+ * TODO 注释
+ *
+ * @author Yun-Shan
  */
 public class DefaultMessageFormat implements MessageFormat {
 
@@ -35,7 +37,9 @@ public class DefaultMessageFormat implements MessageFormat {
             String val;
             if ((val = matcher.group("idx")) != null) {
                 int idx = Integer.parseInt(val);
-                if (idx > 0 && args.length >= idx) val = String.valueOf(args[idx - 1]);
+                if (idx > 0 && args.length >= idx) {
+                    val = String.valueOf(args[idx - 1]);
+                }
             } else if ((val = matcher.group("subMsg")) != null) {
                 Message message = this.context.getMessageManager().getMessage(val.substring(2));
                 val = message.getMessage(null);
@@ -66,15 +70,21 @@ public class DefaultMessageFormat implements MessageFormat {
                     change = true;
                 }
             }
-            if (change) val = new String(chars);
+            if (change) {
+                val = new String(chars);
+            }
             // $ 转义 end
-            // ↓↓↓所以说正则的反向引用检测不加个开关真的很烦_(:з」∠)_
+
             matcher.appendReplacement(buffer, val);
+
+            // 反转义 $  ↓↓↓所以说正则的反向引用检测不加个开关真的很烦_(:з」∠)_
             if (change) {
                 // $ 反转义 start
                 for (int i = 0; i < buffer.length(); i++) {
                     char c = buffer.charAt(i);
-                    if (c == cTmp[0]) c = '$';
+                    if (c == cTmp[0]) {
+                        c = '$';
+                    }
                     buffer.setCharAt(i, c);
                 }
                 // $ 反转义 end

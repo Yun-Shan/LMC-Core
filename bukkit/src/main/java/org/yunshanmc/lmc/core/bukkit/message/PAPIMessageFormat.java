@@ -13,13 +13,17 @@ import org.yunshanmc.lmc.core.utils.PlatformUtils;
 
 /**
  * PlaceholderAPI 格式化
+ *
+ * @author Yun-Shan
  */
 public class PAPIMessageFormat extends DefaultMessageFormat {
+
+    private static final String PAPI_NAME = "PlaceholderAPI";
 
     private static boolean isPlaceholderAPIEnable = false;
 
     static {
-        if (PlatformUtils.isBukkit() && Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+        if (PlatformUtils.isBukkit() && Bukkit.getPluginManager().isPluginEnabled(PAPI_NAME)) {
             isPlaceholderAPIEnable = true;
         }
     }

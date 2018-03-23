@@ -7,9 +7,9 @@ import org.yunshanmc.lmc.core.bukkit.message.BukkitMessageManager;
 import org.yunshanmc.lmc.core.config.ConfigManager;
 import org.yunshanmc.lmc.core.config.DefaultConfigManager;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
+import org.yunshanmc.lmc.core.locale.DefaultLocaleManager;
 import org.yunshanmc.lmc.core.locale.I18nResourceManager;
 import org.yunshanmc.lmc.core.locale.LocaleManager;
-import org.yunshanmc.lmc.core.locale.DefaultLocaleManager;
 import org.yunshanmc.lmc.core.message.MessageManager;
 import org.yunshanmc.lmc.core.message.MessageSender;
 import org.yunshanmc.lmc.core.resource.ResourceManager;
@@ -21,8 +21,10 @@ import java.util.function.Consumer;
 /**
  * LMC插件的Bukkit实现
  * XXX: 由于必须要继承各个端的插件抽象类，然而没法多继承，暂时找不到好方法，目前所有LMC的实现都会和LMCBukkitPlugin的代码几乎一致
+ *
+ * @author Yun-Shan
  */
-public abstract class LMCBukkitPlugin extends JavaPlugin implements LMCPlugin {
+public abstract class BaseLMCBukkitPlugin extends JavaPlugin implements LMCPlugin {
 
     protected boolean useI18n;
     protected boolean useGroupMessage;
@@ -46,9 +48,16 @@ public abstract class LMCBukkitPlugin extends JavaPlugin implements LMCPlugin {
      */
     protected void init() {}
 
-    // 初始化
+
+    /**
+     * 初始化
+     *
+     * @return 是否初始化成功
+     */
     private boolean setup() {
-        if (this.localeManager == null) this.localeManager = new DefaultLocaleManager();
+        if (this.localeManager == null) {
+            this.localeManager = new DefaultLocaleManager();
+        }
 
         try {
             if (this.resourceManager == null) {
@@ -60,7 +69,9 @@ public abstract class LMCBukkitPlugin extends JavaPlugin implements LMCPlugin {
             ExceptionHandler.handle(e);
             return false;
         }
-        if (this.configManager == null) this.configManager = new DefaultConfigManager(this.resourceManager);
+        if (this.configManager == null) {
+            this.configManager = new DefaultConfigManager(this.resourceManager);
+        }
         if (this.messageManager == null) {
             this.messageManager = this.useGroupMessage
                     ? new BukkitGroupMessageManager(this, this.configManager)
@@ -73,7 +84,9 @@ public abstract class LMCBukkitPlugin extends JavaPlugin implements LMCPlugin {
          * 在资源管理器和信息管理器都初始化完毕之后才设置异常处理器，
          * 若资源管理器和信息管理器初始化出现异常，将由默认异常处理器处理
          */
-        if (this.exceptionHandler == null) this.exceptionHandler = ExceptionHandler.DEFAULT_HANDLER;
+        if (this.exceptionHandler == null) {
+            this.exceptionHandler = ExceptionHandler.DEFAULT_HANDLER;
+        }
         ExceptionHandler.setHandler(this, this.exceptionHandler);
         return true;
     }
@@ -83,18 +96,22 @@ public abstract class LMCBukkitPlugin extends JavaPlugin implements LMCPlugin {
         ExceptionHandler.stop();
     }
 
+    @Override
     public LocaleManager getLocaleManager() {
         return this.localeManager;
     }
 
+    @Override
     public ResourceManager getResourceManager() {
         return this.resourceManager;
     }
 
+    @Override
     public ConfigManager getConfigManager() {
         return this.configManager;
     }
 
+    @Override
     public MessageManager getMessageManager() {
         return this.messageManager;
     }

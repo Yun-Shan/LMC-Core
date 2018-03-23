@@ -8,15 +8,17 @@ import java.util.UUID;
 
 /**
  * 信息发送者，用于向后台/玩家发送信息
+ *
+ * @author Yun-Shan
  */
 public interface MessageSender {
 
     /**
      * 获取信息字符串(根据平台自适应)
      *
-     * @param msgKey 信息key
+     * @param msgKey   信息key
      * @param playerId 玩家ID(根据平台自适应)，用于玩家相关变量的格式化
-     * @param args   信息文本中的参数列表
+     * @param args     信息文本中的参数列表
      * @return 格式化后的信息字符串
      */
     String getMessage(String msgKey, UUID playerId, Object... args);
@@ -177,7 +179,13 @@ public interface MessageSender {
     void debugConsole(int debugLevel, String msgKey, Object... args);
 
     /**
-     * 设置调试等级
+     * 设置调试等级.
+     * <p>
+     * 会影响调用
+     * {@link #debug(int, UUID, String, Object...)}，
+     * {@link #debug(int, Object, String, Object...)}，
+     * {@link #debugConsole(int, String, Object...)}
+     * 方法时是否输出
      *
      * @param debugLevel 调试等级
      * @return 自身实例
@@ -185,9 +193,10 @@ public interface MessageSender {
     MessageSender setDebugLevel(int debugLevel);
 
     /**
-     * 获取调试等级
+     * 获取当前调试等级.
+     * <p>
      *
-     * @return 调试等级
+     * @return 当前调试等级
      */
     int getDebugLevel();
 }

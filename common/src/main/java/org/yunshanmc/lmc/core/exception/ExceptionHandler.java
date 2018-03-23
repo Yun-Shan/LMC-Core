@@ -21,16 +21,19 @@ import java.util.function.Consumer;
 
 /**
  * 异常处理器
+ *
+ * @author Yun-Shan
  */
 public final class ExceptionHandler {
 
     private ExceptionHandler() {
     }// 禁止实例化
 
-    private static final AtomicBoolean STOP_FLAG = new AtomicBoolean(false);
+    private static final int EXCEPTION_HANDLER_THREAD_COUNT = 3;
 
+    private static final AtomicBoolean STOP_FLAG = new AtomicBoolean(false);
     static {
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < EXCEPTION_HANDLER_THREAD_COUNT; i++) {
             new ExceptionHandlerThread(i + 1, STOP_FLAG).start();
         }
     }
@@ -68,7 +71,13 @@ public final class ExceptionHandler {
     }
 
     public static void handle(Throwable t) {
-        assert false;// 测试环境的错误不能被错误处理器掩盖
+        // 测试环境的错误不能被错误处理器掩盖
+        try {
+            assert false;
+        } catch (AssertionError e) {
+            t.printStackTrace();
+            return;
+        }
         handle(t, t.getMessage());
     }
 
@@ -92,7 +101,9 @@ public final class ExceptionHandler {
                 err = QUEUE.poll();
                 try {
                     if (err == null) {
-                        if (this.stopFlag.get()) break;
+                        if (this.stopFlag.get()) {
+                            break;
+                        }
                         Thread.sleep(100);
                         continue;
                     }
@@ -100,15 +111,20 @@ public final class ExceptionHandler {
                     ExceptionHandler.handle(e);
                     continue;
                 }
-                if (this.stopFlag.get()) break;
+                if (this.stopFlag.get()) {
+                    break;
+                }
                 String pluginName = PlatformUtils.traceFirstPluginName(err.getThrowable().getStackTrace(), false);
 
-                if (pluginName == null)
+                if (pluginName == null) {
                     pluginName = BuiltinMessage.getMessage("InExceptionHandler_ExceptionDescription");
+                }
                 Consumer<ExceptionInfo> handler = DEFAULT_HANDLER;
 
                 try {
-                    if (this.stopFlag.get()) break;
+                    if (this.stopFlag.get()) {
+                        break;
+                    }
                     err.setPlugin(pluginName);
                     handler = HANDLERS.getOrDefault(pluginName, DEFAULT_HANDLER);
                 } catch (Exception e) {
@@ -116,7 +132,9 @@ public final class ExceptionHandler {
                             "InExceptionHandler_ExceptionDescription")));
                 }
 
-                if (this.stopFlag.get()) break;
+                if (this.stopFlag.get()) {
+                    break;
+                }
                 handler.accept(err);
             }
         }
@@ -126,7 +144,10 @@ public final class ExceptionHandler {
 
         private Throwable throwable;
         private String description;
-        private String plugin;// 出现异常的插件(该变量会在异常处理线程中被设置)
+        /**
+         * 出现异常的插件(该变量会在异常处理线程中被设置)
+         */
+        private String plugin;
 
         public ExceptionInfo(Throwable err, String description) {
             this.throwable = err;

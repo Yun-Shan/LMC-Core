@@ -10,6 +10,9 @@ import org.yunshanmc.lmc.core.utils.PlatformUtils;
 
 import java.util.UUID;
 
+/**
+ * @author Yun-Shan
+ */
 public class BukkitMessage extends BaseMessage {
 
     public BukkitMessage(String msg, MessageContext context) {
@@ -47,7 +50,9 @@ public class BukkitMessage extends BaseMessage {
 
     @Override
     public String getMessage(UUID playerId, Object... args) {
-        if (playerId == null) return getMessage((Object) null, args);
+        if (playerId == null) {
+            return getMessage((Object) null, args);
+        }
         Player p = Bukkit.getPlayer(playerId);
         if (p != null) {
             return this.getMessage(p, args);
@@ -58,7 +63,9 @@ public class BukkitMessage extends BaseMessage {
 
     @Override
     public String[] getMessages(UUID playerId, Object... args) {
-        if (playerId == null) return getMessages((Object) null, args);
+        if (playerId == null) {
+            return getMessages((Object) null, args);
+        }
         Player p = Bukkit.getPlayer(playerId);
         if (p != null) {
             return this.getMessages(p, args);

@@ -4,6 +4,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
+import org.yunshanmc.lmc.core.bukkit.command.BukkitLMCCommandSender;
+import org.yunshanmc.lmc.core.command.AbstractParameterConverter;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.resource.Resource;
 import org.yunshanmc.lmc.core.utils.PlatformUtils;
@@ -18,11 +20,15 @@ import java.util.List;
 
 /**
  * Bukkit相关工具
+ *
+ * @author Yun-Shan
  */
 public class BukkitUtils {
 
     static {
         PlatformUtils.setConsoleRawMessageSender(msg -> Bukkit.getConsoleSender().sendMessage(msg.split("\\n")));
+
+        AbstractParameterConverter.registerLMCSenderClass(BukkitLMCCommandSender.class);
 
         PluginManager pm = Bukkit.getPluginManager();
         PlatformUtils.setPluginGetter(pm::getPlugin);

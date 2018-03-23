@@ -24,7 +24,10 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class OrmLiteDatabase extends Database {
+/**
+ * @author Yun-Shan
+ */
+public class OrmLiteDatabase extends BaseDatabase {
 
     static {
         CreateLoggerInterceptor.setup();
@@ -52,7 +55,9 @@ public class OrmLiteDatabase extends Database {
     public void close() {
         super.close();
         try {
-            if (this.connectionSource != null) this.connectionSource.close();
+            if (this.connectionSource != null) {
+                this.connectionSource.close();
+            }
         } catch (IOException e) {
             ExceptionHandler.handle(e);
         } finally {
@@ -112,10 +117,10 @@ public class OrmLiteDatabase extends Database {
 
         @Override
         public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
-            if (method.getName().equals("createLog")) {
+            if ("createLog".equals(method.getName())) {
                 Object logger = method.invoke(this.logType, args);
                 InvocationHandler handler = (proxyProxy, proxyMethod, proxyArgs) -> {
-                    if (proxyMethod.getName().equals("log")) {
+                    if ("log".equals(proxyMethod.getName())) {
                         String pluginName = null;
                         MessageSender sender = null;
                         Object plugin = PlatformUtils.traceFirstPlugin(ReflectUtils.captureStackTrace(), true);

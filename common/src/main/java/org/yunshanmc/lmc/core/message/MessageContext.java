@@ -5,6 +5,12 @@ import org.yunshanmc.lmc.core.LMCPlugin;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 信息上下文.
+ * <p>
+ *
+ * @author Yun-Shan
+ */
 public class MessageContext {
 
     private final LMCPlugin plugin;

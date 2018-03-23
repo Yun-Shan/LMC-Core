@@ -2,15 +2,18 @@ package org.yunshanmc.lmc.core.command;
 
 import org.yunshanmc.lmc.core.message.MessageSender;
 
-public abstract class LMCCommandSender {
+/**
+ * @author Yun-Shan
+ */
+public abstract class BaseLMCCommandSender {
 
     private final Object handle;
     protected MessageSender messageSender;
 
-    public LMCCommandSender(Object handle) {
+    public BaseLMCCommandSender(Object handle) {
         this.handle = handle;
     }
-    public LMCCommandSender(Object handle, MessageSender messageSender) {
+    public BaseLMCCommandSender(Object handle, MessageSender messageSender) {
         this.handle = handle;
         this.setMessageSender(messageSender);
     }

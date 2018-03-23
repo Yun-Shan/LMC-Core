@@ -2,6 +2,9 @@ package org.yunshanmc.lmc.core.command;
 
 import java.util.List;
 
+/**
+ * @author Yun-Shan
+ */
 public interface CommandManager {
 
     /**
@@ -23,7 +26,7 @@ public interface CommandManager {
      *
      * @param command 要注册的命令
      */
-    void registerCommand(LMCCommand command);
+    void registerCommand(AbstractLMCCommand command);
 
     /**
      * 删除命令
@@ -36,5 +39,5 @@ public interface CommandManager {
      * 获取所有已注册的命令
      * @return 所有已注册的命令(该列表不可修改)
      */
-    List<LMCCommand> getCommands();
+    List<AbstractLMCCommand> getCommands();
 }

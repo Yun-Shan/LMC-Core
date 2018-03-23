@@ -10,7 +10,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class MySQLDatabaseType extends DatabaseType {
+/**
+ * @author Yun-Shan
+ */
+public class MySQLDatabaseType extends AbstractDatabaseType {
 
     protected MySQLDatabaseType(LMCPlugin plugin, MessageSender messageSender) {
         super(plugin, "MySQL", "com.mysql.jdbc.Driver", messageSender);

@@ -9,7 +9,10 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 /**
- * 资源管理器，用于管理插件自身和相应文件夹的资源
+ * 资源管理器，用于管理插件自身和相应文件夹的资源.
+ * <p>
+ *
+ * @author Yun-Shan
  */
 public interface ResourceManager {
     

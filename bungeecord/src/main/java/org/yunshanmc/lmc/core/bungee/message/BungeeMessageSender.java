@@ -14,6 +14,9 @@ import org.yunshanmc.lmc.core.utils.PlatformUtils;
 import java.lang.reflect.Proxy;
 import java.util.UUID;
 
+/**
+ * @author Yun-Shan
+ */
 public class BungeeMessageSender extends BaseMessageSender {
 
     private static final ProxiedPlayer FAKE_PLAYER_BUNGEE;

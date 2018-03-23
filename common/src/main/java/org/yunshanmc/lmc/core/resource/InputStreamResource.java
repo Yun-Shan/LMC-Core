@@ -9,7 +9,10 @@ import java.net.URL;
 import java.util.Objects;
 
 /**
- * 输入流资源
+ * 输入流资源.
+ * <p>
+ *
+ * @author Yun-Shan
  */
 public class InputStreamResource implements Resource {
     

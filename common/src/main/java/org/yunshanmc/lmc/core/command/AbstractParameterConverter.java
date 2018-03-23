@@ -6,7 +6,10 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class ParameterConverter<T> {
+/**
+ * @author Yun-Shan
+ */
+public abstract class AbstractParameterConverter<T> {
 
     private static final MethodHandles.Lookup LOOKUP;
 
@@ -15,7 +18,7 @@ public abstract class ParameterConverter<T> {
 
     static {
         LOOKUP = MethodHandles.lookup();
-        for (Method m : ParameterConverter.class.getDeclaredMethods()) {
+        for (Method m : AbstractParameterConverter.class.getDeclaredMethods()) {
             if ("convert".equals(m.getName())) {
                 M_Convert = m;
                 break;
@@ -23,19 +26,21 @@ public abstract class ParameterConverter<T> {
         }
     }
 
-    private static final Map<Class<?>, ParameterConverter<?>> converters = new HashMap<>();
+    private static final Map<Class<?>, AbstractParameterConverter<?>> CONVERTERS = new HashMap<>();
 
-    public static void register(ParameterConverter<?> converter) {
-        converters.put(converter.convertTo, converter);
+    public static void register(AbstractParameterConverter<?> converter) {
+        CONVERTERS.put(converter.convertTo, converter);
     }
 
     @SuppressWarnings("unchecked")
-    public static <R> ParameterConverter<R> getConverter(Class<R> convertTo) {
-        return (ParameterConverter<R>) converters.get(convertTo);
+    public static <R> AbstractParameterConverter<R> getConverter(Class<R> convertTo) {
+        return (AbstractParameterConverter<R>) CONVERTERS.get(convertTo);
     }
 
     public static synchronized void registerLMCSenderClass(Class<?> lmcSenderCls) {
-        if (LMCSenderCls != null) throw new IllegalStateException();
+        if (LMCSenderCls != null) {
+            throw new IllegalStateException();
+        }
         LMCSenderCls = lmcSenderCls;
     }
 
@@ -45,15 +50,19 @@ public abstract class ParameterConverter<T> {
 
     private final Class<T> convertTo;
 
-    public ParameterConverter(Class<T> convertTo) {
+    public AbstractParameterConverter(Class<T> convertTo) {
         this.convertTo = convertTo;
     }
 
     public T convert(String str) {
-        if (str == null) return this.getDefaultValue();
+        if (str == null) {
+            return this.getDefaultValue();
+        }
         try {
             T res = this.convertArg(str);
-            if (res == null) throw new ParamConverterFailException(str, this.convertTo);
+            if (res == null) {
+                throw new ParamConverterFailException(str, this.convertTo);
+            }
             return res;
         } catch (ParamConverterFailException e) {
             throw e;
@@ -66,6 +75,12 @@ public abstract class ParameterConverter<T> {
         return null;
     }
 
+    /**
+     * 转换参数
+     *
+     * @param str 字符串参数
+     * @return 转换后的参数
+     */
     protected abstract T convertArg(String str);
 
     public final MethodHandle toMethodHandle() {
@@ -80,13 +95,13 @@ public abstract class ParameterConverter<T> {
     }
 
     static {
-        register(new ParameterConverter<String>(String.class) {
+        register(new AbstractParameterConverter<String>(String.class) {
             @Override
             public String convertArg(String str) {
                 return str;
             }
         });
-        register(new ParameterConverter<Integer>(int.class) {
+        register(new AbstractParameterConverter<Integer>(int.class) {
             @Override
             public Integer convertArg(String arg) {
                 return Integer.valueOf(arg);
@@ -97,7 +112,7 @@ public abstract class ParameterConverter<T> {
                 return -1;
             }
         });
-        register(new ParameterConverter<Double>(double.class) {
+        register(new AbstractParameterConverter<Double>(double.class) {
             @Override
             public Double convertArg(String arg) {
                 return Double.valueOf(arg);
@@ -108,7 +123,7 @@ public abstract class ParameterConverter<T> {
                 return Double.NaN;
             }
         });
-        register(new ParameterConverter<Boolean>(boolean.class) {
+        register(new AbstractParameterConverter<Boolean>(boolean.class) {
             @Override
             public Boolean convertArg(String arg) {
                 arg = arg.toLowerCase();

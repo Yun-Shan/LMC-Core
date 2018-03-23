@@ -5,17 +5,20 @@ import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
 import org.yunshanmc.lmc.core.bungee.LMCBungeeCordPlugin;
-import org.yunshanmc.lmc.core.bungee.command.LMCCommandSenderImpl;
+import org.yunshanmc.lmc.core.bungee.command.BungeeLMCCommandSender;
 import org.yunshanmc.lmc.core.command.CommandManager;
-import org.yunshanmc.lmc.core.command.LMCCommand;
-import org.yunshanmc.lmc.core.command.executors.CommandExecutor;
+import org.yunshanmc.lmc.core.command.AbstractLMCCommand;
+import org.yunshanmc.lmc.core.command.executors.BaseCommandExecutor;
 import org.yunshanmc.lmc.core.message.MessageSender;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class BungeeCordExecutor extends CommandExecutor {
+/**
+ * @author Yun-Shan
+ */
+public class BungeeCordExecutor extends BaseCommandExecutor {
 
     public BungeeCordExecutor(CommandManager commandManager, MessageSender messageSender, LMCBungeeCordPlugin plugin, String
         permission, String... aliases) {
@@ -34,7 +37,7 @@ public class BungeeCordExecutor extends CommandExecutor {
     }
 
     public void execute(CommandSender sender, String[] args) {
-        LMCCommand cmd = super.resolveCommand(args);
+        AbstractLMCCommand cmd = super.resolveCommand(args);
 
         if (cmd != null) {
             for (String perm : cmd.getPermissions()) {
@@ -49,7 +52,7 @@ public class BungeeCordExecutor extends CommandExecutor {
                 } else {
                     args = new String[0];
                 }
-                cmd.execute(new LMCCommandSenderImpl(sender, this.messageSender), this.handleCommand, args);
+                cmd.execute(new BungeeLMCCommandSender(sender, this.messageSender), this.handleCommand, args);
             } else {
                 this.messageSender.info(sender, "command.InvalidCommand",
                                         '/' + Joiner.on(' ').join(this.handleCommand, args.length > 0 ? args[0] : cmd.getName()));

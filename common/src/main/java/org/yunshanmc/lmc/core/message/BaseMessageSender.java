@@ -7,7 +7,9 @@ package org.yunshanmc.lmc.core.message;
 import java.util.UUID;
 
 /**
- * //TODO
+ * TODO 注释
+ *
+ * @author Yun-Shan
  */
 public abstract class BaseMessageSender implements MessageSender {
 
@@ -57,12 +59,16 @@ public abstract class BaseMessageSender implements MessageSender {
 
     @Override
     public void debug(int debugLevel, UUID playerId, String msgKey, Object... args) {
-        if (this.getDebugLevel() >= debugLevel) this.message(playerId, "debug", msgKey, args);
+        if (this.getDebugLevel() >= debugLevel) {
+            this.message(playerId, "debug", msgKey, args);
+        }
     }
 
     @Override
     public void debugConsole(int debugLevel, String msgKey, Object... args) {
-        if (this.getDebugLevel() >= debugLevel) this.messageConsole("debug", msgKey, args);
+        if (this.getDebugLevel() >= debugLevel) {
+            this.messageConsole("debug", msgKey, args);
+        }
     }
 
     @Override

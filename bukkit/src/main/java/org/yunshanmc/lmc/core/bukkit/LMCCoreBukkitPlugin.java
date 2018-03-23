@@ -8,8 +8,10 @@ import org.yunshanmc.lmc.core.internal.LMCCoreUtils;
 
 /**
  * LMCCore插件 BungeeCord端主类
+ *
+ * @author Yun-Shan
  */
-public class LMCCoreBukkitPlugin extends LMCBukkitPlugin {
+public class LMCCoreBukkitPlugin extends BaseLMCBukkitPlugin {
 
     @Override
     protected void init() {

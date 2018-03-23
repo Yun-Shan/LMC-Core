@@ -9,7 +9,10 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
-public abstract class LMCCommand {
+/**
+ * @author Yun-Shan
+ */
+public abstract class AbstractLMCCommand {
 
     @SuppressWarnings("MismatchedReadAndWriteOfArray")
     private static final String[] EMPTY_STRINGS = new String[0];
@@ -28,7 +31,7 @@ public abstract class LMCCommand {
     /**
      * @param name 命令名
      */
-    public LMCCommand(String name) {
+    public AbstractLMCCommand(String name) {
         this(name, null, null, null, null);
     }
 
@@ -36,7 +39,7 @@ public abstract class LMCCommand {
      * @param name        命令名
      * @param permissions 命令所需权限
      */
-    public LMCCommand(String name, String[] permissions) {
+    public AbstractLMCCommand(String name, String[] permissions) {
         this(name, null, null, null, permissions);
     }
 
@@ -47,7 +50,7 @@ public abstract class LMCCommand {
      * @param aliases     命令别名
      * @param permissions 命令所需权限
      */
-    public LMCCommand(String name, String usage, String description, String[] aliases, String[] permissions) {
+    public AbstractLMCCommand(String name, String usage, String description, String[] aliases, String[] permissions) {
         Objects.requireNonNull(name);
         this.name = name;
         this.usage = Strings.nullToEmpty(usage);
@@ -128,17 +131,20 @@ public abstract class LMCCommand {
      * @return 是否设置成功
      */
     public final boolean setValidity(boolean valid) {
-        if (valid && !this.valid) {// 要设为有效且当前无效
+        if (valid && !this.valid) {
+            // 要设为有效且当前无效
             if (this.tryEnable()) {
                 this.valid = true;
                 return true;
             }
-        } else if (!valid && this.valid) {// 要设为无效且当前有效
+        } else if (!valid && this.valid) {
+            // 要设为无效且当前有效
             if (this.tryDisable()) {
                 this.valid = false;
                 return true;
             }
-        } else {// 要设置的有效性与当前有效性一致
+        } else {
+            // 要设置的有效性与当前有效性一致
             return true;
         }
         return false;
@@ -169,14 +175,14 @@ public abstract class LMCCommand {
      * @param label  玩家输入的主命令
      * @param args   参数列表
      */
-    public abstract void execute(LMCCommandSender sender, String label, String... args);
+    public abstract void execute(BaseLMCCommandSender sender, String label, String... args);
 
     /**
      * 显示命令帮助
      *
      * @param sender 显示命令帮助的对象
      */
-    public void showHelp(LMCCommandSender sender) {
+    public void showHelp(BaseLMCCommandSender sender) {
 
     }
 
@@ -186,7 +192,9 @@ public abstract class LMCCommand {
 
     public void setCommandManager(CommandManager commandManager) {
         ReflectUtils.checkSafeCall();
-        if (commandManager != null && this.commandManager != null) throw new IllegalArgumentException();
+        if (commandManager != null && this.commandManager != null) {
+            throw new IllegalArgumentException();
+        }
         this.commandManager = commandManager;
     }
 

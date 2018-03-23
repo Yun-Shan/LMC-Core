@@ -4,6 +4,8 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
+import org.yunshanmc.lmc.core.bungee.command.BungeeLMCCommandSender;
+import org.yunshanmc.lmc.core.command.AbstractParameterConverter;
 import org.yunshanmc.lmc.core.config.bukkitcfg.file.YamlConfiguration;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.resource.Resource;
@@ -20,11 +22,15 @@ import java.util.function.Function;
 
 /**
  * Bungee相关工具
+ *
+ * @author Yun-Shan
  */
 public class BungeeUtils {
 
     static {
         PlatformUtils.setConsoleRawMessageSender(msg -> ProxyServer.getInstance().getConsole().sendMessage(TextComponent.fromLegacyText(msg)));
+
+        AbstractParameterConverter.registerLMCSenderClass(BungeeLMCCommandSender.class);
 
         PluginManager pm = ProxyServer.getInstance().getPluginManager();
         PlatformUtils.setPluginGetter(pm::getPlugin);

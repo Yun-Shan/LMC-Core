@@ -9,18 +9,20 @@ import org.yunshanmc.lmc.core.internal.BuiltinMessage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 /**
- * 国际化管理器
- *
+ * 国际化管理器.
+ * <p>
  * 可设置当前所使用的区域({@link Locale})
+ *
+ * @author Yun-Shan
  */
 public class DefaultLocaleManager implements LocaleManager {
     
     private Locale current;
     
-    private final List<Consumer<Locale>> listeners = new ArrayList<>();
+    private final List<BiConsumer<Locale, Locale>> listeners = new ArrayList<>();
     
     public DefaultLocaleManager() {
         this.setLocale(Locale.getDefault());
@@ -33,20 +35,15 @@ public class DefaultLocaleManager implements LocaleManager {
     
     @Override
     public void setLocale(Locale locale) {
+        Locale oldLocale = this.current;
         this.current = locale;
         BuiltinMessage.setLocale(locale);
-        this.listeners.forEach(listener -> listener.accept(locale));
+        this.listeners.forEach(listener -> listener.accept(oldLocale, locale));
     }
     
-    /**
-     * 添加监听器，在当前区域改变时得到通知
-     *
-     * 当前区域改变时调用传入的监听器{@link Consumer}
-     *
-     * @param listener 监听器，被调用时将传入新的区域({@link Locale})作为参数
-     */
+
     @Override
-    public void addListener(Consumer<Locale> listener) {
+    public void addListener(BiConsumer<Locale, Locale> listener) {
         this.listeners.add(listener);
     }
 }

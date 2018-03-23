@@ -6,15 +6,20 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-// 内置信息
+/**
+ * 内置信息.
+ * <p>
+ *
+ * @author Yun-Shan
+ */
 public class BuiltinMessage {
 
-    private static final Map<Locale, Map<String, String>> messages;
+    private static final Map<Locale, Map<String, String>> MESSAGES;
 
     private static Map<String, String> current;
 
     static {
-        messages = new HashMap<>();
+        MESSAGES = new HashMap<>();
         Map<String, String> chinese = new HashMap<>();
         chinese.put("DefaultErrorHandler", "§7[§aLMC-Core§7]§e[0]§b插件出现异常，异常信息如下：\n" +
                                            "§7[§aLMC-Core§7]§6异常类型：§a[1]\n" +
@@ -23,7 +28,7 @@ public class BuiltinMessage {
                                            "[3]\n" +
                                            "§7[§aLMC-Core§7]§b以上为§e[0]§b插件的异常信息");
         chinese.put("InExceptionHandler_ExceptionDescription", "$$读取插件信息失败$$");
-        messages.put(Locale.CHINESE, chinese);
+        MESSAGES.put(Locale.CHINESE, chinese);
         setLocale(Locale.CHINESE);
     }
 
@@ -37,7 +42,7 @@ public class BuiltinMessage {
 
     public static void setLocale(Locale locale) {
         ReflectUtils.checkSafeCall();
-        current = messages.getOrDefault(locale, current);
+        current = MESSAGES.getOrDefault(locale, current);
     }
 
 }

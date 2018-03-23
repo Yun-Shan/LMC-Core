@@ -10,6 +10,9 @@ import org.yunshanmc.lmc.core.utils.PlatformUtils;
 
 import java.util.UUID;
 
+/**
+ * @author Yun-Shan
+ */
 public class BungeeMessage extends BaseMessage {
 
     public BungeeMessage(String msg, MessageContext context) {

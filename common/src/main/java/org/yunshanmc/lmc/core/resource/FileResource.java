@@ -15,7 +15,10 @@ import java.net.URL;
 import java.util.Objects;
 
 /**
- * 文件资源
+ * 文件资源.
+ * <p>
+ *
+ * @author Yun-Shan
  */
 public class FileResource implements Resource {
     

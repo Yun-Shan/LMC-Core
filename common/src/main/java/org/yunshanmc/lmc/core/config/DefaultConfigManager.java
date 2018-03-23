@@ -15,7 +15,8 @@ import java.util.Map;
 
 /**
  * 默认配置管理器
- * // TODO 提取重复代码
+ * TODO 提取重复代码
+ * @author Yun-Shan
  */
 public class DefaultConfigManager implements ConfigManager {
 
@@ -28,14 +29,18 @@ public class DefaultConfigManager implements ConfigManager {
     @Override
     public FileConfiguration getDefaultConfig(String path) {
         Resource res = this.resourceManager.getSelfResource(path);
-        if (res == null) return null;
+        if (res == null) {
+            return null;
+        }
         return this.readConfig(res);
     }
 
     @Override
     public FileConfiguration getUserConfig(String path) {
         Resource res = this.resourceManager.getFolderResource(path);
-        if (res == null) return null;
+        if (res == null) {
+            return null;
+        }
         return this.readConfig(res);
     }
 
@@ -43,22 +48,29 @@ public class DefaultConfigManager implements ConfigManager {
     public FileConfiguration getConfig(String path) {
         FileConfiguration cfg = this.getUserConfig(path);
         FileConfiguration def = this.getDefaultConfig(path);
-        if (cfg == null && def != null) cfg = def;
-        else if (cfg != null && def != null) cfg.addDefaults(def);
+        if (cfg == null && def != null) {
+            cfg = def;
+        } else if (cfg != null && def != null) {
+            cfg.addDefaults(def);
+        }
         return cfg;
     }
 
     @Override
     public Map<String, FileConfiguration> getDefaultConfigs(String path, boolean deep) {
         Map<String, Resource> res = this.resourceManager.getSelfResources(path, name -> name.endsWith(".yml"), deep);
-        if (res == null) return null;
+        if (res == null) {
+            return null;
+        }
         return Maps.transformValues(res, this::readConfig);
     }
 
     @Override
     public Map<String, FileConfiguration> getUserConfigs(String path, boolean deep) {
         Map<String, Resource> res = this.resourceManager.getFolderResources(path, name -> name.endsWith(".yml"), deep);
-        if (res == null) return null;
+        if (res == null) {
+            return null;
+        }
         return Maps.transformValues(res, this::readConfig);
     }
 
@@ -68,7 +80,9 @@ public class DefaultConfigManager implements ConfigManager {
         if (cfgs != null) {
             cfgs.forEach((k, v) -> {
                 FileConfiguration def = this.getDefaultConfig(k);
-                if (def != null) v.addDefaults(def);
+                if (def != null) {
+                    v.addDefaults(def);
+                }
             });
         } else {
             cfgs = this.getDefaultConfigs(path, deep);
@@ -79,7 +93,9 @@ public class DefaultConfigManager implements ConfigManager {
     @Override
     public FileConfiguration getPluginConfig() {
         FileConfiguration cfg = getConfig("config.yml");
-        if (cfg == null) cfg = new YamlConfiguration();
+        if (cfg == null) {
+            cfg = new YamlConfiguration();
+        }
         return cfg;
     }
 

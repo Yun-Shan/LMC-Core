@@ -8,7 +8,9 @@ import java.lang.reflect.Proxy;
 import java.util.UUID;
 
 /**
- * //TODO 注释
+ * TODO 注释
+ *
+ * @author Yun-Shan
  */
 public interface Message {
 

@@ -7,19 +7,23 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.yunshanmc.lmc.core.bukkit.LMCBukkitPlugin;
-import org.yunshanmc.lmc.core.bukkit.command.LMCCommandSenderImpl;
+import org.yunshanmc.lmc.core.bukkit.BaseLMCBukkitPlugin;
+import org.yunshanmc.lmc.core.bukkit.command.BukkitLMCCommandSender;
 import org.yunshanmc.lmc.core.command.CommandManager;
-import org.yunshanmc.lmc.core.command.LMCCommand;
+import org.yunshanmc.lmc.core.command.AbstractLMCCommand;
+import org.yunshanmc.lmc.core.command.executors.BaseCommandExecutor;
 import org.yunshanmc.lmc.core.message.MessageSender;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class BukkitExecutor extends org.yunshanmc.lmc.core.command.executors.CommandExecutor implements CommandExecutor, TabCompleter {
+/**
+ * @author Yun-Shan
+ */
+public class BukkitExecutor extends BaseCommandExecutor implements CommandExecutor, TabCompleter {
 
-    public BukkitExecutor(CommandManager commandManager, MessageSender messageSender, LMCBukkitPlugin plugin) {
+    public BukkitExecutor(CommandManager commandManager, MessageSender messageSender, BaseLMCBukkitPlugin plugin) {
         super(commandManager, messageSender);
         PluginCommand command = ((JavaPlugin)plugin).getCommand(this.handleCommand);
         command.setExecutor(this);
@@ -28,7 +32,7 @@ public class BukkitExecutor extends org.yunshanmc.lmc.core.command.executors.Com
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        LMCCommand cmd = super.resolveCommand(args);
+        AbstractLMCCommand cmd = super.resolveCommand(args);
 
         if (cmd != null) {
             for (String perm : cmd.getPermissions()) {
@@ -43,7 +47,7 @@ public class BukkitExecutor extends org.yunshanmc.lmc.core.command.executors.Com
                 } else {
                     args = new String[0];
                 }
-                cmd.execute(new LMCCommandSenderImpl(sender, this.messageSender), label, args);
+                cmd.execute(new BukkitLMCCommandSender(sender, this.messageSender), label, args);
             } else {
                 this.messageSender.info(sender, "command.InvalidCommand",
                                         '/' + Joiner.on(' ').join(label, args.length > 0 ? args[0] : cmd.getName()));

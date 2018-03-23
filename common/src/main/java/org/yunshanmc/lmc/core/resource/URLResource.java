@@ -12,7 +12,10 @@ import java.net.URL;
 import java.util.jar.JarFile;
 
 /**
- * URL资源
+ * URL资源.
+ * <p>
+ *
+ * @author Yun-Shan
  */
 public class URLResource implements Resource {
 
@@ -32,11 +35,14 @@ public class URLResource implements Resource {
     @Override
     public InputStream getInputStream() throws IOException {
         try {
-            if (this.stream == null) this.stream = this.url.openStream();
+            if (this.stream == null) {
+                this.stream = this.url.openStream();
+            }
         } catch (FileNotFoundException e) {
             String path = this.url.getPath();
             int sep = path.indexOf("!/");
-            File jarFile = new File(path.substring(6 /* file:/ */, sep));
+            /* file:/ */
+            File jarFile = new File(path.substring(6, sep));
             JarFile jar = new JarFile(jarFile);
             this.stream = jar.getInputStream(jar.getEntry(path.substring(sep + 2)));
         }
@@ -45,6 +51,8 @@ public class URLResource implements Resource {
 
     @Override
     protected void finalize() throws Throwable {
-        if (this.stream != null) this.stream.close();
+        if (this.stream != null) {
+            this.stream.close();
+        }
     }
 }
