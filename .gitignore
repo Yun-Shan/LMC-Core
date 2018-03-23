@@ -47,6 +47,3 @@ gradle-app.setting
 
 # Cache of project
 .gradletasknamecache
-
-# Gradle Properties
-gradle.properties
