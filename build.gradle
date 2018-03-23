@@ -9,6 +9,7 @@ ext.jenkinsBuildNumber = getJenkinsBuild()
 
 subprojects {
     apply plugin: 'java'
+    apply plugin: 'maven-publish'
 
     group = 'org.yunshanmc'
     version = "$pluginVersion.${rootProject.ext.jenkinsBuildNumber}-$pluginVersionType"
@@ -30,7 +31,7 @@ subprojects {
         classifier = 'javadoc'
         from javadoc.destinationDir
     }
-    
+
     task sourcesJar(type: Jar, dependsOn: classes) {
         classifier = 'sources'
         from sourceSets.main.allSource
@@ -82,5 +83,31 @@ subprojects {
         testCompile 'junit:junit:4.12'
         testCompile 'org.yaml:snakeyaml:1.18'
         testCompile 'com.google.guava:guava:22.0'
+    }
+
+    publishing {
+        publications {
+            Plugin(MavenPublication) {
+                groupId project.group
+                artifactId archivesBaseName
+                version project.version
+
+                from components.java
+            }
+
+            Source(MavenPublication) {
+                groupId project.group
+                artifactId archivesBaseName
+                version project.version
+                artifact sourcesJar
+            }
+
+            Javadoc(MavenPublication) {
+                groupId project.group
+                artifactId archivesBaseName
+                version project.version
+                artifact javadocJar
+            }
+        }
     }
 }
