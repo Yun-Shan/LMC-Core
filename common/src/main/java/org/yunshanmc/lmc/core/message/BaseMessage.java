@@ -26,7 +26,7 @@ public abstract class BaseMessage implements Message {
     }
 
     /**
-     * 转换颜色字符(& -> §).
+     * 转换颜色字符(&amp; -&gt; §).
      * <p>
      *
      * @param msg 原始信息

@@ -21,10 +21,10 @@ public interface ConfigManager {
      * <p>
      * 相当于<br>
      * <pre>
-     *     FileConfiguration> cfg = {@link #getUserConfig(String) getUserConfig}(path);
-     *     if (cfg == null) {
-     *         cfg = {@link #getDefaultConfig(String) getDefaultConfig}(path);
-     *     }
+     * FileConfiguration cfg = {@link #getUserConfig(String) getUserConfig}(path);
+     * if (cfg == null) {
+     *     cfg = {@link #getDefaultConfig(String) getDefaultConfig}(path);
+     * }
      * </pre>
      *
      * @param path 配置文件的相对路径
@@ -55,16 +55,15 @@ public interface ConfigManager {
      * <p>
      * 相当于
      * <pre>
-     *     Map<String, FileConfiguration> cfgs = {@link #getUserConfigs(String, boolean) getUserConfigs}(path);
-     *     if (cfgs == null) {
-     *         cfgs = {@link #getDefaultConfigs(String, boolean) getDefaultConfigs}(path);
-     *     }
+     * Map{@code <String, FileConfiguration>} cfgs = {@link #getUserConfigs(String, boolean) getUserConfigs}(path);
+     * if (cfgs == null) {
+     *     cfgs = {@link #getDefaultConfigs(String, boolean) getDefaultConfigs}(path);
+     * }
      * </pre>
-     *
      *
      * @param path 配置文件夹的相对路径
      * @param deep 是否搜索子文件夹
-     * @return 获取到的配置(K -> 文件相对路径, V -> 配置)，当找不到任何配置文件或读取失败时返回null
+     * @return 获取到的配置(K: 文件相对路径, V: 配置)，当找不到任何配置文件或读取失败时返回null
      */
     Map<String, FileConfiguration> getConfigs(String path, boolean deep);
 
@@ -74,7 +73,7 @@ public interface ConfigManager {
      *
      * @param path 配置文件夹的相对路径
      * @param deep 是否搜索子文件夹
-     * @return 获取到的配置(K -> 文件相对路径, V -> 配置)，当找不到任何配置文件或读取失败时返回null
+     * @return 获取到的配置(K: 文件相对路径, V: 配置)，当找不到任何配置文件或读取失败时返回null
      */
     Map<String, FileConfiguration> getDefaultConfigs(String path, boolean deep);
 
@@ -84,7 +83,7 @@ public interface ConfigManager {
      *
      * @param path 配置文件夹的相对路径
      * @param deep 是否搜索子文件夹
-     * @return 获取到的配置(K -> 文件相对路径, V -> 配置)，当找不到任何配置文件或读取失败时返回null
+     * @return 获取到的配置(K: 文件相对路径, V: 配置)，当找不到任何配置文件或读取失败时返回null
      */
     Map<String, FileConfiguration> getUserConfigs(String path, boolean deep);
 

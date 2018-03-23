@@ -29,9 +29,10 @@ public class I18nResourceManager extends StandardResourceManager {
     private Path[] localeTags = {Paths.get(Locale.ENGLISH.toLanguageTag()), Paths.get(Locale.ENGLISH.getLanguage())};
 
     /**
-     * 通过Bukkit插件实例构造一个国际化资源管理器
+     * 构造国际化资源管理器
      *
-     * @param plugin Bukkit插件实例
+     * @param plugin        LMC插件实例
+     * @param localeManager 本地化管理器
      * @throws IOException 当读取插件Jar文件失败时抛出
      */
     public I18nResourceManager(LMCPlugin plugin, LocaleManager localeManager) throws IOException {

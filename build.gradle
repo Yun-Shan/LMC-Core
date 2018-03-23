@@ -26,6 +26,10 @@ subprojects {
         from sourceSets.main.allSource
     }
 
+    artifacts {
+        archives sourcesJar
+    }
+
     jar {
         from {
             configurations.compile.collect {

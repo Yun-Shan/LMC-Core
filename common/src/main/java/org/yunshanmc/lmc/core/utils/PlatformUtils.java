@@ -170,6 +170,7 @@ public final class PlatformUtils {
      *
      * @param stackTrace 调用栈
      * @param duplicate  连续插件是否重复，如果多个连续调用栈是同一个插件时是否重复记录插件(注意：同插件在不连续的调用栈上不会去重)
+     * @param reverse    由于调用栈是倒序的，该参数指定是否将倒序转为正序，true即转为正序，false即保持倒序
      * @return 追踪到的插件列表
      */
     public static List<String> tracePluginsName(StackTraceElement[] stackTrace, boolean duplicate, boolean reverse) {
@@ -216,6 +217,7 @@ public final class PlatformUtils {
      * 会通过每个调用栈Class尝试获取插件，直到获取到第一个插件为止
      *
      * @param stackTrace 调用栈
+     * @param skipSelf   是否要跳过调用者
      * @return 追踪到的调用栈上的第一个插件
      */
     public static String traceFirstPluginName(StackTraceElement[] stackTrace, boolean skipSelf) {
@@ -234,6 +236,7 @@ public final class PlatformUtils {
      *
      * @param stackTrace 调用栈
      * @param duplicate  连续插件是否重复，如果多个连续调用栈是同一个插件时是否重复记录插件(注意：同插件在不连续的调用栈上不会去重)
+     * @param reverse    由于调用栈是倒序的，该参数指定是否将倒序转为正序，true即转为正序，false即保持倒序
      * @return 追踪到的插件列表
      */
     public static List<Object> tracePlugins(StackTraceElement[] stackTrace, boolean duplicate, boolean reverse) {
@@ -280,6 +283,7 @@ public final class PlatformUtils {
      * 会通过每个调用栈Class尝试获取插件，直到获取到第一个插件为止
      *
      * @param stackTrace 调用栈
+     * @param skipSelf   是否要跳过调用者
      * @return 追踪到的调用栈上的第一个插件
      */
     public static Object traceFirstPlugin(StackTraceElement[] stackTrace, boolean skipSelf) {

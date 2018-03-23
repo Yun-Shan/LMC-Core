@@ -79,6 +79,7 @@ public class BungeeUtils {
      * 会通过每个调用栈Class尝试获取插件，直到获取到第一个插件为止
      *
      * @param stackTrace 调用栈
+     * @param skipSelf   是否要跳过调用者
      * @return 追踪到的调用栈上的第一个插件
      */
     public static Plugin traceFirstPlugin(StackTraceElement[] stackTrace) {

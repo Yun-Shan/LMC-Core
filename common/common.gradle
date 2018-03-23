@@ -1,5 +1,17 @@
 ext.type = 'API'
 archivesBaseName = "${rootProject.name}-${ext.type}"
 
-dependencies {
+javadoc {
+    options.encoding "UTF-8"
+    options.charSet 'UTF-8'
+    options.links("http://docs.oracle.com/javase/8/docs/api/")
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
 }
