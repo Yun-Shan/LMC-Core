@@ -64,10 +64,6 @@ subprojects {
             name 'SpigotMC'
             url 'https://hub.spigotmc.org/nexus/content/groups/public/'
         }
-        maven {
-            name 'For PlaceholderAPI'
-            url 'http://repo.extendedclip.com/content/repositories/placeholderapi/'
-        }
     }
 
     dependencies {
