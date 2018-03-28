@@ -11,6 +11,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.invoke.WrongMethodTypeException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.List;
@@ -59,8 +60,8 @@ public final class SimpleCommandFactory {
 
     static List<AbstractLMCCommand> build(SimpleLMCCommand rawCmd, MessageSender messageSender, String handleCommand, MessageManager messageManager) {
         String msgPath = "simplecommand.register.";
-        return Arrays.stream(rawCmd.getClass().getDeclaredMethods()).filter(
-            m -> m.isAnnotationPresent(SimpleCommand.class)).map(m -> {
+        return Arrays.stream(rawCmd.getClass().getMethods()).filter(
+            m -> !Modifier.isStatic(m.getModifiers()) && m.isAnnotationPresent(SimpleCommand.class)).map(m -> {
 
             SimpleCommand cmdAnno = m.getAnnotation(SimpleCommand.class);
             try {
