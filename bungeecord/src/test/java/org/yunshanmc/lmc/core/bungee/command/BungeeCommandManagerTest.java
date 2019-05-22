@@ -1,10 +1,9 @@
-package org.yunshanmc.lmc.bungee.command;
+package org.yunshanmc.lmc.core.bungee.command;
 
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.junit.Test;
-import org.yunshanmc.lmc.bungee.EnvironmentUtil;
-import org.yunshanmc.lmc.bungee.MockPlugin;
-import org.yunshanmc.lmc.core.bungee.command.BungeeLMCCommandSender;
+import org.yunshanmc.lmc.core.MockPlugin;
+import org.yunshanmc.lmc.core.bungee.EnvironmentUtil;
 import org.yunshanmc.lmc.core.command.*;
 
 import java.lang.reflect.Proxy;
@@ -12,7 +11,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class BungeeCommandManagerTest {
     @Test
@@ -20,7 +19,7 @@ public class BungeeCommandManagerTest {
     public void registerCommands() throws Exception {
         // TODO alias, label测试
 
-        EnvironmentUtil.mockBukkit();
+        EnvironmentUtil.mockBungeeCord();
 
         MockPlugin plugin = MockPlugin.newInstance();
 

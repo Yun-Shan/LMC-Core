@@ -3,11 +3,14 @@ package org.yunshanmc.lmc.core.bukkit.util;
 import com.google.common.base.Strings;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.yunshanmc.lmc.core.bukkit.command.BukkitLMCCommandSender;
+import org.yunshanmc.lmc.core.bukkit.gui.BukkitInvProvider;
 import org.yunshanmc.lmc.core.command.AbstractParameterConverter;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
+import org.yunshanmc.lmc.core.gui.GuiFactory;
 import org.yunshanmc.lmc.core.resource.Resource;
 import org.yunshanmc.lmc.core.util.PlatformUtils;
 import org.yunshanmc.lmc.core.util.ReflectUtils;
@@ -24,15 +27,30 @@ import java.util.List;
  *
  * @author Yun-Shan
  */
-public class BukkitUtils {
+public final class BukkitUtils {
 
-    static {
+    private static volatile boolean inited = false;
+
+    public static synchronized void init() {
+        ReflectUtils.checkSafeCall();
+        if (inited) {
+            return;
+        }
+
         PlatformUtils.setConsoleRawMessageSender(msg -> Bukkit.getConsoleSender().sendMessage(msg.split("\\n")));
 
         AbstractParameterConverter.registerLMCSenderClass(BukkitLMCCommandSender.class);
 
         PluginManager pm = Bukkit.getPluginManager();
         PlatformUtils.setPluginGetter(pm::getPlugin);
+        PlatformUtils.setPlayerNameGetter(id -> {
+            Player player = Bukkit.getPlayer(id);
+            return player != null ? player.getName() : null;
+        });
+
+        GuiFactory.setInvProvider(new BukkitInvProvider());
+
+        inited = true;
     }
 
     /**

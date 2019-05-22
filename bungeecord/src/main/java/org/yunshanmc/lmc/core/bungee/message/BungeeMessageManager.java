@@ -1,22 +1,22 @@
 package org.yunshanmc.lmc.core.bungee.message;
 
 import org.yunshanmc.lmc.core.LMCPlugin;
-import org.yunshanmc.lmc.core.config.ConfigManager;
 import org.yunshanmc.lmc.core.message.BaseMessageManager;
 import org.yunshanmc.lmc.core.message.Message;
 import org.yunshanmc.lmc.core.message.MessageContext;
 import org.yunshanmc.lmc.core.message.MessageSender;
+import org.yunshanmc.lmc.core.resource.ResourceManager;
 
 /**
  * @author Yun-Shan
  */
 public class BungeeMessageManager extends BaseMessageManager {
-    public BungeeMessageManager(LMCPlugin plugin, ConfigManager configManager) {
-        super(plugin, configManager);
+    public BungeeMessageManager(LMCPlugin plugin, ResourceManager resourceManager) {
+        super(plugin, resourceManager);
     }
 
-    public BungeeMessageManager(LMCPlugin plugin, ConfigManager configManager, String defMsgPath) {
-        super(plugin, configManager, defMsgPath);
+    public BungeeMessageManager(LMCPlugin plugin, ResourceManager resourceManager, String defMsgPath) {
+        super(plugin, resourceManager, defMsgPath);
     }
 
     @Override

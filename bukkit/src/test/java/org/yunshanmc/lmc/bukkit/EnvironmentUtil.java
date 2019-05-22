@@ -1,51 +1,22 @@
 package org.yunshanmc.lmc.bukkit;
 
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
+import org.yunshanmc.lmc.core.CommonEnvironmentUtil;
 import org.yunshanmc.lmc.core.bukkit.util.BukkitUtils;
 import org.yunshanmc.lmc.core.util.PlatformUtils;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Proxy;
 import java.util.logging.Logger;
 
-public final class EnvironmentUtil {
+public final class EnvironmentUtil extends CommonEnvironmentUtil {
 
     private EnvironmentUtil() {
         // 禁止实例化
         throw new Error();
-    }
-
-    private static Field f_platform;
-    private static Field f_SENDER_CLASS;
-    private static Field f_PLAYER_CLASS;
-
-    static {
-        try {
-            Field f = PlatformUtils.class.getDeclaredField("PLATFORM");
-            Field f_m = Field.class.getDeclaredField("modifiers");
-            f_m.setAccessible(true);
-            f_m.setInt(f, Modifier.PUBLIC | Modifier.STATIC);
-            f.setAccessible(true);
-            f_platform = f;
-
-            f = PlatformUtils.class.getDeclaredField("SENDER_CLASS");
-            f_m = Field.class.getDeclaredField("modifiers");
-            f_m.setAccessible(true);
-            f_m.setInt(f, Modifier.PUBLIC | Modifier.STATIC);
-            f.setAccessible(true);
-            f_SENDER_CLASS = f;
-
-            f = PlatformUtils.class.getDeclaredField("PLAYER_CLASS");
-            f_m = Field.class.getDeclaredField("modifiers");
-            f_m.setAccessible(true);
-            f_m.setInt(f, Modifier.PUBLIC | Modifier.STATIC);
-            f.setAccessible(true);
-            f_PLAYER_CLASS = f;
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public static void mockBukkit() {
@@ -75,11 +46,7 @@ public final class EnvironmentUtil {
                 }
             })
         );
-        try {
-            Class.forName(BukkitUtils.class.getName());
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        BukkitUtils.init();
     }
 
 }

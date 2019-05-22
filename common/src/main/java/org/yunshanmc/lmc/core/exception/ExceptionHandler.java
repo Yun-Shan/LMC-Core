@@ -76,6 +76,7 @@ public final class ExceptionHandler {
             assert false;
         } catch (AssertionError e) {
             t.printStackTrace();
+            assert false;
             return;
         }
         handle(t, t.getMessage());
@@ -114,14 +115,14 @@ public final class ExceptionHandler {
                 if (this.stopFlag.get()) {
                     break;
                 }
-                String pluginName = PlatformUtils.traceFirstPluginName(err.getThrowable().getStackTrace(), false);
-
-                if (pluginName == null) {
-                    pluginName = BuiltinMessage.getMessage("InExceptionHandler_ExceptionDescription");
-                }
                 Consumer<ExceptionInfo> handler = DEFAULT_HANDLER;
-
                 try {
+                    String pluginName = PlatformUtils.traceFirstPluginName(err.getThrowable().getStackTrace(), false);
+
+                    if (pluginName == null) {
+                        pluginName = BuiltinMessage.getMessage("InExceptionHandler_ExceptionDescription");
+                    }
+
                     if (this.stopFlag.get()) {
                         break;
                     }

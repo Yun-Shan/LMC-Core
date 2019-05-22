@@ -3,6 +3,7 @@ package org.yunshanmc.lmc.core.bungee.util;
 import com.google.common.base.Strings;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
 import org.yunshanmc.lmc.core.bungee.command.BungeeLMCCommandSender;
@@ -28,13 +29,26 @@ import java.util.function.Function;
  */
 public class BungeeUtils {
 
-    static {
+    private static volatile boolean inited = false;
+
+    public static synchronized void init() {
+        ReflectUtils.checkSafeCall();
+        if (inited) {
+            return;
+        }
+
         PlatformUtils.setConsoleRawMessageSender(msg -> ProxyServer.getInstance().getConsole().sendMessage(TextComponent.fromLegacyText(msg)));
 
         AbstractParameterConverter.registerLMCSenderClass(BungeeLMCCommandSender.class);
 
         PluginManager pm = ProxyServer.getInstance().getPluginManager();
         PlatformUtils.setPluginGetter(pm::getPlugin);
+        PlatformUtils.setPlayerNameGetter(id -> {
+            ProxiedPlayer player = ProxyServer.getInstance().getPlayer(id);
+            return player != null ? player.getName() : null;
+        });
+
+        inited = true;
     }
 
     /**
@@ -77,13 +91,14 @@ public class BungeeUtils {
                         ExceptionHandler.handle(e);
                     }
                 }
+                return result;
             }
             return null;
         };
 
         List<Plugin> result = fetcher.apply("bungee.yml");
         if (result == null) {
-            fetcher.apply("plugin.yml");
+            result = fetcher.apply("plugin.yml");
         }
         if (result == null) {
             result = Collections.emptyList();

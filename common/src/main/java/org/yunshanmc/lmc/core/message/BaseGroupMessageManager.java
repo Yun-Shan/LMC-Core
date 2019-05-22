@@ -1,10 +1,13 @@
 package org.yunshanmc.lmc.core.message;
 
+import org.yaml.snakeyaml.Yaml;
 import org.yunshanmc.lmc.core.LMCPlugin;
-import org.yunshanmc.lmc.core.config.ConfigManager;
-import org.yunshanmc.lmc.core.config.bukkitcfg.file.FileConfiguration;
+import org.yunshanmc.lmc.core.exception.ExceptionHandler;
+import org.yunshanmc.lmc.core.resource.Resource;
+import org.yunshanmc.lmc.core.resource.ResourceManager;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,19 +27,19 @@ public abstract class BaseGroupMessageManager extends BaseMessageManager {
     private MessageGroup defMsgGroup;
     private String userMsgPath;
 
-    public BaseGroupMessageManager(LMCPlugin plugin, ConfigManager configManager) {
-        this(plugin, configManager, MESSAGE_DIR);
+    public BaseGroupMessageManager(LMCPlugin plugin, ResourceManager resourceManager) {
+        this(plugin, resourceManager, MESSAGE_DIR);
     }
 
-    public BaseGroupMessageManager(LMCPlugin plugin, ConfigManager configManager, String defMsgPath) {
-        super(plugin, configManager);
+    public BaseGroupMessageManager(LMCPlugin plugin, ResourceManager resourceManager, String defMsgPath) {
+        super(plugin, resourceManager);
         this.userMsgPath = defMsgPath;
         // init default message name
-        Map<String, FileConfiguration> cfgs = configManager.getDefaultConfigs(defMsgPath, true);
-        MessageGroup msgGroup = new MessageGroup("", cfgs.remove(""), new HashMap<>());
+        Map<String, Resource> cfgs = resourceManager.getSelfResources(defMsgPath, name -> name.endsWith("" + ".yml"), true);
+        MessageGroup msgGroup = new MessageGroup("", new HashMap<>(), new HashMap<>());
         // "xxx" + "/"
         int startIdx = defMsgPath.length() + 1;
-        cfgs.forEach((path, cfg) -> {
+        cfgs.forEach((path, res) -> {
             MessageGroup group = msgGroup;
             MessageGroup sub;
             if (path.endsWith(YML_EXT)) {
@@ -46,10 +49,17 @@ public abstract class BaseGroupMessageManager extends BaseMessageManager {
             for (String key : path.split(PATH_REGEX)) {
                 sub = group.subGroups.get(key);
                 if (sub == null) {
-                    sub = new MessageGroup(key, cfg, new HashMap<>());
+                    sub = new MessageGroup(key, new HashMap<>(), new HashMap<>());
                     group.subGroups.put(key, sub);
+                    group = sub;
                 }
-                group = sub;
+            }
+            try {
+                @SuppressWarnings("unchecked")
+                Map<String, ?> dataMap = new Yaml().loadAs(res.getInputStream(), Map.class);
+                group.msgMap.putAll(super.resolveMap(dataMap));
+            } catch (IOException e) {
+                ExceptionHandler.handle(e);
             }
         });
         this.defMsgGroup = msgGroup;
@@ -65,18 +75,23 @@ public abstract class BaseGroupMessageManager extends BaseMessageManager {
 
         String path = this.userMsgPath + File.separator + key;
         int firstSep;
-        FileConfiguration cfg;
+        Resource cfg;
         do {
             char[] chars = path.toCharArray();
 
             String cfgPath = path.indexOf('.') > 0 ? new String(chars, 0, path.indexOf('.')) : path;
-            cfg = this.configManager.getUserConfig(cfgPath + ".yml");
-
-            if (cfg != null
-                    // 去除key的组路径部分
-                    && cfg.isString(key.substring(path.indexOf('.') - this.userMsgPath.length()))) {
-                // 在用户配置中找到
-                return this.newMessage(cfg.getString(key.substring(path.indexOf('.') - this.userMsgPath.length())), context);
+            cfg = this.resourceManager.getFolderResource(cfgPath + ".yml");
+            if (cfg != null) {
+                try {
+                    @SuppressWarnings("unchecked")
+                    Map<String, ?> dataMap = new Yaml().loadAs(cfg.getInputStream(), Map.class);
+                    Map<String, String> msgMap = super.resolveMap(dataMap);
+                    if (msgMap.containsKey(key.substring(path.indexOf('.') - this.userMsgPath.length()))) {
+                        return this.newMessage(msgMap.get(key.substring(path.indexOf('.') - this.userMsgPath.length())), context);
+                    }
+                } catch (IOException e) {
+                    ExceptionHandler.handle(e);
+                }
             }
 
             // 用户配置中未找到，尝试在默认配置中查找
@@ -92,19 +107,19 @@ public abstract class BaseGroupMessageManager extends BaseMessageManager {
     private class MessageGroup {
 
         private final String name;
-        private final FileConfiguration cfg;
+        private final Map<String, String> msgMap;
         private final Map<String, MessageGroup> subGroups;
 
-        public MessageGroup(String name, FileConfiguration cfg, Map<String, MessageGroup> subGroups) {
+        public MessageGroup(String name, Map<String, ?> dataMap, Map<String, MessageGroup> subGroups) {
             this.name = name;
-            this.cfg = cfg;
+            this.msgMap = BaseGroupMessageManager.super.resolveMap(dataMap);
             this.subGroups = subGroups;
         }
 
         public Message getMessage(String key, MessageContext context) {
             Message msg = null;
-            if (this.cfg != null && this.cfg.isString(key)) {
-                msg = BaseGroupMessageManager.this.newMessage(cfg.getString(key), context);
+            if (this.msgMap != null && this.msgMap.containsKey(key)) {
+                msg = BaseGroupMessageManager.this.newMessage(this.msgMap.get(key), context);
             } else {// 搜索子组
                 int groupSep = key.indexOf('.');
                 if (groupSep > 0) {

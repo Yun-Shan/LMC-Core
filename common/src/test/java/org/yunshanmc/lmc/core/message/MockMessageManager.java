@@ -1,11 +1,11 @@
 package org.yunshanmc.lmc.core.message;
 
 import org.yunshanmc.lmc.core.LMCPlugin;
-import org.yunshanmc.lmc.core.config.ConfigManager;
+import org.yunshanmc.lmc.core.resource.ResourceManager;
 
 public class MockMessageManager extends BaseMessageManager {
-    public MockMessageManager(LMCPlugin plugin, ConfigManager configManager) {
-        super(plugin, configManager);
+    public MockMessageManager(LMCPlugin plugin, ResourceManager resourceManager) {
+        super(plugin, resourceManager);
     }
 
     @Override

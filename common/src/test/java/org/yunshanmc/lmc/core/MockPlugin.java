@@ -76,8 +76,8 @@ public class MockPlugin implements LMCPlugin {
     @Override
     public MessageManager getMessageManager() {
         if (this.messageManager == null) this.messageManager =
-            this.isGroupMM ? new MockGroupMessageManager(this, this.getConfigManager())
-                : new MockMessageManager(this, this.getConfigManager());
+            this.isGroupMM ? new MockGroupMessageManager(this, this.getResourceManager())
+                : new MockMessageManager(this, this.getResourceManager());
         return this.messageManager;
     }
 }

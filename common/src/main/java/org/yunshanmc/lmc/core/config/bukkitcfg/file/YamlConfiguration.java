@@ -8,6 +8,7 @@ import org.yaml.snakeyaml.representer.Representer;
 import org.yunshanmc.lmc.core.config.bukkitcfg.Configuration;
 import org.yunshanmc.lmc.core.config.bukkitcfg.ConfigurationSection;
 import org.yunshanmc.lmc.core.config.bukkitcfg.InvalidConfigurationException;
+import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -203,8 +204,10 @@ public class YamlConfiguration extends FileConfiguration {
         try {
             config.load(reader);
         } catch (IOException ex) {
+            ExceptionHandler.handle(ex);
             // TODO Logger Bukkit.getLogger().log(Level.SEVERE, "Cannot load configuration from stream", ex);
         } catch (InvalidConfigurationException ex) {
+            ExceptionHandler.handle(ex);
             // TODO Logger Bukkit.getLogger().log(Level.SEVERE, "Cannot load configuration from stream", ex);
         }
 

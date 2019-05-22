@@ -4,6 +4,10 @@
  */
 package org.yunshanmc.lmc.core.bukkit;
 
+import org.bukkit.plugin.PluginManager;
+import org.yunshanmc.lmc.core.bukkit.listener.GuiListener;
+import org.yunshanmc.lmc.core.bukkit.util.BukkitUtils;
+import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.internal.LMCCoreUtils;
 
 /**
@@ -16,10 +20,18 @@ public class LMCCoreBukkitPlugin extends BaseLMCBukkitPlugin {
     @Override
     protected void init() {
         LMCCoreUtils.setLMCCorePlugin(this);
+        BukkitUtils.init();
         this.useGroupMessage = true;
     }
 
     @Override
     public void onEnable() {
+        PluginManager pm = getServer().getPluginManager();
+        pm.registerEvents(new GuiListener(), this);
+    }
+
+    @Override
+    public void onDisable() {
+        ExceptionHandler.stop();
     }
 }

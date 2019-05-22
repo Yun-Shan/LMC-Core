@@ -8,7 +8,6 @@ import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.resource.Resource;
 import org.yunshanmc.lmc.core.resource.URLResource;
 
-import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -63,15 +62,19 @@ public final class ReflectUtils {
     }
 
     public static StackTraceElement[] captureStackTrace() {
-        @SuppressWarnings("ThrowableNotThrown")
         StackTraceElement[] stack = new Throwable().getStackTrace();
         return Arrays.copyOfRange(stack, 1, stack.length);
     }
 
-    private static final String GRADLE_TEST_PATH_TEST = "build/classes/java/test";
-    private static final String GRADLE_TEST_PATH_MAIN = "build/classes/java/main";
-
     public static void checkSafeCall() {
+        // 测试环境不进行安全检查
+        try {
+            assert false;
+        } catch (AssertionError e) {
+            return;
+        }
+
+        // 正式环境
         StackTraceElement[] elements = new Throwable().getStackTrace();
 
         //noinspection ConstantConditions
@@ -83,21 +86,11 @@ public final class ReflectUtils {
                 if (cls.getProtectionDomain() == null || cls.getProtectionDomain().getCodeSource() == null) {
                     break;
                 }
-                CodeSource codeSource = cls.getProtectionDomain().getCodeSource();
 
-                // 正式环境
+                CodeSource codeSource = cls.getProtectionDomain().getCodeSource();
                 if (codeSource.equals(beCalled.getProtectionDomain().getCodeSource())) {
                     return;
                 }
-
-                File file = Resource.urlToFile(codeSource.getLocation());
-                if (file.isDirectory()) {
-                    String path = file.getPath().replace('\\', '/');
-                    if (path.endsWith(GRADLE_TEST_PATH_TEST) || path.endsWith(GRADLE_TEST_PATH_MAIN)) {
-                        return;
-                    }
-                }
-
             } catch (Exception e) {
                 e.printStackTrace();
                 break;

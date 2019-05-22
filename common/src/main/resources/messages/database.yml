@@ -5,6 +5,7 @@ MissingAllConfig: "无法找到数据库配置信息，请检查是否有配置�
 MissingTypeConfig: "未配置数据库类型！"
 UnsupportedDatabaseType: "暂不支持该数据库类型：{1}！"
 MissingSubConfig: "无法找到{1}数据库配置信息，请检查是否有配置数据库信息(配置节点：database.{2})!"
+TryConnect: "正在尝试连接数据库，使用JDBC URL：{1}"
 MySQL:
   buildURL:
     MissingConfig: |
@@ -32,9 +33,6 @@ SQLite:
     JDBC_URL: |
       正在构造连接SQLite数据库的JDBC URL，当前配置信息为：
       path: {1}
-
-
-UnknownOrmLiteLogLevel: "未配置日志级别或日志级别无效，将默认设为INFO！"
 
 OrmLiteLog:
   trace: "[Database Trace Log]{1}"

@@ -11,7 +11,7 @@ import org.yunshanmc.lmc.core.command.BaseCommandManager;
 public class BukkitCommandManager extends BaseCommandManager {
 
     public BukkitCommandManager(LMCPlugin plugin, String handleCommand) {
-        super(plugin, handleCommand, null, (String[]) null);
+        super(plugin, handleCommand, null);
     }
 
     @Override

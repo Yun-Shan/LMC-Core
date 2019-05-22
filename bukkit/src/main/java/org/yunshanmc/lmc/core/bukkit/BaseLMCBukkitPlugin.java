@@ -78,8 +78,8 @@ public abstract class BaseLMCBukkitPlugin extends JavaPlugin implements LMCPlugi
         }
         if (this.messageManager == null) {
             this.messageManager = this.useGroupMessage
-                    ? new BukkitGroupMessageManager(this, this.configManager)
-                    : new BukkitMessageManager(this, this.configManager);
+                ? new BukkitGroupMessageManager(this, this.resourceManager)
+                : new BukkitMessageManager(this, this.resourceManager);
         }
 
         this.messageSender = this.messageManager.getMessageSender();
@@ -93,11 +93,6 @@ public abstract class BaseLMCBukkitPlugin extends JavaPlugin implements LMCPlugi
         }
         ExceptionHandler.setHandler(this, this.exceptionHandler);
         return true;
-    }
-
-    @Override
-    public void onDisable() {
-        ExceptionHandler.stop();
     }
 
     @Override

@@ -7,9 +7,9 @@ import org.yunshanmc.lmc.core.bungee.message.BungeeMessageManager;
 import org.yunshanmc.lmc.core.config.ConfigManager;
 import org.yunshanmc.lmc.core.config.DefaultConfigManager;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
+import org.yunshanmc.lmc.core.locale.DefaultLocaleManager;
 import org.yunshanmc.lmc.core.locale.I18nResourceManager;
 import org.yunshanmc.lmc.core.locale.LocaleManager;
-import org.yunshanmc.lmc.core.locale.DefaultLocaleManager;
 import org.yunshanmc.lmc.core.message.MessageManager;
 import org.yunshanmc.lmc.core.message.MessageSender;
 import org.yunshanmc.lmc.core.resource.ResourceManager;
@@ -24,7 +24,7 @@ import java.util.function.Consumer;
  *
  * @author Yun-Shan
  */
-public abstract class LMCBungeeCordPlugin extends Plugin implements LMCPlugin {
+public abstract class BaseLMCBungeeCordPlugin extends Plugin implements LMCPlugin {
 
     protected boolean useI18n;
     protected boolean useGroupMessage;
@@ -77,8 +77,8 @@ public abstract class LMCBungeeCordPlugin extends Plugin implements LMCPlugin {
         }
         if (this.messageManager == null) {
             this.messageManager = this.useGroupMessage
-                    ? new BungeeGroupMessageManager(this, this.configManager)
-                    : new BungeeMessageManager(this, this.configManager);
+                ? new BungeeGroupMessageManager(this, this.resourceManager)
+                : new BungeeMessageManager(this, this.resourceManager);
         }
 
         this.messageSender = this.messageManager.getMessageSender();
@@ -92,11 +92,6 @@ public abstract class LMCBungeeCordPlugin extends Plugin implements LMCPlugin {
         }
         ExceptionHandler.setHandler(this, this.exceptionHandler);
         return true;
-    }
-
-    @Override
-    public void onDisable() {
-        ExceptionHandler.stop();
     }
 
     @Override

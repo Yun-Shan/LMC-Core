@@ -1,6 +1,7 @@
 package org.yunshanmc.lmc.core.database;
 
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
+import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
 import com.j256.ormlite.logger.Log;
 import com.j256.ormlite.logger.LoggerFactory;
 import com.j256.ormlite.support.ConnectionSource;
@@ -34,9 +35,15 @@ public class OrmLiteDatabase extends BaseDatabase {
     }
 
     private ConnectionSource connectionSource;
+    private final boolean pooled;
 
     public OrmLiteDatabase(LMCPlugin plugin, FileConfiguration pluginConfig, MessageSender messageSender) {
+        this(plugin, pluginConfig, messageSender, true);
+    }
+
+    public OrmLiteDatabase(LMCPlugin plugin, FileConfiguration pluginConfig, MessageSender messageSender, boolean pooled) {
         super(plugin, pluginConfig, messageSender);
+        this.pooled = pooled;
 
         if (this.dbConfig != null) {
             String levelStr = this.dbConfig.getString("logLevel", "");
@@ -44,8 +51,7 @@ public class OrmLiteDatabase extends BaseDatabase {
             try {
                 level = Log.Level.valueOf(levelStr.toUpperCase());
             } catch (IllegalArgumentException ex) {
-                messageSender.warningConsole("database.UnknownOrmLiteLogLevel", levelStr);
-                level = Log.Level.INFO;
+                level = Log.Level.ERROR;
             }
             CreateLoggerInterceptor.setLevel(plugin.getName(), level);
         }
@@ -67,7 +73,11 @@ public class OrmLiteDatabase extends BaseDatabase {
 
     @Override
     protected boolean connect(String jdbcUrl) throws SQLException {
-        this.connectionSource = new JdbcConnectionSource(jdbcUrl);
+        if (this.pooled) {
+            this.connectionSource = new JdbcPooledConnectionSource(jdbcUrl);
+        } else {
+            this.connectionSource = new JdbcConnectionSource(jdbcUrl);
+        }
 
         // 连接测试
         DatabaseConnection conn = this.connectionSource.getReadOnlyConnection("");
@@ -110,8 +120,8 @@ public class OrmLiteDatabase extends BaseDatabase {
                                                           "LMC-Core_CreateLoggerInterceptor",
                                                           "LMC-Core_CreateLoggerInterceptor",
                                                           null }));
-            } catch (NoSuchFieldException | IllegalAccessException | ClassNotFoundException ignored) {
-                ignored.printStackTrace();
+            } catch (NoSuchFieldException | IllegalAccessException | ClassNotFoundException e) {
+                ExceptionHandler.handle(e);
             }
         }
 

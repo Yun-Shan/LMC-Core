@@ -3,7 +3,7 @@ package org.yunshanmc.lmc.bukkit.command;
 import org.bukkit.entity.Player;
 import org.junit.Test;
 import org.yunshanmc.lmc.bukkit.EnvironmentUtil;
-import org.yunshanmc.lmc.bukkit.MockPlugin;
+import org.yunshanmc.lmc.core.MockPlugin;
 import org.yunshanmc.lmc.core.bukkit.command.BukkitLMCCommandSender;
 import org.yunshanmc.lmc.core.command.*;
 
@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class BukkitCommandManagerTest {
     @Test

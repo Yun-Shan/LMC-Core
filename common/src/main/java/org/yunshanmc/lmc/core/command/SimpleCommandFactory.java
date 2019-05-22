@@ -58,6 +58,10 @@ public final class SimpleCommandFactory {
         throw new Error();
     }
 
+
+    /**
+     * TODO 把单个大方法分解为多个小方法
+     */
     static List<AbstractLMCCommand> build(SimpleLMCCommand rawCmd, MessageSender messageSender, String handleCommand, MessageManager messageManager) {
         String msgPath = "simplecommand.register.";
         return Arrays.stream(rawCmd.getClass().getMethods()).filter(
@@ -411,11 +415,11 @@ public final class SimpleCommandFactory {
 
                 if (e instanceof Error) {
                     // Error是程序无法处理的，不应掩盖，故原样抛出
+                    // TODO 添加输出说明，虽然不掩盖但是也要添加一些说明(不然腐竹会迷茫)
                     throw (Error) e;
                 }
                 ExceptionHandler.handle(e);
-                this.failTip(sender, "command.simpleCommand.DeveloperCommandError",
-                    this.messageSender.getMessage("message.name"));
+                this.failTip(sender, "command.simpleCommand.DeveloperCommandError");
             }
         }
 

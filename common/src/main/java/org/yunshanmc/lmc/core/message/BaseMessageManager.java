@@ -4,14 +4,17 @@
  */
 package org.yunshanmc.lmc.core.message;
 
+import org.yaml.snakeyaml.Yaml;
 import org.yunshanmc.lmc.core.LMCPlugin;
-import org.yunshanmc.lmc.core.config.ConfigManager;
-import org.yunshanmc.lmc.core.config.bukkitcfg.file.FileConfiguration;
-import org.yunshanmc.lmc.core.config.bukkitcfg.file.YamlConfiguration;
 import org.yunshanmc.lmc.core.internal.LMCCoreUtils;
+import org.yunshanmc.lmc.core.resource.Resource;
+import org.yunshanmc.lmc.core.resource.ResourceManager;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
 
 /**
  * 默认信息管理器.
@@ -22,28 +25,35 @@ import java.util.Map;
 public abstract class BaseMessageManager implements MessageManager {
 
     protected final LMCPlugin plugin;
-    protected final ConfigManager configManager;
+    protected final ResourceManager resourceManager;
 
     protected MessageContext context;
 
     private Map<String, Message> messageCache = new HashMap<>();
-    private FileConfiguration defaultMsg;
+    private Map<String, String> defaultMsg;
     private int debugLevel;
 
     private static final String MESSAGE_PATH = "messages.yml";
     private static final String INTERNAL_START_PATH = "__internal.";
 
-    public BaseMessageManager(LMCPlugin plugin, ConfigManager configManager) {
-        this(plugin, configManager, MESSAGE_PATH);
+    public BaseMessageManager(LMCPlugin plugin, ResourceManager resourceManager) {
+        this(plugin, resourceManager, MESSAGE_PATH);
     }
 
-    public BaseMessageManager(LMCPlugin plugin, ConfigManager configManager, String defMsgPath) {
+    public BaseMessageManager(LMCPlugin plugin, ResourceManager resourceManager, String defMsgPath) {
         this.plugin = plugin;
-        this.configManager = configManager;
-        this.defaultMsg = configManager.getDefaultConfig(defMsgPath);
-        // 避免空指针
-        if (this.defaultMsg == null) {
-            this.defaultMsg = new YamlConfiguration();
+        this.resourceManager = resourceManager;
+        Resource defMsgRes = resourceManager.getSelfResource(defMsgPath);
+        if (defMsgRes != null) {
+            try {
+                @SuppressWarnings("unchecked")
+                Map<String, ?> defaultMsg = new Yaml().loadAs(defMsgRes.getInputStream(), Map.class);
+                this.defaultMsg = resolveMap(defaultMsg);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            this.defaultMsg = new HashMap<>();
         }
 
         this.context = new MessageContext(plugin, this);
@@ -108,16 +118,23 @@ public abstract class BaseMessageManager implements MessageManager {
     }
 
     protected Message getMessageFromResource(String key, MessageContext context) {
-        FileConfiguration cfg = this.configManager.getUserConfig(MESSAGE_PATH);
+        Resource res = this.resourceManager.getFolderResource(MESSAGE_PATH);
         String msg = null;
-        // 这段代码感觉特别不优雅，于是写清楚注释
-        // 尝试从用户配置获取
-        if (cfg != null && cfg.isString(key)) {
-            msg = cfg.getString(key);
+        try {
+            // 尝试从用户配置获取
+            if (res != null) {
+                @SuppressWarnings("unchecked")
+                Map<String, ?> dataMap = new Yaml().loadAs(res.getInputStream(), Map.class);
+                Map<String, String> msgMap = resolveMap(dataMap);
+                msg = msgMap.get(key);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
         // 用户配置文件不存在或配置项不存在，尝试从默认配置获取
-        if (msg == null && this.defaultMsg.isString(key)) {
-            msg = this.defaultMsg.getString(key);
+        if (msg == null && this.defaultMsg.containsKey(key)) {
+            msg = this.defaultMsg.get(key);
         }
         // 存在用户配置或默认配置
         if (msg != null) {
@@ -135,4 +152,22 @@ public abstract class BaseMessageManager implements MessageManager {
      * @return 构建出的新信息
      */
     protected abstract Message newMessage(String msg, MessageContext context);
+
+    @SuppressWarnings("unchecked")
+    protected final Map<String, String> resolveMap(Map<String, ?> map) {
+        Map<String, String> msg = new HashMap<>(map.size());
+        AtomicReference<BiConsumer<String, Object>> resolver = new AtomicReference<>();
+        resolver.set((k, data) -> {
+            if (data instanceof String) {
+                msg.put(k, (String) data);
+            } else if (data instanceof Map) {
+                ((Map<String, ?>) data)
+                    .forEach((nextK, nextData) ->
+                        resolver.get().accept((k.isEmpty() ? "" : k + '.') + nextK, nextData)
+                    );
+            }
+        });
+        resolver.get().accept("", map);
+        return msg;
+    }
 }

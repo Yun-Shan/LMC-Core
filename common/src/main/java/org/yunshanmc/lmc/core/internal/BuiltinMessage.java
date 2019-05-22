@@ -28,12 +28,21 @@ public class BuiltinMessage {
                                            "[3]\n" +
                                            "§7[§aLMC-Core§7]§b以上为§e[0]§b插件的异常信息");
         chinese.put("InExceptionHandler_ExceptionDescription", "$$读取插件信息失败$$");
+        chinese.put("MissingLanguage", "§c未知的提示信息模板：[0]");
+
+        Map<String, String> english = new HashMap<>();
+        english.put("MissingLanguage", "§cMissingLanguage：[0]");
+
         MESSAGES.put(Locale.CHINESE, chinese);
+        MESSAGES.put(Locale.ENGLISH, english);
         setLocale(Locale.CHINESE);
     }
 
     public static String getMessage(String key, Object... args) {
         String msg = current.get(key);
+        if (msg == null) {
+            return getMessage("MissingLanguage", "null");
+        }
         for (int i = 0; i < args.length; i++) {
             msg = msg.replace("[" + i + "]", String.valueOf(args[i]));
         }

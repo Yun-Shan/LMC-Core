@@ -1,7 +1,7 @@
-name: "&a{$PluginName}"
+prefix: "&e[&a{$PluginName}&e]"
 type:
   raw: "{1}"
-  info: "&e[{##message.name}&e]&a{1}"
-  warning: "&e[{##message.name}&e]&4WARNING：{1}"
-  error: "&e[{##message.name}&e]&c错误信息：{1}"
-  debug: "&e[{##message.name}&e]&aDEBUG：{1}"
+  info: "{##message.prefix}&a{1}"
+  warning: "{##message.prefix}&cWARNING：{1}"
+  error: "{##message.prefix}&c错误信息：{1}"
+  debug: "{##message.prefix}&aDEBUG：{1}"

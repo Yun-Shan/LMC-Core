@@ -24,8 +24,8 @@ public class DefaultMessageFormat implements MessageFormat {
         Pattern.compile("" +
             "\\{(" +
             "(?<idx>[0-9]+)" +
-            "|(?<subMsg>##[^}]+)" +
-            "|(?<context>\\$[^}]+)" +
+            "|(?<subMsg>##[\\w.]+)" +
+            "|(?<context>\\$[\\w.]+)" +
             // "|(?<js>&[^}]+)" + // TODO js功能
             ")}");
 
@@ -34,61 +34,29 @@ public class DefaultMessageFormat implements MessageFormat {
         Matcher matcher = VARIABLE_PATTERN.matcher(msg);
         StringBuffer buffer = new StringBuffer();
         while (matcher.find()) {
-            String val;
-            if ((val = matcher.group("idx")) != null) {
-                int idx = Integer.parseInt(val);
+            String val = null;
+            String key;
+            if ((key = matcher.group("idx")) != null) {
+                int idx = Integer.parseInt(key);
                 if (idx > 0 && args.length >= idx) {
                     val = String.valueOf(args[idx - 1]);
                 }
-            } else if ((val = matcher.group("subMsg")) != null) {
-                Message message = this.context.getMessageManager().getMessage(val.substring(2));
+            } else if ((key = matcher.group("subMsg")) != null) {
+                Message message = this.context.getMessageManager().getMessage(key.substring(2));
                 val = message.getMessage(null);
 
                 if (val != null) {
                     val = "§r" + val + "§r";
                 }
-            } else if ((val = matcher.group("context")) != null) {
-                val = this.context.getString(val.substring(1));
+            } else if ((key = matcher.group("context")) != null) {
+                val = this.context.getString(key.substring(1));
             }
 
             if (val == null) {
                 val = matcher.group();
             }
-
-            // $ 转义 start
-            char[] cTmp = {40};
-            String sTmp = new String(cTmp);
-            while (val.contains(sTmp) || buffer.indexOf(sTmp) != -1) {
-                cTmp[0]++;
-                sTmp = new String(cTmp);
-            }
-            boolean change = false;
-            char[] chars = val.toCharArray();
-            for (int i = 0; i < chars.length; i++) {
-                if (chars[i] == '$') {
-                    chars[i] = cTmp[0];
-                    change = true;
-                }
-            }
-            if (change) {
-                val = new String(chars);
-            }
-            // $ 转义 end
-
-            matcher.appendReplacement(buffer, val);
-
-            // 反转义 $  ↓↓↓所以说正则的反向引用检测不加个开关真的很烦_(:з」∠)_
-            if (change) {
-                // $ 反转义 start
-                for (int i = 0; i < buffer.length(); i++) {
-                    char c = buffer.charAt(i);
-                    if (c == cTmp[0]) {
-                        c = '$';
-                    }
-                    buffer.setCharAt(i, c);
-                }
-                // $ 反转义 end
-            }
+            // '\'和'$'会在前面加反斜杠
+            matcher.appendReplacement(buffer, val.replace("\\", "\\\\").replace("$", "\\$"));
         }
         matcher.appendTail(buffer);
         return buffer.toString();

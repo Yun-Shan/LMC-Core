@@ -7,4 +7,4 @@ simpleCommand:
   TooLittleArgs: "参数不足！"
   ConvertFail: "参数不合法！"
   SimpleCommandBug: "LMC-Core出现BUG，请服主查看后台详细信息！"
-  DeveloperCommandError: "{1}插件命令执行异常，请服主联系该插件作者解决！"
+  DeveloperCommandError: "插件命令执行异常，请服主联系该插件作者解决！"

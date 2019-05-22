@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -94,9 +95,6 @@ public final class PlatformUtils {
         PLAYER_CLASS = playerCls;
     }
 
-    private static Consumer<String> ConsoleRawMessageSender;
-    private static Function<String, Object> PluginGetter;
-
     public static boolean isBukkit() {
         return PlatformType.Bukkit.equals(PLATFORM);
     }
@@ -123,6 +121,10 @@ public final class PlatformUtils {
         Preconditions.checkArgument(SENDER_CLASS.isInstance(sender));
     }
 
+    private static Consumer<String> ConsoleRawMessageSender;
+    private static Function<String, Object> PluginGetter;
+    private static Function<UUID, String> PlayerNameGetter;
+
     public static synchronized void setConsoleRawMessageSender(Consumer<String> consoleRawMessageSender) {
         ReflectUtils.checkSafeCall();
         if (PlatformUtils.ConsoleRawMessageSender != null) {
@@ -139,8 +141,28 @@ public final class PlatformUtils {
         PlatformUtils.PluginGetter = pluginGetter;
     }
 
+    public static void setPlayerNameGetter(Function<UUID, String> playerNameGetter) {
+        ReflectUtils.checkSafeCall();
+        if (PlatformUtils.PlayerNameGetter != null) {
+            throw new IllegalStateException();
+        }
+        PlatformUtils.PlayerNameGetter = playerNameGetter;
+    }
+
     public static Object getPlugin(String name) {
         return PlatformUtils.PluginGetter.apply(name);
+    }
+
+    /**
+     * 根据UUID获取玩家名
+     * <p>
+     * 注意：当且仅当玩家在线时可获取，其它时候返回null
+     *
+     * @param uuid 玩家UUID
+     * @return 玩家名
+     */
+    public static String getPlayerName(UUID uuid) {
+        return PlatformUtils.PlayerNameGetter.apply(uuid);
     }
 
     public enum PlatformType {
@@ -198,6 +220,7 @@ public final class PlatformUtils {
                         ExceptionHandler.handle(e);
                     }
                 }
+                return result;
             }
             return null;
         };
@@ -207,7 +230,7 @@ public final class PlatformUtils {
             result = fetcher.apply("bungee.yml");
         }
         if (result == null) {
-            fetcher.apply("plugin.yml");
+            result = fetcher.apply("plugin.yml");
         }
         if (result == null) {
             result = Collections.emptyList();
@@ -264,6 +287,7 @@ public final class PlatformUtils {
                         ExceptionHandler.handle(e);
                     }
                 }
+                return result;
             }
             return null;
         };
@@ -273,7 +297,7 @@ public final class PlatformUtils {
             result = fetcher.apply("bungee.yml");
         }
         if (result == null) {
-            fetcher.apply("plugin.yml");
+            result = fetcher.apply("plugin.yml");
         }
         if (result == null) {
             result = Collections.emptyList();
@@ -291,7 +315,7 @@ public final class PlatformUtils {
      * @return 追踪到的调用栈上的第一个插件
      */
     public static Object traceFirstPlugin(StackTraceElement[] stackTrace, boolean skipSelf) {
-        List<String> resList = PlatformUtils.tracePluginsName(stackTrace, false, false);
+        List<Object> resList = PlatformUtils.tracePlugins(stackTrace, false, false);
         boolean hasValid = !resList.isEmpty() && (!skipSelf || resList.size() > 1);
         if (hasValid) {
             return resList.get(skipSelf ? 1 : 0);

@@ -4,6 +4,8 @@
  */
 package org.yunshanmc.lmc.core.bungee;
 
+import org.yunshanmc.lmc.core.bungee.util.BungeeUtils;
+import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.internal.LMCCoreUtils;
 
 /**
@@ -11,15 +13,22 @@ import org.yunshanmc.lmc.core.internal.LMCCoreUtils;
  *
  * @author Yun-Shan
  */
-public class LMCCoreBungeeCordPlugin extends LMCBungeeCordPlugin {
+public class LMCCoreBungeeCordPlugin extends BaseLMCBungeeCordPlugin {
 
     @Override
     protected void init() {
         LMCCoreUtils.setLMCCorePlugin(this);
+        BungeeUtils.init();
         this.useGroupMessage = true;
     }
 
     @Override
     public void onEnable() {
+
+    }
+
+    @Override
+    public void onDisable() {
+        ExceptionHandler.stop();
     }
 }
