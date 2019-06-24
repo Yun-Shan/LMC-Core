@@ -20,6 +20,12 @@ public class PacketDecoder extends ByteToMessageDecoder {
 
     private final Map<Class<? extends AbstractPacket>, Constructor<? extends AbstractPacket>> constructors = new HashMap<>();
 
+    private final PacketType packetType;
+
+    public PacketDecoder(PacketType packetType) {
+        this.packetType = packetType;
+    }
+
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
         int length;
@@ -28,6 +34,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
                 return;
             }
             length = this.lastLength;
+            this.lastLength = -1;
         } else if (in.readableBytes() < INT_BYTES) {
             return;
         } else {
@@ -35,13 +42,12 @@ public class PacketDecoder extends ByteToMessageDecoder {
             if (in.readableBytes() < length) {
                 this.lastLength = length;
                 return;
-            } else {
-                this.lastLength = -1;
             }
         }
         DataBuffer buffer = new DataBuffer(Unpooled.buffer(length));
         in.readBytes(buffer, length);
-        Class<? extends AbstractPacket> type = PacketType.getTypeById(buffer.readInt());
+        int id = buffer.readInt();
+        Class<? extends AbstractPacket> type = this.packetType.getTypeById(id);
         Constructor<? extends AbstractPacket> constructor = this.constructors.get(type);
         if (constructor == null) {
             constructor = type.getDeclaredConstructor();

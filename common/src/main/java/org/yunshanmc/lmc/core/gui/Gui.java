@@ -21,6 +21,7 @@ public class Gui {
     private final Container[] outputs;
 
     private final InvProvider invProvider;
+    private Object invSingleton;
 
     public Gui(String title, int row, Icon[] icons, BaseComponent[] components, Container[] containers, InvProvider invProvider) {
         this.title = title;
@@ -65,15 +66,23 @@ public class Gui {
         return this.outputs[slot] != null;
     }
 
-    public void onClick(int slot, ClickInfo clickInfo) {
+    public void onClick(int slot, ClickInfo clickInfo, Object player) {
         BaseComponent clickable = this.components[slot];
         if (clickable != null) {
-            clickable.onClick(clickInfo);
+            clickable.onClick(slot, clickInfo, player);
         }
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T buildInv() {
+    public <T> T buildNewInv() {
         return (T) this.invProvider.buildInv(this);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T getInvSingleton() {
+        if (this.invSingleton == null) {
+            this.invSingleton = this.buildNewInv();
+        }
+        return (T) this.invSingleton;
     }
 }

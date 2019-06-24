@@ -31,6 +31,8 @@ public class NetworkClient {
 
     private final MessageSender messageSender;
 
+    private final PacketType packetType = new PacketType();
+
     public NetworkClient(String name, int port, MessageSender messageSender) {
         this.name = name;
         this.port = port;
@@ -50,8 +52,8 @@ public class NetworkClient {
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(new PacketDecoder());
-                        ch.pipeline().addLast(new PacketEncoder());
+                        ch.pipeline().addLast(new PacketDecoder(packetType));
+                        ch.pipeline().addLast(new PacketEncoder(packetType));
                         if (getHandlers != null) {
                             ch.pipeline().addLast(getHandlers.get());
                         }
@@ -109,7 +111,11 @@ public class NetworkClient {
             this.messageSender.infoConsole("network.client.Connected");
             this.channel = future.channel();
             this.channel.writeAndFlush(new RegisterClientPacket(this.name));
+            this.onConnected();
         }
+    }
+
+    protected void onConnected() {
     }
 
     public void stop() {
@@ -130,5 +136,9 @@ public class NetworkClient {
     public <T extends BaseResponsivePacket> void sendResponsivePacket(BaseResponsivePacket packet, BiConsumer<ChannelHandlerContext, T> responseHandle) {
         this.responseHandles.put(packet.getResponseId(), responseHandle);
         this.sendPacket(packet);
+    }
+
+    public PacketType getPacketType() {
+        return this.packetType;
     }
 }

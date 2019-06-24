@@ -9,6 +9,13 @@ import lombok.NonNull;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * 表示一个GUI中的图标
+ * <p>
+ * 该类实现了物品缓存机制，请尽量复用
+ *
+ * @author Yun-Shan
+ */
 @Getter
 public class Icon {
 

@@ -5,6 +5,7 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.util.AttributeKey;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.message.MessageSender;
 import org.yunshanmc.lmc.core.network.packet.RegisterClientPacket;
@@ -20,6 +21,10 @@ public class NetworkServer {
     private EventLoopGroup eventLoopGroup;
     private ClientHandler clientHandler;
 
+    private final PacketType packetType = new PacketType();
+
+    private static final AttributeKey<String> CLIENT_NEME = AttributeKey.valueOf("lmc.network.server.clientName");
+
     public NetworkServer(int port) {
         this.port = port;
     }
@@ -34,8 +39,8 @@ public class NetworkServer {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(new PacketDecoder());
-                        ch.pipeline().addLast(new PacketEncoder());
+                        ch.pipeline().addLast(new PacketDecoder(packetType));
+                        ch.pipeline().addLast(new PacketEncoder(packetType));
                         ch.pipeline().addLast(clientHandler);
                         if (getHandlers != null) {
                             ch.pipeline().addLast(getHandlers.get());
@@ -48,13 +53,13 @@ public class NetworkServer {
 
                             @Override
                             public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-                                messageSender.infoConsole("network.server.ClientDisconnected");
+                                messageSender.infoConsole("network.server.ClientDisconnected", ctx.channel().attr(CLIENT_NEME).get());
                             }
 
                             @Override
                             public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
                                 clientHandler.removeChannel(ctx);
-                                messageSender.infoConsole("network.server.ClientRemoved");
+                                messageSender.infoConsole("network.server.ClientRemoved", ctx.channel().attr(CLIENT_NEME).get());
                             }
                         });
                     }
@@ -77,8 +82,16 @@ public class NetworkServer {
         }
     }
 
+    public void broadcast(AbstractPacket packet) {
+        this.clientHandler.name2channel.values().forEach(ctx -> ctx.channel().writeAndFlush(packet));
+    }
+
     public ChannelHandlerContext getChannelByName(String name) {
-        return clientHandler.getChannelByName(name);
+        return this.clientHandler.getChannelByName(name);
+    }
+
+    public PacketType getPacketType() {
+        return this.packetType;
     }
 
     @ChannelHandler.Sharable
@@ -86,7 +99,6 @@ public class NetworkServer {
 
         private final MessageSender sender;
         private final HashMap<String, ChannelHandlerContext> name2channel = new HashMap<>();
-        private final HashMap<String, String> internal2name = new HashMap<>();
 
         public ClientHandler(MessageSender messageSender) {
             this.sender = messageSender;
@@ -94,7 +106,7 @@ public class NetworkServer {
 
         public void handle(ChannelHandlerContext ctx, RegisterClientPacket packet) {
             this.name2channel.put(packet.getName(), ctx);
-            this.internal2name.put(ctx.name(), packet.getName());
+            ctx.channel().attr(CLIENT_NEME).set(packet.getName());
             this.sender.debugConsole(3, "network.packet.SubServerInfo.Add", packet.getName());
         }
 
@@ -103,8 +115,7 @@ public class NetworkServer {
         }
 
         void removeChannel(ChannelHandlerContext ctx) {
-            String name = this.internal2name.remove(ctx.name());
-            this.name2channel.remove(name);
+            this.name2channel.remove(ctx.channel().attr(CLIENT_NEME).get());
         }
     }
 }

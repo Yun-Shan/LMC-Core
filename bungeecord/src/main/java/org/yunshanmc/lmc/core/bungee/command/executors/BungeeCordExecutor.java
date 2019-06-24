@@ -60,6 +60,7 @@ public class BungeeCordExecutor extends BaseCommandExecutor {
                     args = new String[0];
                 }
                 cmd.execute(new BungeeLMCCommandSender(sender, this.messageSender), label, args);
+
             } else {
                 this.messageSender.info(sender, "command.InvalidCommand",
                     '/' + Joiner.on(' ').join(label, args.length > 0 ? args[0] : cmd.getName()));

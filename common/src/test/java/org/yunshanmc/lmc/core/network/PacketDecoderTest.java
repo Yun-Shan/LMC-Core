@@ -17,11 +17,12 @@ public class PacketDecoderTest {
 
     @Test
     public void decode() throws Exception {
-        PacketDecoder decoder = new PacketDecoder();
+        PacketType packetType = new PacketType();
+        PacketDecoder decoder = new PacketDecoder(packetType);
         ByteBuf buffer = Unpooled.buffer();
         List<Object> list = new ArrayList<>();
         ByteBuf packet = Unpooled.buffer();
-        packet.writeInt(PacketType.getIdByType(TextPacket.class));
+        packet.writeInt(packetType.getIdByType(TextPacket.class));
         byte[] bytes = TEXT.getBytes(StandardCharsets.UTF_8);
         packet.writeInt(bytes.length);
         packet.writeBytes(bytes);

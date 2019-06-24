@@ -382,23 +382,24 @@ public final class SimpleCommandFactory {
         }
 
         @Override
-        public void execute(BaseLMCCommandSender sender, String label, String... args) {
+        public void execute(BaseLMCCommandSender sender, String label, String... rawArgs) {
             if (!this.senderType.equals(BaseLMCCommandSender.class) && !this.senderType.isInstance(sender.getHandle())) {
                 this.failTip(sender, "command.simpleCommand.senderTypeRequire."
                     + this.senderType.getName().replace('.', '-'));
                 return;
-            } else if (args.length > this.maxArgCount) {
+            } else if (rawArgs.length > this.maxArgCount) {
                 this.failTip(sender, "command.simpleCommand.TooManyArgs");
                 return;
-            } else if (args.length < this.minArgCount) {
+            } else if (rawArgs.length < this.minArgCount) {
                 this.failTip(sender, "command.simpleCommand.TooLittleArgs");
                 return;
             }
-            if (args.length < this.maxArgCount) {
-                args = Arrays.copyOf(args, this.maxArgCount);
+            String[] args = rawArgs;
+            if (rawArgs.length < this.maxArgCount) {
+                args = Arrays.copyOf(rawArgs, this.maxArgCount);
             }
             try {
-                this.handle.invoke(sender, new SimpleCommand.CommandRawInfo(label, args), args);
+                this.handle.invoke(sender, new SimpleCommand.CommandRawInfo(label, this.getName(), rawArgs), args);
             } catch (ParamConverterFailException e) {
                 this.failTip(sender, "command.simpleCommand.ConvertFail", e.getArg());
             } catch (WrongMethodTypeException | ClassCastException e) {

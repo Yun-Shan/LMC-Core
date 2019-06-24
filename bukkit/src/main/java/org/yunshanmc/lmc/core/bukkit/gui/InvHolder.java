@@ -81,7 +81,7 @@ public class InvHolder implements InventoryHolder {
         ClickInfo.ClickType type = transformClickType(event);
 
         if (event.getClickedInventory().getHolder() == this) {
-            this.gui.onClick(event.getRawSlot(), new ClickInfo(type));
+            this.gui.onClick(event.getRawSlot(), new ClickInfo(type), event.getWhoClicked());
         }
 
         this.handleAction(event);
@@ -92,6 +92,7 @@ public class InvHolder implements InventoryHolder {
      *
      * @param event 点击事件
      */
+    @SuppressWarnings("deprecation")
     private void handleAction(InventoryClickEvent event) {
         ItemStack cursor = event.getCursor();
         ItemStack currentItem = event.getCurrentItem();

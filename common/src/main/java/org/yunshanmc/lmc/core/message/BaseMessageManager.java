@@ -155,7 +155,7 @@ public abstract class BaseMessageManager implements MessageManager {
 
     @SuppressWarnings("unchecked")
     protected final Map<String, String> resolveMap(Map<String, ?> map) {
-        Map<String, String> msg = new HashMap<>(map.size());
+        Map<String, String> msg = new HashMap<>(map != null ? map.size() : 8);
         AtomicReference<BiConsumer<String, Object>> resolver = new AtomicReference<>();
         resolver.set((k, data) -> {
             if (data instanceof String) {

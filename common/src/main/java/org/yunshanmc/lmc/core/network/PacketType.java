@@ -9,26 +9,21 @@ import java.util.HashMap;
 /**
  * @author Yun-Shan
  */
-
 public final class PacketType {
 
-    private static final IntObjectHashMap<Class<? extends AbstractPacket>> BY_ID = new IntObjectHashMap<>();
-    private static final HashMap<Class<? extends AbstractPacket>, Integer> TYPE_TO_ID = new HashMap<>();
+    private final IntObjectHashMap<Class<? extends AbstractPacket>> BY_ID = new IntObjectHashMap<>();
+    private final HashMap<Class<? extends AbstractPacket>, Integer> TYPE_TO_ID = new HashMap<>();
 
-    static {
-        final int startId = 600000;
-        // 纯字符串
-        register(startId + 1, TextPacket.class);
-        // 子服信息
-        register(startId + 2, RegisterClientPacket.class);
-    }
-
-    public static Class<? extends AbstractPacket> getTypeById(int id) {
+    public Class<? extends AbstractPacket> getTypeById(int id) {
         return BY_ID.get(id);
     }
 
-    public static int getIdByType(Class<? extends AbstractPacket> cls) {
-        return TYPE_TO_ID.getOrDefault(cls, -1);
+    public int getIdByType(Class<? extends AbstractPacket> cls) {
+        Integer id = TYPE_TO_ID.get(cls);
+        if (id == null) {
+            throw new IllegalArgumentException(cls.getName());
+        }
+        return id;
     }
 
     /**
@@ -38,7 +33,7 @@ public final class PacketType {
      * @param cls 数据包类型
      * @return 注册成功返回true，id小于等于0或已有重复id时返回false
      */
-    public static boolean register(int id, Class<? extends AbstractPacket> cls) {
+    public boolean register(int id, Class<? extends AbstractPacket> cls) {
         if (id <= 0) {
             return false;
         }
@@ -50,6 +45,11 @@ public final class PacketType {
         }
     }
 
-    private PacketType() {
+    PacketType() {
+        final int startId = 600000;
+        // 纯字符串
+        register(startId + 1, TextPacket.class);
+        // 子服信息
+        register(startId + 2, RegisterClientPacket.class);
     }
 }

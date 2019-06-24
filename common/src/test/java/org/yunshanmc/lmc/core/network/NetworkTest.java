@@ -12,13 +12,13 @@ public class NetworkTest {
 
     @Test
     public void start() throws Exception {
-        PacketType.register(10001, TestPacket.class);
         String testVal = "Test Value~Yeah!";
         int port = 28080;
 
         CountDownLatch countDown = new CountDownLatch(1);
 
         NetworkServer server = new NetworkServer(port);
+        server.getPacketType().register(100001, TestPacket.class);
         server.start(MockPlugin.newInstance().getMessageManager().getMessageSender(), () -> new AbstractPacketHandler[]{
             new AbstractPacketHandler() {
                 protected void handle(ChannelHandlerContext ctx, TestPacket msg) throws Exception {
@@ -30,21 +30,7 @@ public class NetworkTest {
                 }
             }});
         NetworkClient client = new NetworkClient("TestClient", port, MockPlugin.newInstance().getMessageManager().getMessageSender());
-        client.start(() ->
-            new AbstractPacketHandler[]{
-                new AbstractPacketHandler() {
-                    protected void handle(ChannelHandlerContext ctx, TestPacket msg) throws Exception {
-                        long re = System.currentTimeMillis();
-                        System.out.println("cl re time: " + re);
-                        assertEquals(msg.val, testVal);
-                    }
-                }
-            });
-        client.sendPacket(new TestPacket(testVal));
-        client.stop();
-        server.getChannelByName("TestClient").channel().writeAndFlush(new TestPacket(testVal));
-        Thread.sleep(5000);
-        client = new NetworkClient("TestClient", port, MockPlugin.newInstance().getMessageManager().getMessageSender());
+        client.getPacketType().register(100001, TestPacket.class);
         client.start(() ->
             new AbstractPacketHandler[]{
                 new AbstractPacketHandler() {

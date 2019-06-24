@@ -3,21 +3,36 @@ package org.yunshanmc.lmc.core.gui.components;
 import org.yunshanmc.lmc.core.gui.ClickInfo;
 import org.yunshanmc.lmc.core.gui.Icon;
 
+import java.util.Arrays;
+import java.util.function.BiConsumer;
+
 public abstract class BaseComponent {
 
-    private final int[] slots;
+    protected static final BiConsumer<ClickInfo, Object> EMPTY_CONSUMER = (a, b) -> {
+    };
+
+    protected final int[] slots;
     protected final Icon[] icons;
 
+    protected final int[] slotMap;
+
     protected BaseComponent(int[] slots) {
+        Arrays.sort(slots);
         this.slots = slots;
         this.icons = new Icon[slots.length];
+
+        this.slotMap = new int[slots[slots.length - 1] + 1];
+        for (int i = 0; i < slots.length; i++) {
+            int slot = slots[i];
+            this.slotMap[slot] = i;
+        }
     }
 
     /**
      * @return 该组件占用的slot列表
      */
     public final int[] getSlots() {
-        return this.slots;
+        return Arrays.copyOf(this.slots, this.slots.length);
     }
 
     /**
@@ -32,9 +47,11 @@ public abstract class BaseComponent {
     /**
      * 当该组件被点击的时候调用
      *
+     * @param slot
      * @param click 点击信息
+     * @param player 玩家对象
      */
-    public void onClick(ClickInfo click) {
+    public void onClick(int slot, ClickInfo click, Object player) {
 
     }
 }

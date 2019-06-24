@@ -3,8 +3,10 @@ package org.yunshanmc.lmc.core.gui.components;
 import com.google.common.base.Preconditions;
 import lombok.Getter;
 import lombok.Setter;
+import org.yunshanmc.lmc.core.gui.ClickInfo;
 import org.yunshanmc.lmc.core.gui.Icon;
 
+import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
 public class Container extends BaseComponent {
@@ -17,27 +19,35 @@ public class Container extends BaseComponent {
     private Predicate checker;
     @Getter
     private final int size;
+    @Getter
+    private final BiConsumer<ClickInfo, Object>[] handlers;
 
+    @SuppressWarnings("unchecked")
     public Container(int[] slots, Predicate checker) {
         super(slots);
         this.size = slots.length;
         this.checker = checker;
-    }
-
-    public Container(int rowX, int columnX, int rowY, int columnY, Predicate checker) {
-        this(computeSlots(rowX, columnX, rowY, columnY), checker);
+        this.handlers = new BiConsumer[this.size];
     }
 
     public Container(int[] slots) {
         this(slots, o -> true);
     }
 
+    public Container(int rowX, int columnX, int rowY, int columnY, Predicate checker) {
+        this(computeSlots(rowX, columnX, rowY, columnY), checker);
+    }
+
     public Container(int rowX, int columnX, int rowY, int columnY) {
-        this(computeSlots(rowX, columnX, rowY, columnY));
+        this(rowX, columnX, rowY, columnY, null);
     }
 
     public void setIcons(Icon[] icons) {
         System.arraycopy(icons, 0, super.icons, 0, icons.length);
+    }
+
+    public void setHandlers(BiConsumer<ClickInfo, Object>[] handlers) {
+        System.arraycopy(handlers, 0, this.handlers, 0, handlers.length);
     }
 
     public boolean canInput() {
@@ -57,6 +67,14 @@ public class Container extends BaseComponent {
     @SuppressWarnings("unchecked")
     public boolean accept(Object item) {
         return this.canInput && this.checker.test(item);
+    }
+
+    @Override
+    public void onClick(int slot, ClickInfo click, Object player) {
+        BiConsumer<ClickInfo, Object> handler = this.handlers[this.slotMap[slot]];
+        if (handler != null) {
+            handler.accept(click, player);
+        }
     }
 
     private static int[] computeSlots(int rowX, int columnX, int rowY, int columnY) {

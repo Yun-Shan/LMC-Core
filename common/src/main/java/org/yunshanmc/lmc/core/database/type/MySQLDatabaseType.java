@@ -26,6 +26,7 @@ public class MySQLDatabaseType extends AbstractDatabaseType {
         String dbName = config.getString("database-name", "");
         String user = config.getString("user", "");
         String password = config.getString("password", "");
+        String timezone = config.getString("timezone", "Asia/Shanghai");
         List<String> require = Stream
             .of(host, port, dbName, user)
             .filter(Strings::isNullOrEmpty)
@@ -43,9 +44,9 @@ public class MySQLDatabaseType extends AbstractDatabaseType {
                 "&autoReconnect=true" +
                 "&useUnicode=true" +
                 "&characterEncoding=UTF-8" +
-                "&serverTimezone=UTC" +
+                "&serverTimezone={5}" +
                 "&useSSL=false",
-            host, port, dbName, user, password);
+            host, port, dbName, user, password, timezone);
         messageSender.debugConsole(2, "database.MySQL.buildURL.JDBC_URL", host, port, dbName, user, password, url);
         return url;
     }

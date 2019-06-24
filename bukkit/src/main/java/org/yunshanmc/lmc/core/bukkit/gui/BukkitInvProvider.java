@@ -27,6 +27,7 @@ public class BukkitInvProvider implements InvProvider<Inventory> {
         return inv;
     }
 
+    @SuppressWarnings("deprecation")
     private static ItemStack buildItem(Icon icon) {
         Material material = Material.matchMaterial(icon.getMaterial());
         int count = Math.min(icon.getCount(), material.getMaxStackSize());

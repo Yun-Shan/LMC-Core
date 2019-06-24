@@ -15,10 +15,11 @@ public class PacketEncoderTest {
 
     @Test
     public void encode() throws Exception {
-        PacketEncoder encoder = new PacketEncoder();
+        PacketType packetType = new PacketType();
+        PacketEncoder encoder = new PacketEncoder(packetType);
         ByteBuf data = Unpooled.buffer();
         ByteBuf packet = Unpooled.buffer();
-        packet.writeInt(PacketType.getIdByType(TextPacket.class));
+        packet.writeInt(packetType.getIdByType(TextPacket.class));
         byte[] bytes = TEXT.getBytes(StandardCharsets.UTF_8);
         packet.writeInt(bytes.length);
         packet.writeBytes(bytes);

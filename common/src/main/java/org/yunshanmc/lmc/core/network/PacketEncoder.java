@@ -10,10 +10,16 @@ import io.netty.handler.codec.MessageToByteEncoder;
  */
 public class PacketEncoder extends MessageToByteEncoder<AbstractPacket> {
 
+    private final PacketType packetType;
+
+    public PacketEncoder(PacketType packetType) {
+        this.packetType = packetType;
+    }
+
     @Override
     protected void encode(ChannelHandlerContext ctx, AbstractPacket msg, ByteBuf out) throws Exception {
         DataBuffer buffer = new DataBuffer(Unpooled.buffer());
-        buffer.writeInt(msg.getTypeId());
+        buffer.writeInt(this.packetType.getIdByType(msg.getClass()));
         msg.write(buffer);
         out.writeInt(buffer.readableBytes());
         out.writeBytes(buffer);

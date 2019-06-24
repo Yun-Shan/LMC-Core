@@ -1,7 +1,12 @@
 package org.yunshanmc.lmc.core.command;
 
+import com.google.common.base.Joiner;
+
 import java.lang.annotation.*;
 
+/**
+ * @author Yun-Shan
+ */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
@@ -93,11 +98,17 @@ public @interface SimpleCommand {
 
     class CommandRawInfo {
         private final String label;
-        private final String[] args;
+        private final String name;
+        private final String[] argsWithCmdName;
 
-        public CommandRawInfo(String label, String[] args) {
+        // 由于用到RawInfo的情况很少，所以不用预先初始化，用到的时候再初始化
+        private String cmdLine;
+        private String[] args;
+
+        public CommandRawInfo(String label, String name, String[] argsWithCmdName) {
             this.label = label;
-            this.args = args;
+            this.name = name;
+            this.argsWithCmdName = argsWithCmdName;
         }
 
         public String getLabel() {
@@ -105,7 +116,28 @@ public @interface SimpleCommand {
         }
 
         public String[] getArgs() {
+            if (this.args == null) {
+                int nilIdx = -1;
+                for (int i = 0; i < argsWithCmdName.length; i++) {
+                    if (argsWithCmdName[i] == null) {
+                        nilIdx = i;
+                        break;
+                    }
+                }
+                int len = nilIdx >= 0 ? nilIdx : argsWithCmdName.length;
+                String[] args = new String[len + 1];
+                args[0] = this.name;
+                System.arraycopy(argsWithCmdName, 0, args, 1, len);
+                this.args = args;
+            }
             return this.args;
+        }
+
+        public String getCmdLine() {
+            if (this.cmdLine == null) {
+                this.cmdLine = '/' + label + ' ' + Joiner.on(' ').join(this.getArgs());
+            }
+            return this.cmdLine;
         }
     }
 }
