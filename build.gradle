@@ -1,16 +1,30 @@
-static def getJenkinsBuild() {
-    def buildNumber = System.getenv().BUILD_NUMBER?.toInteger()
-    return buildNumber ?: 0
+plugins {
+    id 'jacoco'
+    id 'com.github.kt3k.coveralls' version '2.8.4'
 }
 
-ext.jenkinsBuildNumber = getJenkinsBuild()
+static def getBuildNumber() {
+    def buildNumber = System.env.BUILD_NUMBER?.toInteger()
+    return buildNumber ?: 0
+}
+ext.buildNumber = getBuildNumber()
+
+allprojects {
+    apply plugin: 'jacoco'
+    jacoco {
+        toolVersion = '0.8.4'
+    }
+    repositories {
+        jcenter()
+    }
+}
 
 subprojects {
     apply plugin: 'java'
     apply plugin: 'maven-publish'
     
     group = 'org.yunshanmc'
-    version = "$pluginVersion.${rootProject.ext.jenkinsBuildNumber}-$pluginVersionType"
+    version = "$pluginVersion.${rootProject.ext.buildNumber}-$pluginVersionType"
 
     targetCompatibility = 1.8
     sourceCompatibility = 1.8
@@ -18,6 +32,11 @@ subprojects {
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'
         options.compilerArgs = ['-parameters', '-Xlint:deprecation']
+    }
+
+    def jacocoExecutionDataFiles = fileTree(buildDir).include("/jacoco/*.exec")
+    jacocoTestReport {
+        executionData.from jacocoExecutionDataFiles
     }
 
     javadoc {
@@ -103,4 +122,33 @@ subprojects {
             }
         }
     }
+}
+
+task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
+    description = 'Generates an aggregate report from all subprojects'
+    dependsOn subprojects.test
+
+    additionalSourceDirs.from files(subprojects.sourceSets.main.allSource.srcDirs)
+    sourceDirectories.from files(subprojects.sourceSets.main.allSource.srcDirs)
+    classDirectories.from files(subprojects.sourceSets.main.output)
+    
+    executionData.from files(subprojects.jacocoTestReport.executionData)
+
+    reports {
+        html.enabled = true // human readable
+        xml.enabled = true // required by coveralls
+    }
+}
+
+coveralls {
+    sourceDirs = subprojects.sourceSets.main.allSource.srcDirs.flatten()
+    jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
+}
+
+tasks.coveralls {
+    group = 'Coverage reports'
+    description = 'Uploads the aggregated coverage report to Coveralls'
+
+    dependsOn jacocoRootReport
+    onlyIf { System.env.'CI' }
 }
