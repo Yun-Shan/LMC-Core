@@ -2,10 +2,10 @@ package org.yunshanmc.lmc.core.bungee;
 
 import net.md_5.bungee.api.plugin.Plugin;
 import org.yunshanmc.lmc.core.LMCPlugin;
+import org.yunshanmc.lmc.core.bungee.config.BungeeCordConfigManager;
 import org.yunshanmc.lmc.core.bungee.message.BungeeGroupMessageManager;
 import org.yunshanmc.lmc.core.bungee.message.BungeeMessageManager;
 import org.yunshanmc.lmc.core.config.ConfigManager;
-import org.yunshanmc.lmc.core.config.DefaultConfigManager;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.locale.DefaultLocaleManager;
 import org.yunshanmc.lmc.core.locale.I18nResourceManager;
@@ -20,7 +20,7 @@ import java.util.function.Consumer;
 
 /**
  * LMC插件的BungeeCord实现
- * XXX: 由于必须要继承各个端的插件抽象类，然而没法多继承，暂时找不到好方法，目前所有LMC的实现都会和LMCBukkitPlugin的代码几乎一致
+ * XXX: 由于必须要继承各个端的插件抽象类，暂时找不到好方法，目前所有LMC的实现都会和LMCBukkitPlugin的代码几乎一致
  *
  * @author Yun-Shan
  */
@@ -73,7 +73,7 @@ public abstract class BaseLMCBungeeCordPlugin extends Plugin implements LMCPlugi
             return false;
         }
         if (this.configManager == null) {
-            this.configManager = new DefaultConfigManager(this.resourceManager);
+            this.configManager = new BungeeCordConfigManager(this.resourceManager);
         }
         if (this.messageManager == null) {
             this.messageManager = this.useGroupMessage

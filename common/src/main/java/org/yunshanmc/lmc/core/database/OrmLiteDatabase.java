@@ -10,7 +10,7 @@ import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 import org.yunshanmc.lmc.core.LMCPlugin;
-import org.yunshanmc.lmc.core.config.bukkitcfg.file.FileConfiguration;
+import org.yunshanmc.lmc.core.config.LMCConfiguration;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.message.MessageSender;
 import org.yunshanmc.lmc.core.util.PlatformUtils;
@@ -37,24 +37,25 @@ public class OrmLiteDatabase extends BaseDatabase {
     private ConnectionSource connectionSource;
     private final boolean pooled;
 
-    public OrmLiteDatabase(LMCPlugin plugin, FileConfiguration pluginConfig, MessageSender messageSender) {
+    public OrmLiteDatabase(LMCPlugin plugin, LMCConfiguration pluginConfig, MessageSender messageSender) {
         this(plugin, pluginConfig, messageSender, true);
     }
 
-    public OrmLiteDatabase(LMCPlugin plugin, FileConfiguration pluginConfig, MessageSender messageSender, boolean pooled) {
+    public OrmLiteDatabase(LMCPlugin plugin, LMCConfiguration pluginConfig, MessageSender messageSender, boolean pooled) {
         super(plugin, pluginConfig, messageSender);
         this.pooled = pooled;
 
+        Log.Level level = Log.Level.ERROR;
         if (this.dbConfig != null) {
             String levelStr = this.dbConfig.getString("logLevel", "");
-            Log.Level level;
             try {
                 level = Log.Level.valueOf(levelStr.toUpperCase());
             } catch (IllegalArgumentException ex) {
+                ExceptionHandler.handle(ex);
                 level = Log.Level.ERROR;
             }
-            CreateLoggerInterceptor.setLevel(plugin.getName(), level);
         }
+        CreateLoggerInterceptor.setLevel(plugin.getName(), level);
     }
 
     @Override

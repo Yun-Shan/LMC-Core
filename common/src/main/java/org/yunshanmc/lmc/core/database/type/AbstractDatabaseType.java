@@ -1,7 +1,7 @@
 package org.yunshanmc.lmc.core.database.type;
 
 import org.yunshanmc.lmc.core.LMCPlugin;
-import org.yunshanmc.lmc.core.config.bukkitcfg.ConfigurationSection;
+import org.yunshanmc.lmc.core.config.LMCConfiguration;
 import org.yunshanmc.lmc.core.message.MessageSender;
 
 /**
@@ -45,7 +45,7 @@ public abstract class AbstractDatabaseType {
      * @param config 数据库配置
      * @return 用于连接数据库的jdbc url
      */
-    public abstract String constructJdbcUrl(ConfigurationSection config);
+    public abstract String constructJdbcUrl(LMCConfiguration config);
 
     /**
      * 获取测试URL，该测试URL用于测试数据库连接是否正常

@@ -2,7 +2,7 @@ package org.yunshanmc.lmc.core.database.type;
 
 import com.google.common.base.Strings;
 import org.yunshanmc.lmc.core.LMCPlugin;
-import org.yunshanmc.lmc.core.config.bukkitcfg.ConfigurationSection;
+import org.yunshanmc.lmc.core.config.LMCConfiguration;
 import org.yunshanmc.lmc.core.message.MessageSender;
 
 import java.text.MessageFormat;
@@ -20,7 +20,7 @@ public class MySQLDatabaseType extends AbstractDatabaseType {
     }
 
     @Override
-    public String constructJdbcUrl(ConfigurationSection config) {
+    public String constructJdbcUrl(LMCConfiguration config) {
         String host = config.getString("host", "");
         String port = config.getString("port", "");
         String dbName = config.getString("database-name", "");

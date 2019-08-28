@@ -4,7 +4,6 @@
  */
 package org.yunshanmc.lmc.core.config;
 
-import org.yunshanmc.lmc.core.config.bukkitcfg.file.FileConfiguration;
 import org.yunshanmc.lmc.core.resource.Resource;
 
 import java.util.Map;
@@ -30,7 +29,7 @@ public interface ConfigManager {
      * @param path 配置文件的相对路径
      * @return 获取到的配置，当配置文件不存在或读取失败时返回null
      */
-    FileConfiguration getConfig(String path);
+    LMCConfiguration getConfig(String path);
 
     /**
      * 从自身Jar获取配置.
@@ -39,7 +38,7 @@ public interface ConfigManager {
      * @param path 配置文件的相对路径
      * @return 获取到的配置，当配置文件不存在或读取失败时返回null
      */
-    FileConfiguration getDefaultConfig(String path);
+    LMCConfiguration getDefaultConfig(String path);
 
     /**
      * 从插件文件夹获取配置.
@@ -48,7 +47,7 @@ public interface ConfigManager {
      * @param path 配置文件的相对路径
      * @return 获取到的配置，当配置文件不存在或读取失败时返回null
      */
-    FileConfiguration getUserConfig(String path);
+    LMCConfiguration getUserConfig(String path);
 
     /**
      * 获取多个配置.
@@ -65,7 +64,7 @@ public interface ConfigManager {
      * @param deep 是否搜索子文件夹
      * @return 获取到的配置(K: 文件相对路径, V: 配置)，当找不到任何配置文件或读取失败时返回null
      */
-    Map<String, FileConfiguration> getConfigs(String path, boolean deep);
+    Map<String, LMCConfiguration> getConfigs(String path, boolean deep);
 
     /**
      * 从自身Jar获取多个配置.
@@ -75,7 +74,7 @@ public interface ConfigManager {
      * @param deep 是否搜索子文件夹
      * @return 获取到的配置(K: 文件相对路径, V: 配置)，当找不到任何配置文件或读取失败时返回null
      */
-    Map<String, FileConfiguration> getDefaultConfigs(String path, boolean deep);
+    Map<String, LMCConfiguration> getDefaultConfigs(String path, boolean deep);
 
     /**
      * 从插件文件夹获取多个配置.
@@ -85,7 +84,7 @@ public interface ConfigManager {
      * @param deep 是否搜索子文件夹
      * @return 获取到的配置(K: 文件相对路径, V: 配置)，当找不到任何配置文件或读取失败时返回null
      */
-    Map<String, FileConfiguration> getUserConfigs(String path, boolean deep);
+    Map<String, LMCConfiguration> getUserConfigs(String path, boolean deep);
 
     /**
      * 获取插件配置.
@@ -94,7 +93,7 @@ public interface ConfigManager {
      *
      * @return 插件配置，若没有配置也不会返回null
      */
-    FileConfiguration getPluginConfig();
+    LMCConfiguration getPluginConfig();
 
     /**
      * 从资源中读取配置
@@ -102,5 +101,5 @@ public interface ConfigManager {
      * @param resource 配置所在资源
      * @return 读取到的配置，读取失败返回null
      */
-    FileConfiguration readConfig(Resource resource);
+    LMCConfiguration readConfig(Resource resource);
 }

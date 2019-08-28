@@ -1,6 +1,5 @@
 package org.yunshanmc.lmc.core.bukkit.gui;
 
-import com.j256.ormlite.field.DatabaseField;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.ClickType;
@@ -25,7 +24,6 @@ import java.util.function.IntFunction;
 
 public class InvHolder implements InventoryHolder {
 
-    @DatabaseField
     private final Gui gui;
     private final Inventory inventory;
 

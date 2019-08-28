@@ -2,8 +2,8 @@ package org.yunshanmc.lmc.core.util;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import org.yaml.snakeyaml.Yaml;
 import org.yunshanmc.lmc.core.LMCPlugin;
-import org.yunshanmc.lmc.core.config.bukkitcfg.file.YamlConfiguration;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.internal.LMCCoreUtils;
 import org.yunshanmc.lmc.core.resource.Resource;
@@ -11,10 +11,7 @@ import org.yunshanmc.lmc.core.resource.Resource;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -203,9 +200,8 @@ public final class PlatformUtils {
                 List<String> result = new ArrayList<>();
                 for (Resource res : resList) {
                     try {
-                        YamlConfiguration yml = YamlConfiguration.loadConfiguration(
-                            new InputStreamReader(res.getInputStream(), StandardCharsets.UTF_8));
-                        String plugin = yml.getString("name");
+                        Map<String, String> map = new Yaml().load(new InputStreamReader(res.getInputStream(), StandardCharsets.UTF_8));
+                        String plugin = map.get("name");
                         if (Strings.isNullOrEmpty(plugin)) {
                             continue;
                         }
@@ -273,9 +269,8 @@ public final class PlatformUtils {
                 List<Object> result = new ArrayList<>();
                 for (Resource res : resList) {
                     try {
-                        YamlConfiguration yml = YamlConfiguration.loadConfiguration(
-                            new InputStreamReader(res.getInputStream(), StandardCharsets.UTF_8));
-                        Object plugin = getPlugin(yml.getString("name"));
+                        Map<String, String> map = new Yaml().load(new InputStreamReader(res.getInputStream(), StandardCharsets.UTF_8));
+                        Object plugin = getPlugin(map.get("name"));
                         boolean canAdd = true;
                         if (!duplicate) {
                             canAdd = result.isEmpty() || !plugin.equals(result.get(result.size() - 1));

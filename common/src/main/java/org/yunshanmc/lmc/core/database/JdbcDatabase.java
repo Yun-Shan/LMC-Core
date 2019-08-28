@@ -1,7 +1,7 @@
 package org.yunshanmc.lmc.core.database;
 
 import org.yunshanmc.lmc.core.LMCPlugin;
-import org.yunshanmc.lmc.core.config.bukkitcfg.file.FileConfiguration;
+import org.yunshanmc.lmc.core.config.LMCConfiguration;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.message.MessageSender;
 
@@ -16,7 +16,7 @@ public class JdbcDatabase extends BaseDatabase {
 
     private Connection connection;
 
-    public JdbcDatabase(LMCPlugin plugin, FileConfiguration pluginConfig, MessageSender messageSender) {
+    public JdbcDatabase(LMCPlugin plugin, LMCConfiguration pluginConfig, MessageSender messageSender) {
         super(plugin, pluginConfig, messageSender);
     }
 

@@ -1,7 +1,6 @@
 package org.yunshanmc.lmc.core;
 
 import org.yunshanmc.lmc.core.config.ConfigManager;
-import org.yunshanmc.lmc.core.config.DefaultConfigManager;
 import org.yunshanmc.lmc.core.internal.LMCCoreUtils;
 import org.yunshanmc.lmc.core.locale.LocaleManager;
 import org.yunshanmc.lmc.core.message.MessageManager;
@@ -12,12 +11,15 @@ import org.yunshanmc.lmc.core.resource.ResourceManager;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.util.function.Function;
 
 public class MockPlugin implements LMCPlugin {
 
+    public static Function<ResourceManager, ConfigManager> ConfigManagerNewer;
+
     private MessageManager messageManager;
     private MockResourceManager resourceManager;
-    private DefaultConfigManager configManager;
+    private ConfigManager configManager;
 
     public static MockPlugin newInstance() {
         return new MockPlugin();
@@ -62,7 +64,7 @@ public class MockPlugin implements LMCPlugin {
 
     @Override
     public ConfigManager getConfigManager() {
-        if (this.configManager == null) this.configManager = new DefaultConfigManager(this.getResourceManager());
+        if (this.configManager == null) this.configManager = ConfigManagerNewer.apply(this.getResourceManager());
         return this.configManager;
     }
 

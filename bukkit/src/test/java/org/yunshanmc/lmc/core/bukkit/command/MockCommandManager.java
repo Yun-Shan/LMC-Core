@@ -1,8 +1,8 @@
-package org.yunshanmc.lmc.bukkit.command;
+package org.yunshanmc.lmc.core.bukkit.command;
 
 import org.yunshanmc.lmc.core.LMCPlugin;
-import org.yunshanmc.lmc.core.command.BaseCommandManager;
 import org.yunshanmc.lmc.core.command.AbstractLMCCommand;
+import org.yunshanmc.lmc.core.command.BaseCommandManager;
 import org.yunshanmc.lmc.core.command.executors.BaseCommandExecutor;
 
 import java.util.Map;

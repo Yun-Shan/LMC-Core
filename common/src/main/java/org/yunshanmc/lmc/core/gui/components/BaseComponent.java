@@ -47,8 +47,8 @@ public abstract class BaseComponent {
     /**
      * 当该组件被点击的时候调用
      *
-     * @param slot
-     * @param click 点击信息
+     * @param slot   点击的slot位置
+     * @param click  点击信息
      * @param player 玩家对象
      */
     public void onClick(int slot, ClickInfo click, Object player) {

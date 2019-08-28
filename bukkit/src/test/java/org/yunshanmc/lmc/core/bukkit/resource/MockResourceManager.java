@@ -1,4 +1,4 @@
-package org.yunshanmc.lmc.bukkit.resource;
+package org.yunshanmc.lmc.core.bukkit.resource;
 
 import org.yunshanmc.lmc.core.resource.Resource;
 import org.yunshanmc.lmc.core.resource.ResourceManager;
@@ -15,7 +15,7 @@ import java.util.function.Predicate;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class MockResourceManager implements ResourceManager {
 

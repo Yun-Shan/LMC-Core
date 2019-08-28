@@ -1,10 +1,9 @@
-package org.yunshanmc.lmc.bukkit.command;
+package org.yunshanmc.lmc.core.bukkit.command;
 
 import org.bukkit.entity.Player;
 import org.junit.Test;
-import org.yunshanmc.lmc.bukkit.EnvironmentUtil;
 import org.yunshanmc.lmc.core.MockPlugin;
-import org.yunshanmc.lmc.core.bukkit.command.BukkitLMCCommandSender;
+import org.yunshanmc.lmc.core.bukkit.EnvironmentUtil;
 import org.yunshanmc.lmc.core.command.*;
 
 import java.lang.reflect.Proxy;

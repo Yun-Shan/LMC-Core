@@ -8,6 +8,8 @@ import net.md_5.bungee.api.plugin.PluginManager;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import org.yunshanmc.lmc.core.CommonEnvironmentUtil;
+import org.yunshanmc.lmc.core.MockPlugin;
+import org.yunshanmc.lmc.core.bungee.config.BungeeCordConfigManager;
 import org.yunshanmc.lmc.core.bungee.util.BungeeUtils;
 import org.yunshanmc.lmc.core.util.PlatformUtils;
 
@@ -30,6 +32,7 @@ public final class EnvironmentUtil extends CommonEnvironmentUtil {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+        MockPlugin.ConfigManagerNewer = BungeeCordConfigManager::new;
         AtomicReference<PluginManager> pmar = new AtomicReference<>();
         Map<String, ServerInfo> servers = new HashMap<>();
         Enhancer enhancer = new Enhancer();

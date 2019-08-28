@@ -1,8 +1,7 @@
 package org.yunshanmc.lmc.core.database;
 
 import org.yunshanmc.lmc.core.LMCPlugin;
-import org.yunshanmc.lmc.core.config.bukkitcfg.ConfigurationSection;
-import org.yunshanmc.lmc.core.config.bukkitcfg.file.FileConfiguration;
+import org.yunshanmc.lmc.core.config.LMCConfiguration;
 import org.yunshanmc.lmc.core.database.type.AbstractDatabaseType;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.message.MessageSender;
@@ -15,16 +14,16 @@ import java.sql.SQLException;
 public abstract class BaseDatabase {
 
     protected final LMCPlugin plugin;
-    protected final ConfigurationSection dbConfig;
+    protected final LMCConfiguration dbConfig;
     protected MessageSender messageSender;
 
     private volatile boolean inited = false;
     private volatile boolean closed = false;
     protected AbstractDatabaseType dbType;
 
-    public BaseDatabase(LMCPlugin plugin, FileConfiguration pluginConfig, MessageSender messageSender) {
+    public BaseDatabase(LMCPlugin plugin, LMCConfiguration dbConfig, MessageSender messageSender) {
         this.plugin = plugin;
-        this.dbConfig = pluginConfig.getConfigurationSection("database");
+        this.dbConfig = dbConfig;
         this.messageSender = messageSender;
     }
 
@@ -50,7 +49,7 @@ public abstract class BaseDatabase {
             return fail("UnsupportedDatabaseType", type);
         }
         // 获取实际数据库配置
-        ConfigurationSection dbCfg = this.dbConfig.getConfigurationSection(this.dbType.getName().toLowerCase());
+        LMCConfiguration dbCfg = this.dbConfig.getSection(this.dbType.getName().toLowerCase());
         if (dbCfg == null) {
             return fail("MissingSubConfig", this.dbType.getName(), this.dbType.getName().toLowerCase());
         }

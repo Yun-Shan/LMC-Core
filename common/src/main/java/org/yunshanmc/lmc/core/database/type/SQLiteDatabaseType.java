@@ -2,7 +2,7 @@ package org.yunshanmc.lmc.core.database.type;
 
 import com.google.common.base.Strings;
 import org.yunshanmc.lmc.core.LMCPlugin;
-import org.yunshanmc.lmc.core.config.bukkitcfg.ConfigurationSection;
+import org.yunshanmc.lmc.core.config.LMCConfiguration;
 import org.yunshanmc.lmc.core.message.MessageSender;
 
 import java.io.File;
@@ -18,7 +18,7 @@ public class SQLiteDatabaseType extends AbstractDatabaseType {
     }
 
     @Override
-    public String constructJdbcUrl(ConfigurationSection config) {
+    public String constructJdbcUrl(LMCConfiguration config) {
         String path = config.getString("path");
         if (Strings.isNullOrEmpty(path)) {
             this.messageSender.errorConsole("database.SQLite.buildURL.MissingConfig", path);

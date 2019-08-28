@@ -6,9 +6,9 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
+import org.yaml.snakeyaml.Yaml;
 import org.yunshanmc.lmc.core.bungee.command.BungeeLMCCommandSender;
 import org.yunshanmc.lmc.core.command.AbstractParameterConverter;
-import org.yunshanmc.lmc.core.config.bukkitcfg.file.YamlConfiguration;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.resource.Resource;
 import org.yunshanmc.lmc.core.util.PlatformUtils;
@@ -20,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -70,9 +71,8 @@ public class BungeeUtils {
                 //noinspection Duplicates
                 for (Resource res : resList) {
                     try {
-                        YamlConfiguration yml = YamlConfiguration.loadConfiguration(
-                            new InputStreamReader(res.getInputStream(), StandardCharsets.UTF_8));
-                        String name = yml.getString("name");
+                        Map<String, String> map = new Yaml().load(new InputStreamReader(res.getInputStream(), StandardCharsets.UTF_8));
+                        String name = map.get("name");
                         if (Strings.isNullOrEmpty(name)) {
                             continue;
                         }
