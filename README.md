@@ -1,6 +1,7 @@
 # LMC-Core
 [![Build Status](https://travis-ci.org/Yun-Shan/LMC-Core.svg?branch=master)](https://travis-ci.org/Yun-Shan/LMC-Core)
 [![Coverage Status](https://coveralls.io/repos/github/Yun-Shan/LMC-Core/badge.svg?branch=master)](https://coveralls.io/github/Yun-Shan/LMC-Core?branch=master)
+[![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu)
 ---
 
 # Lightning-MC核心库
