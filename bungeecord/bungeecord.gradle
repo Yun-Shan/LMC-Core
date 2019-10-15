@@ -10,7 +10,7 @@ jar {
 }
 
 dependencies {
-    implementation project(':common')
+    implementation project(':common').sourceSets.main.output
     // https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
     implementation 'org.xerial:sqlite-jdbc:3.27.2.1'
     compileOnly 'net.md-5:bungeecord-api:1.12-SNAPSHOT'

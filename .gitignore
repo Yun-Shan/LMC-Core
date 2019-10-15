@@ -39,6 +39,7 @@ bin/
 ### Gradle
 .gradle
 build/
+local.properties
 
 # Ignore Gradle GUI config
 gradle-app.setting

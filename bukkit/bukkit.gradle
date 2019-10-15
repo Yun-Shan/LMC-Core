@@ -22,7 +22,7 @@ repositories {
 }
 
 dependencies {
-    implementation project(':common')
+    implementation project(':common').sourceSets.main.output
     compileOnly 'org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT'
     compileOnly 'com.comphenix.protocol:ProtocolLib:4.4.0'
     compileOnly 'me.clip:placeholderapi:2.0.8'
