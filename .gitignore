@@ -21,6 +21,8 @@ out/
 
 # Package Files #
 *.jar
+!**/main/resources/**/*.jar
+!**/test/resources/**/*.jar
 *.war
 *.ear
 *.zip

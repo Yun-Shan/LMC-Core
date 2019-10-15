@@ -99,6 +99,12 @@ subprojects {
         testImplementation 'io.netty:netty-all:4.1.21.Final'
     }
 
+    test {
+        testLogging {
+            exceptionFormat = 'full'
+        }
+    }
+
     publishing {
         publications {
             Plugin(MavenPublication) {
