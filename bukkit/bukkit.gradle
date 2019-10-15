@@ -16,7 +16,8 @@ repositories {
     }
     maven {
         name 'ProtocolLib Repo'
-        url 'http://repo.dmulloy2.net/nexus/repository/public/'
+        // url 'http://repo.dmulloy2.net/nexus/repository/public/'
+        url 'https://dl.bintray.com/yun-shan/ProtocolLib-Temporary/'
     }
 }
 
