@@ -1,2 +1,12 @@
-ext.type = 'API'
+ext.type = 'Common'
 archivesBaseName = "${rootProject.name}-${ext.type}"
+
+dependencies {
+    // ORM: ORMLite
+    api 'com.j256.ormlite:ormlite-core:5.1'
+    api 'com.j256.ormlite:ormlite-jdbc:5.1'
+    // CGLIB
+    api('cglib:cglib:3.2.6') {
+        exclude group: 'org.apache.ant', module: 'ant'
+    }
+}

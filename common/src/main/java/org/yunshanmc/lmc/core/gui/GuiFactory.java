@@ -2,6 +2,7 @@ package org.yunshanmc.lmc.core.gui;
 
 import org.yunshanmc.lmc.core.gui.components.BaseComponent;
 import org.yunshanmc.lmc.core.gui.components.Container;
+import org.yunshanmc.lmc.core.util.PlatformUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +14,12 @@ public class GuiFactory {
     private String title;
     private int row;
     private List<BaseComponent> components = new ArrayList<>();
+
+    public GuiFactory() {
+        if (invProvider == null) {
+            throw new UnsupportedOperationException("Gui Unsupported at " + PlatformUtils.getPlatform());
+        }
+    }
 
     /**
      * 设置GUI的标题
@@ -67,6 +74,9 @@ public class GuiFactory {
     }
 
     public static void setInvProvider(InvProvider invProvider) {
+        if (GuiFactory.invProvider != null) {
+            throw new IllegalStateException();
+        }
         GuiFactory.invProvider = invProvider;
     }
 }

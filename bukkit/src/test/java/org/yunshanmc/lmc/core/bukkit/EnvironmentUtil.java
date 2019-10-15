@@ -21,7 +21,12 @@ public final class EnvironmentUtil extends CommonEnvironmentUtil {
         throw new Error();
     }
 
+    private static boolean hasMocked;
+
     public static void mockBukkit() {
+        if (hasMocked) {
+            return;
+        }
         try {
             f_platform.set(null, PlatformUtils.PlatformType.Bukkit);
             f_SENDER_CLASS.set(null, CommandSender.class);
@@ -50,6 +55,7 @@ public final class EnvironmentUtil extends CommonEnvironmentUtil {
             })
         );
         BukkitUtils.init();
+        hasMocked = true;
     }
 
 }

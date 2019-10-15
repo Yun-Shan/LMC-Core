@@ -46,4 +46,9 @@ public class JdbcDatabase extends BaseDatabase {
         this.checkNotClosed();
         return this.connection;
     }
+
+    @Override
+    protected void tryPing() throws SQLException {
+        this.connection.createStatement().execute(this.dbType.getTestSQL());
+    }
 }

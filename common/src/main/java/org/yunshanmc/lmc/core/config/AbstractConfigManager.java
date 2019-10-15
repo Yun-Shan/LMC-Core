@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import org.yunshanmc.lmc.core.resource.Resource;
 import org.yunshanmc.lmc.core.resource.ResourceManager;
 
+import javax.annotation.Nonnull;
 import java.util.Map;
 
 /**
@@ -17,6 +18,11 @@ public abstract class AbstractConfigManager implements ConfigManager {
 
     public AbstractConfigManager(ResourceManager resourceManager) {
         this.resourceManager = resourceManager;
+    }
+
+    @Override
+    public <T> T getConfig(Class<T> clazz) {
+        return ConfigFactory.loadConfig(this, clazz);
     }
 
     @Override
@@ -83,8 +89,21 @@ public abstract class AbstractConfigManager implements ConfigManager {
         return cfgs;
     }
 
+    @Nonnull
     @Override
-    public LMCConfiguration getPluginConfig() {
-        return getConfig("config.yml");
+    public LMCConfiguration getMainConfig() {
+        LMCConfiguration config = getConfig("config.yml");
+        if (config == null) {
+            config = this.createEmptyConfig();
+        }
+        return config;
     }
+
+    /**
+     * 创建一个新的空配置，目前暂时仅用于保证{@link #getMainConfig()}非空
+     *
+     * @return 新的空配置
+     */
+    @Nonnull
+    protected abstract LMCConfiguration createEmptyConfig();
 }

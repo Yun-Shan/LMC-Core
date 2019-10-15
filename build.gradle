@@ -20,9 +20,9 @@ allprojects {
 }
 
 subprojects {
-    apply plugin: 'java'
+    apply plugin: 'java-library'
     apply plugin: 'maven-publish'
-    
+
     group = 'org.yunshanmc'
     version = "$pluginVersion.${rootProject.ext.buildNumber}-$pluginVersionType"
 
@@ -31,7 +31,7 @@ subprojects {
 
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'
-        options.compilerArgs = ['-parameters', '-Xlint:deprecation']
+        options.compilerArgs = ['-parameters', '-Xlint:deprecation', '-Xlint:unchecked']
     }
 
     def jacocoExecutionDataFiles = fileTree(buildDir).include("/jacoco/*.exec")
@@ -60,14 +60,6 @@ subprojects {
         archives javadocJar
     }
 
-    jar {
-        from {
-            configurations.compile.collect {
-                it.isDirectory() ? it : zipTree(it)
-            }
-        }
-    }
-
     repositories {
         maven {
             name 'Aliyun Maven Center'
@@ -84,27 +76,29 @@ subprojects {
     }
 
     dependencies {
-        compileOnly 'org.projectlombok:lombok:1.18.8'
-        annotationProcessor 'org.projectlombok:lombok:1.18.8'
+        compileOnly 'org.projectlombok:lombok:1.18.10'
+        annotationProcessor 'org.projectlombok:lombok:1.18.10'
         
         compileOnly 'com.google.guava:guava:22.0'
         compileOnly 'org.yaml:snakeyaml:1.25'
         compileOnly 'io.netty:netty-all:4.1.21.Final'
 
         // ORM: ORMLite
-        compile 'com.j256.ormlite:ormlite-core:5.1'
-        compile 'com.j256.ormlite:ormlite-jdbc:5.1'
+        implementation 'com.j256.ormlite:ormlite-core:5.1'
+        implementation 'com.j256.ormlite:ormlite-jdbc:5.1'
         // CGLIB
-        compile('cglib:cglib:3.2.6') {
+        implementation('cglib:cglib:3.2.6') {
             exclude group: 'org.apache.ant', module: 'ant'
         }
 
-        testCompile 'junit:junit:4.12'
-        testCompile 'org.yaml:snakeyaml:1.18'
-        testCompile 'com.google.guava:guava:22.0'
-        testCompile 'io.netty:netty-all:4.1.21.Final'
+        testCompileOnly 'org.projectlombok:lombok:1.18.10'
+        testAnnotationProcessor 'org.projectlombok:lombok:1.18.10'
+        testImplementation 'junit:junit:4.12'
+        testImplementation 'org.yaml:snakeyaml:1.18'
+        testImplementation 'com.google.guava:guava:22.0'
+        testImplementation 'io.netty:netty-all:4.1.21.Final'
     }
-    
+
     publishing {
         publications {
             Plugin(MavenPublication) {

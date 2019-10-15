@@ -72,9 +72,7 @@ public final class ExceptionHandler {
 
     public static void handle(Throwable t) {
         // 测试环境的错误不能被错误处理器掩盖
-        try {
-            assert false;
-        } catch (AssertionError e) {
+        if (PlatformUtils.isInTest()) {
             t.printStackTrace();
             assert false;
             return;

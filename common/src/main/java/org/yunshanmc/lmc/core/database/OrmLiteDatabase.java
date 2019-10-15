@@ -1,5 +1,6 @@
 package org.yunshanmc.lmc.core.database;
 
+import com.google.common.base.Strings;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
 import com.j256.ormlite.logger.Log;
@@ -47,12 +48,14 @@ public class OrmLiteDatabase extends BaseDatabase {
 
         Log.Level level = Log.Level.ERROR;
         if (this.dbConfig != null) {
-            String levelStr = this.dbConfig.getString("logLevel", "");
-            try {
-                level = Log.Level.valueOf(levelStr.toUpperCase());
-            } catch (IllegalArgumentException ex) {
-                ExceptionHandler.handle(ex);
-                level = Log.Level.ERROR;
+            String levelStr = this.dbConfig.getString("logLevel");
+            if (!Strings.isNullOrEmpty(levelStr)) {
+                try {
+                    level = Log.Level.valueOf(levelStr.toUpperCase());
+                } catch (IllegalArgumentException ex) {
+                    ExceptionHandler.handle(ex);
+                    level = Log.Level.ERROR;
+                }
             }
         }
         CreateLoggerInterceptor.setLevel(plugin.getName(), level);
@@ -93,6 +96,14 @@ public class OrmLiteDatabase extends BaseDatabase {
         return this.connectionSource;
     }
 
+    @Override
+    protected void tryPing() throws SQLException {
+        if (this.connectionSource instanceof JdbcConnectionSource) {
+            DatabaseConnection conn = this.connectionSource.getReadOnlyConnection("");
+            conn.executeStatement(this.dbType.getTestSQL(), DatabaseConnection.DEFAULT_RESULT_FLAGS);
+        }
+    }
+
     static class CreateLoggerInterceptor implements MethodInterceptor {
 
         private static final Map<String, Log.Level> LEVELS = new HashMap<>();
@@ -114,13 +125,13 @@ public class OrmLiteDatabase extends BaseDatabase {
                 Field f = LoggerFactory.class.getDeclaredField("logType");
                 f.setAccessible(true);
                 interceptor.logType = (LoggerFactory.LogType) f.get(null);
-                f.set(null, enhancer.create(new Class[]{ String.class, int.class, String.class, String.class,
-                                                         Class.forName(LoggerFactory.class.getName() + "$1") },
-                                            new Object[]{ "LMC_Core_CreateLoggerInterceptor",
-                                                          LoggerFactory.LogType.values().length,
-                                                          "LMC-Core_CreateLoggerInterceptor",
-                                                          "LMC-Core_CreateLoggerInterceptor",
-                                                          null }));
+                f.set(null, enhancer.create(new Class[]{String.class, int.class, String.class, String.class,
+                        Class.forName(LoggerFactory.class.getName() + "$1")},
+                    new Object[]{"LMC_Core_CreateLoggerInterceptor",
+                        LoggerFactory.LogType.values().length,
+                        "LMC-Core_CreateLoggerInterceptor",
+                        "LMC-Core_CreateLoggerInterceptor",
+                        null}));
             } catch (NoSuchFieldException | IllegalAccessException | ClassNotFoundException e) {
                 ExceptionHandler.handle(e);
             }
@@ -153,8 +164,8 @@ public class OrmLiteDatabase extends BaseDatabase {
                     }
                     return proxyMethod.invoke(logger, proxyArgs);
                 };
-                return Proxy.newProxyInstance(CreateLoggerInterceptor.class.getClassLoader(), new Class[]{ Log.class },
-                                              handler);
+                return Proxy.newProxyInstance(CreateLoggerInterceptor.class.getClassLoader(), new Class[]{Log.class},
+                    handler);
             }
             return method.invoke(this.logType, args);
         }

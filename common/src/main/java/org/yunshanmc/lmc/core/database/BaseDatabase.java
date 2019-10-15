@@ -94,11 +94,21 @@ public abstract class BaseDatabase {
         this.closed = true;
     }
 
-    public void checkNotClosed() {
+    protected void checkNotClosed() {
         if (this.closed) {
             throw new IllegalStateException(messageSender.getMessage("database.close"));
         }
+        try {
+            this.tryPing();
+        } catch (SQLException e) {
+            ExceptionHandler.handle(e);
+        }
     }
+
+    /**
+     * 尝试Ping数据库(执行测试语句)，如果因为太长时间没活动被MySQL服务器断开，由于默认加了autoReconnect参数，在报错之后他会自动重连，用户体验Max
+     */
+    protected abstract void tryPing() throws SQLException;
 
     private boolean fail(String msgKey, Object... args) {
         messageSender.errorConsole("database." + msgKey, args);

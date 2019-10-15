@@ -28,6 +28,7 @@ public final class PlatformUtils {
     }
 
     private static final PlatformType PLATFORM;
+    private static final boolean inTest;
 
     static {
         PlatformType type;
@@ -48,6 +49,18 @@ public final class PlatformUtils {
             type = PlatformType.Unknown;
         }
         PLATFORM = type;
+        boolean test = false;
+        try {
+            assert false;
+        } catch (AssertionError e) {
+            test = true;
+        }
+        //noinspection ConstantConditions
+        inTest = test;
+    }
+
+    public static boolean isInTest() {
+        return inTest;
     }
 
     private static final Class<?> SENDER_CLASS;
@@ -153,7 +166,7 @@ public final class PlatformUtils {
     /**
      * 根据UUID获取玩家名
      * <p>
-     * 注意：当且仅当玩家在线时可获取，其它时候返回null
+     * 注意：只有玩家曾经进入过服务器才能获取，如果对应UUID的玩家从未进入过服务器则返回null
      *
      * @param uuid 玩家UUID
      * @return 玩家名

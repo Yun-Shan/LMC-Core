@@ -5,6 +5,7 @@ import org.yunshanmc.lmc.core.gui.components.BaseComponent;
 import org.yunshanmc.lmc.core.gui.components.Container;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 public class Gui {
 
@@ -30,6 +31,7 @@ public class Gui {
         this.icons = icons;
         this.components = components;
         this.containers = containers;
+        this.invProvider = Objects.requireNonNull(invProvider);
         this.inputs = new Container[icons.length];
         this.outputs = new Container[icons.length];
         Arrays.stream(containers)
@@ -46,7 +48,6 @@ public class Gui {
                     this.outputs[slot] = c;
                 }
             });
-        this.invProvider = invProvider;
     }
 
     public Icon[] getIcons() {

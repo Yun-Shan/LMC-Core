@@ -19,13 +19,13 @@ public class LMCCoreBukkitPlugin extends BaseLMCBukkitPlugin {
 
     @Override
     protected void init() {
-        LMCCoreUtils.setLMCCorePlugin(this);
-        BukkitUtils.init();
         this.useGroupMessage = true;
     }
 
     @Override
     public void onEnable() {
+        LMCCoreUtils.setLMCCorePlugin(this);
+        BukkitUtils.init();
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(new GuiListener(), this);
     }

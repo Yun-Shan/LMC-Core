@@ -13,6 +13,7 @@ import java.util.Map;
 /**
  * @author Yun-Shan
  */
+@SuppressWarnings("unchecked")
 public abstract class AbstractPacketHandler extends SimpleChannelInboundHandler<AbstractPacket> {
 
     private final Map<Class<? extends AbstractPacket>, MethodHandle> handles = new HashMap<>();
@@ -53,7 +54,6 @@ public abstract class AbstractPacketHandler extends SimpleChannelInboundHandler<
             }
             Class newCls = cls.getSuperclass();
             if (AbstractPacket.class.isAssignableFrom(newCls)) {
-                //noinspection unchecked
                 cls = newCls;
             } else {
                 break;

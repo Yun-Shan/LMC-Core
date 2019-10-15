@@ -58,8 +58,8 @@ public class NetworkClient {
                             ch.pipeline().addLast(getHandlers.get());
                         }
                         ch.pipeline().addLast(new AbstractPacketHandler() {
+                            @SuppressWarnings("unchecked")
                             public void handle(ChannelHandlerContext ctx, BaseResponsivePacket packet) {
-                                //noinspection unchecked
                                 BiConsumer<ChannelHandlerContext, BaseResponsivePacket> handler = (BiConsumer<ChannelHandlerContext, BaseResponsivePacket>) responseHandles.remove(packet.getResponseId());
                                 if (handler != null) {
                                     handler.accept(ctx, packet);

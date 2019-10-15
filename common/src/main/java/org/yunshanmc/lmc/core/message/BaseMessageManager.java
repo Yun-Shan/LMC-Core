@@ -12,7 +12,9 @@ import org.yunshanmc.lmc.core.resource.ResourceManager;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 
@@ -30,6 +32,7 @@ public abstract class BaseMessageManager implements MessageManager {
     protected MessageContext context;
 
     private Map<String, Message> messageCache = new HashMap<>();
+    private Set<String> invalidKeyCache = new HashSet<>();
     private Map<String, String> defaultMsg;
     private int debugLevel;
 
@@ -70,13 +73,16 @@ public abstract class BaseMessageManager implements MessageManager {
     }
 
     @Override
-    public Message getMessage(String key, MessageContext context) {
+    public Message getMessage(final String key, MessageContext context) {
         if (context == null) {
             context = this.context;
         }
         Message message = this.messageCache.get(key);
         if (message == null) {
-            message = this.getMessageFromResource(key, context);
+            if (this.invalidKeyCache.contains(key)) {
+                return Message.getMissingMessage(key);
+            }
+            message = this.getMessageFromResource(key, context, true);
             if (message != null) {
                 this.messageCache.put(key, message);
             }
@@ -96,13 +102,18 @@ public abstract class BaseMessageManager implements MessageManager {
                     // 自己的__internal未找到且当前不是LMC-Core插件，则尝试LMC-Core提供的公共message
                     message = coreMsgManager.getMessage(key, context);
                 } else {
-                    // __internal的MissingMessage会换成没有__internal.前缀的key的MissingMessage
+                    // 这时message要么为null，是可以合并到下方的message == null判断的
+                    // 但是也可能是MissingMessage且有__internal前缀，见上方：message = this.getMessage(INTERNAL_START_PATH + key, context)
+                    // 这时就需要重新创建一个没有__internal前缀的
                     message = Message.getMissingMessage(key);
                 }
             }
         }
         if (message == null) {
-            return Message.getMissingMessage(key);
+            message = Message.getMissingMessage(key);
+        }
+        if (message.isMissingMessage()) {
+            this.invalidKeyCache.add(key);
         }
         return message;
     }
@@ -117,7 +128,7 @@ public abstract class BaseMessageManager implements MessageManager {
         return this.debugLevel;
     }
 
-    protected Message getMessageFromResource(String key, MessageContext context) {
+    protected Message getMessageFromResource(String key, MessageContext context, boolean useDef) {
         Resource res = this.resourceManager.getFolderResource(MESSAGE_PATH);
         String msg = null;
         try {
@@ -132,8 +143,8 @@ public abstract class BaseMessageManager implements MessageManager {
             e.printStackTrace();
         }
 
-        // 用户配置文件不存在或配置项不存在，尝试从默认配置获取
-        if (msg == null && this.defaultMsg.containsKey(key)) {
+        // 用户配置文件不存在或配置项不存在，且需要使用默认值，尝试从默认配置获取
+        if (msg == null && useDef && this.defaultMsg.containsKey(key)) {
             msg = this.defaultMsg.get(key);
         }
         // 存在用户配置或默认配置

@@ -1,12 +1,20 @@
 ext.type = 'BungeeCord'
 archivesBaseName = "${rootProject.name}-${ext.type}"
 
+jar {
+    from {
+        configurations.runtimeClasspath.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+}
+
 dependencies {
-    compile project(':common')
+    implementation project(':common')
     // https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
-    compile group: 'org.xerial', name: 'sqlite-jdbc', version: '3.27.2.1'
+    implementation 'org.xerial:sqlite-jdbc:3.27.2.1'
     compileOnly 'net.md-5:bungeecord-api:1.12-SNAPSHOT'
 
-    testCompile project(':common').sourceSets.test.output
-    testCompile 'net.md-5:bungeecord-api:1.12-SNAPSHOT'
+    testImplementation project(':common').sourceSets.test.output
+    testImplementation 'net.md-5:bungeecord-api:1.12-SNAPSHOT'
 }

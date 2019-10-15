@@ -1,0 +1,6 @@
+u_test1: ggu
+u_test2:
+  test2_1:
+    test2_1_1: $测试2u
+cover.BeCover_test:
+  gg: 成功覆盖

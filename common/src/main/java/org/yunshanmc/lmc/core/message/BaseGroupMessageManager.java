@@ -66,9 +66,10 @@ public abstract class BaseGroupMessageManager extends BaseMessageManager {
     }
 
     @Override
-    protected Message getMessageFromResource(String key, MessageContext context) {
+    protected Message getMessageFromResource(String key, MessageContext context, boolean useDef) {
         // 根目录的messages.yml的优先级高于messages目录下的分组信息
-        Message msg = super.getMessageFromResource(key, context);
+        // 第一次尝试时不使用默认值，避免默认的messages.yml覆盖了用户的分组信息
+        Message msg = super.getMessageFromResource(key, context, false);
         if (msg != null) {
             return msg;
         }
@@ -96,7 +97,12 @@ public abstract class BaseGroupMessageManager extends BaseMessageManager {
 
             // 用户配置中未找到，尝试在默认配置中查找
             if ((firstSep = path.indexOf(CFG_PATH_SEPARATOR)) == -1) {
-                return this.defMsgGroup.getMessage(key, context);
+                // messages.yml默认值优先于分组默认值
+                msg = super.getMessageFromResource(key, context, true);
+                if (msg == null) {
+                    msg = this.defMsgGroup.getMessage(key, context);
+                }
+                return msg;
             }
 
             chars[firstSep] = File.separatorChar;

@@ -33,10 +33,10 @@ public class BungeeUtils {
     private static volatile boolean inited = false;
 
     public static synchronized void init() {
-        ReflectUtils.checkSafeCall();
         if (inited) {
             return;
         }
+        ReflectUtils.checkSafeCall();
 
         PlatformUtils.setConsoleRawMessageSender(msg -> ProxyServer.getInstance().getConsole().sendMessage(TextComponent.fromLegacyText(msg)));
 
@@ -45,6 +45,7 @@ public class BungeeUtils {
         PluginManager pm = ProxyServer.getInstance().getPluginManager();
         PlatformUtils.setPluginGetter(pm::getPlugin);
         PlatformUtils.setPlayerNameGetter(id -> {
+            // TODO 文件缓存的方式保存UUID对应玩家名
             ProxiedPlayer player = ProxyServer.getInstance().getPlayer(id);
             return player != null ? player.getName() : null;
         });

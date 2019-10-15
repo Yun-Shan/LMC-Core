@@ -17,14 +17,13 @@ public class LMCCoreBungeeCordPlugin extends BaseLMCBungeeCordPlugin {
 
     @Override
     protected void init() {
-        LMCCoreUtils.setLMCCorePlugin(this);
-        BungeeUtils.init();
         this.useGroupMessage = true;
     }
 
     @Override
     public void onEnable() {
-
+        LMCCoreUtils.setLMCCorePlugin(this);
+        BungeeUtils.init();
     }
 
     @Override

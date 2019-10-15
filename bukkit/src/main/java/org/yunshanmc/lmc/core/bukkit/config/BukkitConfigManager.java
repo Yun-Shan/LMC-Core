@@ -7,6 +7,7 @@ import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.resource.Resource;
 import org.yunshanmc.lmc.core.resource.ResourceManager;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -27,5 +28,11 @@ public class BukkitConfigManager extends AbstractConfigManager {
             ExceptionHandler.handle(e);
             return null;
         }
+    }
+
+    @Nonnull
+    @Override
+    protected LMCConfiguration createEmptyConfig() {
+        return new BukkitLMCConfiguration(new YamlConfiguration());
     }
 }

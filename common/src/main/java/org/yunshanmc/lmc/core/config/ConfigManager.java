@@ -6,6 +6,8 @@ package org.yunshanmc.lmc.core.config;
 
 import org.yunshanmc.lmc.core.resource.Resource;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Map;
 
 /**
@@ -14,6 +16,17 @@ import java.util.Map;
  * @author Yun-Shan
  */
 public interface ConfigManager {
+
+    /**
+     * 通过注解读取配置
+     * TODO 读取过程中出现异常应抛出一个自定义异常，保证正常返回时必然不是null
+     *
+     * @param clazz 任意类，需要保证有一个无参构造函数
+     * @param <T>   任意类
+     * @return 实例化后的配置类，如果读取过程中出现异常则返回null
+     * @see ConfigFile
+     */
+    <T> T getConfig(Class<T> clazz);
 
     /**
      * 获取配置.
@@ -29,6 +42,7 @@ public interface ConfigManager {
      * @param path 配置文件的相对路径
      * @return 获取到的配置，当配置文件不存在或读取失败时返回null
      */
+    @Nullable
     LMCConfiguration getConfig(String path);
 
     /**
@@ -38,6 +52,7 @@ public interface ConfigManager {
      * @param path 配置文件的相对路径
      * @return 获取到的配置，当配置文件不存在或读取失败时返回null
      */
+    @Nullable
     LMCConfiguration getDefaultConfig(String path);
 
     /**
@@ -47,6 +62,7 @@ public interface ConfigManager {
      * @param path 配置文件的相对路径
      * @return 获取到的配置，当配置文件不存在或读取失败时返回null
      */
+    @Nullable
     LMCConfiguration getUserConfig(String path);
 
     /**
@@ -64,6 +80,7 @@ public interface ConfigManager {
      * @param deep 是否搜索子文件夹
      * @return 获取到的配置(K: 文件相对路径, V: 配置)，当找不到任何配置文件或读取失败时返回null
      */
+    @Nullable
     Map<String, LMCConfiguration> getConfigs(String path, boolean deep);
 
     /**
@@ -74,6 +91,7 @@ public interface ConfigManager {
      * @param deep 是否搜索子文件夹
      * @return 获取到的配置(K: 文件相对路径, V: 配置)，当找不到任何配置文件或读取失败时返回null
      */
+    @Nullable
     Map<String, LMCConfiguration> getDefaultConfigs(String path, boolean deep);
 
     /**
@@ -84,16 +102,18 @@ public interface ConfigManager {
      * @param deep 是否搜索子文件夹
      * @return 获取到的配置(K: 文件相对路径, V: 配置)，当找不到任何配置文件或读取失败时返回null
      */
+    @Nullable
     Map<String, LMCConfiguration> getUserConfigs(String path, boolean deep);
 
     /**
-     * 获取插件配置.
+     * 获取主配置.
      * <p>
      * 相当于调用<code>{@link #getConfig(String) getConfig}("config.yml")</code>
      *
-     * @return 插件配置，若没有配置也不会返回null
+     * @return 主配置(若没有配置也不会返回null ， 而是返回一个空的配置)
      */
-    LMCConfiguration getPluginConfig();
+    @Nonnull
+    LMCConfiguration getMainConfig();
 
     /**
      * 从资源中读取配置
@@ -101,5 +121,6 @@ public interface ConfigManager {
      * @param resource 配置所在资源
      * @return 读取到的配置，读取失败返回null
      */
+    @Nullable
     LMCConfiguration readConfig(Resource resource);
 }

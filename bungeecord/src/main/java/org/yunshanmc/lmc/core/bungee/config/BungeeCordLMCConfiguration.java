@@ -60,7 +60,7 @@ public class BungeeCordLMCConfiguration implements LMCConfiguration {
             if (obj == null) {
                 F_DECLARED.set(this.config, defaults);
             } else {
-                // 多级缓存不会生效，不过由于应用场景较少暂不优化
+                // TODO 多级缓存不会生效，先加进TODO，不过由于应用场景较少暂不优化
                 Map<String, Object> map = (Map<String, Object>) F_SELF.get(defaults);
                 Configuration rawDefaults = (Configuration) obj;
                 for (Map.Entry<String, Object> entry : map.entrySet()) {
@@ -83,6 +83,11 @@ public class BungeeCordLMCConfiguration implements LMCConfiguration {
         return new BungeeCordLMCConfiguration(section);
     }
 
+    @Override
+    public boolean isSet(@Nonnull String path) {
+        return config.get(path) != null;
+    }
+
     @Nullable
     @Override
     public Object get(@Nonnull String path) {
@@ -101,9 +106,9 @@ public class BungeeCordLMCConfiguration implements LMCConfiguration {
         return config.getString(path);
     }
 
-    @Nullable
+    @Nonnull
     @Override
-    public String getString(@Nonnull String path, String def) {
+    public String getString(@Nonnull String path, @Nonnull String def) {
         return config.getString(path, def);
     }
 
@@ -115,5 +120,15 @@ public class BungeeCordLMCConfiguration implements LMCConfiguration {
     @Override
     public int getInt(@Nonnull String path, int def) {
         return config.getInt(path, def);
+    }
+
+    @Override
+    public boolean getBoolean(@Nonnull String path) {
+        return config.getBoolean(path);
+    }
+
+    @Override
+    public boolean getBoolean(@Nonnull String path, boolean def) {
+        return config.getBoolean(path, def);
     }
 }

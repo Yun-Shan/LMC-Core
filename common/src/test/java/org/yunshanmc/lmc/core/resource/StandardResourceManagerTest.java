@@ -3,8 +3,6 @@ package org.yunshanmc.lmc.core.resource;
 import com.google.common.io.ByteStreams;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.yunshanmc.lmc.core.resource.Resource;
-import org.yunshanmc.lmc.core.resource.StandardResourceManager;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -27,9 +25,11 @@ public class StandardResourceManagerTest {
 
     @BeforeClass
     public static void setUp() throws Exception {
+        // 由于该类中的测试有直接写jar文件的操作，为避免影响其它测试，使用自己独立的jar文件
+
         m_resolvePath = StandardResourceManager.class.getDeclaredMethod("resolvePath", String.class, FileSystem.class);
         m_resolvePath.setAccessible(true);
-        testDir = new File("build" + File.separator + "testing");
+        testDir = Paths.get("build", "resources", "test").toAbsolutePath().toFile();
         if (!testDir.exists()) assertTrue(testDir.mkdirs());
 
         testJar = new File(testDir, "standardRM.jar");
@@ -43,8 +43,7 @@ public class StandardResourceManagerTest {
         out.closeEntry();
         out.flush();
         out.close();
-        Constructor<StandardResourceManager> c = StandardResourceManager.class.getDeclaredConstructor(File.class,
-            Path.class);
+        Constructor<StandardResourceManager> c = StandardResourceManager.class.getDeclaredConstructor(File.class, Path.class);
         c.setAccessible(true);
         resourceManager = c.newInstance(testJar, testDir.toPath());
     }
@@ -75,7 +74,6 @@ public class StandardResourceManagerTest {
         out.close();
         resourceManager.updateJar();
         assertEquals(4, resourceManager.getSelfResources("/", null, true).values().size());
-        System.out.println(resourceManager.getSelfResources("/", null, true));
         Resource res = resourceManager.getSelfResource("b/c");
         assertNotNull(res);
         assertArrayEquals(ByteStreams.toByteArray(res.getInputStream()),

@@ -17,10 +17,12 @@ public class DefaultMessageManagerTest {
 
     @Test
     public void getMessage() {
-        assertEquals("gg", getRawMessage("_test1"));
-        assertEquals("$测试2", getRawMessage("_test2.test2_1.test2_1_1"));
+        assertEquals("gg", getRawMessage("test1"));
+        assertEquals("$测试2", getRawMessage("test2.test2_1.test2_1_1"));
+        assertEquals("ggu", getRawMessage("u_test1"));
+        assertEquals("$测试2u", getRawMessage("u_test2.test2_1.test2_1_1"));
         assertEquals("成功覆盖", getRawMessage("cover.BeCover_test.gg"));
-        assertEquals("§c未知的提示信息模板：null_key",
+        assertEquals("§c未知的提示信息模板： null_key",
             messageManager.getMessage("null_key").getMessage(null));
     }
 

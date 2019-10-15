@@ -45,6 +45,7 @@ public class I18nResourceManager extends StandardResourceManager {
             /* 空路径为资源未国际化时的默认路径 */
             Paths.get("")
         });
+        this.localeManager.setLocale(this.localeManager.getLocale());
     }
 
     @Override

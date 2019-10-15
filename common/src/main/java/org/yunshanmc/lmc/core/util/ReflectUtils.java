@@ -68,9 +68,7 @@ public final class ReflectUtils {
 
     public static void checkSafeCall() {
         // 测试环境不进行安全检查
-        try {
-            assert false;
-        } catch (AssertionError e) {
+        if (isInTest()) {
             return;
         }
 
@@ -92,11 +90,21 @@ public final class ReflectUtils {
                     return;
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                ExceptionHandler.handle(e);
                 break;
             }
         } while (false);
         throw new Error("unsafe call");
+    }
+
+    public static boolean isInTest() {
+        // 为了安全起见 不使用PlatformUtils.isInTest判断平台而是直接判断
+        try {
+            assert false;
+            return false;
+        } catch (AssertionError e) {
+            return true;
+        }
     }
 
 }

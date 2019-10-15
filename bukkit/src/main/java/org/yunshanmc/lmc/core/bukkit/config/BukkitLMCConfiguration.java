@@ -50,6 +50,11 @@ public class BukkitLMCConfiguration implements LMCConfiguration {
         return new BukkitLMCConfiguration(section);
     }
 
+    @Override
+    public boolean isSet(@Nonnull String path) {
+        return config.isSet(path);
+    }
+
     @Nullable
     @Override
     public Object get(@Nonnull String path) {
@@ -69,9 +74,9 @@ public class BukkitLMCConfiguration implements LMCConfiguration {
         return config.getString(path);
     }
 
-    @Nullable
+    @Nonnull
     @Override
-    public String getString(@Nonnull String path, String def) {
+    public String getString(@Nonnull String path, @Nonnull String def) {
         return config.getString(path, def);
     }
 
@@ -83,5 +88,15 @@ public class BukkitLMCConfiguration implements LMCConfiguration {
     @Override
     public int getInt(@Nonnull String path, int def) {
         return config.getInt(path, def);
+    }
+
+    @Override
+    public boolean getBoolean(@Nonnull String path) {
+        return config.getBoolean(path);
+    }
+
+    @Override
+    public boolean getBoolean(@Nonnull String path, boolean def) {
+        return config.getBoolean(path, def);
     }
 }

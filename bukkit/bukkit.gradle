@@ -1,18 +1,31 @@
 ext.type = 'Bukkit'
 archivesBaseName = "${rootProject.name}-${ext.type}"
 
+jar {
+    from {
+        configurations.runtimeClasspath.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+}
+
 repositories {
     maven {
-        name 'For PlaceholderAPI'
+        name 'PlaceholderAPI Repo'
         url 'http://repo.extendedclip.com/content/repositories/placeholderapi/'
+    }
+    maven {
+        name 'ProtocolLib Repo'
+        url 'http://repo.dmulloy2.net/nexus/repository/public/'
     }
 }
 
 dependencies {
-    compile project(':common')
+    implementation project(':common')
     compileOnly 'org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT'
+    compileOnly 'com.comphenix.protocol:ProtocolLib:4.4.0'
     compileOnly 'me.clip:placeholderapi:2.0.8'
 
-    testCompile project(':common').sourceSets.test.output
-    testCompile 'org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT'
+    testImplementation project(':common').sourceSets.test.output
+    testImplementation 'org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT'
 }

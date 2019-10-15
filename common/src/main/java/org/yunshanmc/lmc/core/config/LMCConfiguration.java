@@ -34,6 +34,14 @@ public interface LMCConfiguration {
     LMCConfiguration getSection(String path);
 
     /**
+     * 获取指定路径是否有值
+     *
+     * @param path 配置路径
+     * @return 对应路径是否有值
+     */
+    boolean isSet(@Nonnull String path);
+
+    /**
      * 获取指定路径的对象
      *
      * @param path 配置路径
@@ -69,8 +77,8 @@ public interface LMCConfiguration {
      * @param def  默认值
      * @return 对应路径的字符串，不存在时返回默认值
      */
-    @Nullable
-    String getString(@Nonnull String path, @Nullable String def);
+    @Nonnull
+    String getString(@Nonnull String path, @Nonnull String def);
 
     /**
      * 获取指定路径的int
@@ -85,7 +93,24 @@ public interface LMCConfiguration {
      *
      * @param path 配置路径
      * @param def  默认值
-     * @return 对应路径的字符串，不存在时返回默认值
+     * @return 对应路径的int，不存在时返回默认值
      */
     int getInt(@Nonnull String path, int def);
+
+    /**
+     * 获取指定路径的boolean
+     *
+     * @param path 配置路径
+     * @return 对应路径的boolean，不存在时返回false
+     */
+    boolean getBoolean(@Nonnull String path);
+
+    /**
+     * 获取指定路径的boolean
+     *
+     * @param path 配置路径
+     * @param def  默认值
+     * @return 对应路径的boolean，不存在时返回默认值
+     */
+    boolean getBoolean(@Nonnull String path, boolean def);
 }

@@ -2,15 +2,22 @@ package org.yunshanmc.lmc.core.bukkit.util;
 
 import com.google.common.base.Strings;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.yunshanmc.lmc.core.bukkit.command.BukkitLMCCommandSender;
 import org.yunshanmc.lmc.core.bukkit.gui.BukkitInvProvider;
+import org.yunshanmc.lmc.core.bukkit.gui.sign.BukkitSignEditorProvider;
 import org.yunshanmc.lmc.core.command.AbstractParameterConverter;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.gui.GuiFactory;
+import org.yunshanmc.lmc.core.gui.sign.SignHelper;
 import org.yunshanmc.lmc.core.resource.Resource;
 import org.yunshanmc.lmc.core.util.PlatformUtils;
 import org.yunshanmc.lmc.core.util.ReflectUtils;
@@ -32,10 +39,10 @@ public final class BukkitUtils {
     private static volatile boolean inited = false;
 
     public static synchronized void init() {
-        ReflectUtils.checkSafeCall();
         if (inited) {
             return;
         }
+        ReflectUtils.checkSafeCall();
 
         PlatformUtils.setConsoleRawMessageSender(msg -> Bukkit.getConsoleSender().sendMessage(msg.split("\\n")));
 
@@ -44,11 +51,14 @@ public final class BukkitUtils {
         PluginManager pm = Bukkit.getPluginManager();
         PlatformUtils.setPluginGetter(pm::getPlugin);
         PlatformUtils.setPlayerNameGetter(id -> {
-            Player player = Bukkit.getPlayer(id);
-            return player != null ? player.getName() : null;
+            OfflinePlayer player = Bukkit.getOfflinePlayer(id);
+            return (player instanceof Player || player.hasPlayedBefore()) ? player.getName() : null;
         });
 
-        GuiFactory.setInvProvider(new BukkitInvProvider());
+        if (!PlatformUtils.isInTest()) {
+            GuiFactory.setInvProvider(new BukkitInvProvider());
+            SignHelper.setEditorProvider(BukkitSignEditorProvider.getInstance());
+        }
 
         inited = true;
     }
@@ -113,5 +123,26 @@ public final class BukkitUtils {
             return resList.get(skipSelf ? 1 : 0);
         }
         return null;
+    }
+
+    /**
+     * 正版玩家头颅预载
+     * <p>
+     * 服务器需要通过Mojang API获取正版玩家头颅皮肤，可能导致服务器顿卡。
+     * 通过提前异步加载皮肤解决
+     *
+     * @param ownerNames 头颅所属正版玩家名
+     */
+    @SuppressWarnings("deprecation")
+    public static void skullPreload(String... ownerNames) {
+        //TODO 改为手动访问Mojang API批量获取玩家信息的方式，避免被Mojang服务器ban IP
+        Inventory inv = Bukkit.createInventory(null, 9);
+        ItemStack item = new ItemStack(Material.SKULL_ITEM, 1);
+        SkullMeta meta = (SkullMeta) item.getItemMeta();
+        for (String name : ownerNames) {
+            meta.setOwner(name);
+            item.setItemMeta(meta);
+            inv.setItem(0, item);
+        }
     }
 }

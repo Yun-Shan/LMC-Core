@@ -8,6 +8,7 @@ import java.util.Map;
 
 /**
  * @author Yun-Shan
+ * TODO 由于现在同时被命令模块和配置模块使用，需要独立出一个模块，考虑定为表达式模块
  */
 public abstract class AbstractParameterConverter<T> {
 

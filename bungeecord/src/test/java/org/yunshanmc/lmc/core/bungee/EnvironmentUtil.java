@@ -24,7 +24,13 @@ public final class EnvironmentUtil extends CommonEnvironmentUtil {
         throw new Error();
     }
 
+    private static boolean hasMocked;
+
     public static void mockBungeeCord() {
+        // TODO 所有Bukkit的测试，能移到common的移到common，不能的 如果能在其它平台复制一份的都复制一份 注意提炼共同代码
+        if (hasMocked) {
+            return;
+        }
         try {
             f_platform.set(null, PlatformUtils.PlatformType.BungeeCord);
             f_SENDER_CLASS.set(null, CommandSender.class);
@@ -51,6 +57,8 @@ public final class EnvironmentUtil extends CommonEnvironmentUtil {
         pmar.set(new PluginManager(ProxyServer.getInstance()));
 
         BungeeUtils.init();
+
+        hasMocked = true;
     }
 
 }
