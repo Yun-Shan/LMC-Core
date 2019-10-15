@@ -1,6 +1,8 @@
 # LMC-Core
 [![Build Status](https://travis-ci.org/Yun-Shan/LMC-Core.svg?branch=master)](https://travis-ci.org/Yun-Shan/LMC-Core)
 [![Coverage Status](https://coveralls.io/repos/github/Yun-Shan/LMC-Core/badge.svg?branch=master)](https://coveralls.io/github/Yun-Shan/LMC-Core?branch=master)
+[![GitHub repo size](https://img.shields.io/github/repo-size/Yun-Shan/LMC-Core)](https://github.com/Yun-Shan/LMC-Core/graphs/contributors)
+[![GitHub](https://img.shields.io/github/license/Yun-Shan/LMC-Core)](https://github.com/Yun-Shan/LMC-Core/blob/master/LICENSE)
 [![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu)
 ---
 
