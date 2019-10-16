@@ -36,7 +36,9 @@ public class PAPIMessageFormat extends DefaultMessageFormat {
     public String format(Object player, String msg, Object... args) {
         PlatformUtils.checkPlayer(player);
         msg = super.format(player, msg, args);
-        if (isPlaceholderAPIEnable) msg = PlaceholderAPI.setPlaceholders((Player) player, msg);
+        if (isPlaceholderAPIEnable) {
+            msg = PlaceholderAPI.setPlaceholders((Player) player, msg);
+        }
         return msg;
     }
 }

@@ -56,7 +56,8 @@ public interface Resource {
     /**
      * 获取URL对应的文件.
      * <p>
-     * 只支持file, jar协议的url
+     * 只支持file, jar协议的url<br>
+     * 当协议为jar时只返回jar文件，不包含该文件在jar中的路径
      *
      * @param url 要获取文件的URL
      * @return 获取到的文件

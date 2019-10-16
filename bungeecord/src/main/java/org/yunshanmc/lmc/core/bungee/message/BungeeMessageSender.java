@@ -65,7 +65,7 @@ public class BungeeMessageSender extends BaseMessageSender {
 
     @Override
     public String getMessage(String msgKey, Object player, Object... args) {
-        return this.messageManager.getMessage(msgKey).getMessage(player, args);
+        return this.messageManager.getMessage(msgKey).getMessageForPlayer(player, args);
     }
 
     @Override
@@ -85,10 +85,10 @@ public class BungeeMessageSender extends BaseMessageSender {
     public void message(Object receiver, String type, String msgKey, Object... args) {
         PlatformUtils.checkCommandSender(receiver);
         ProxiedPlayer player = receiver instanceof ProxiedPlayer ? (ProxiedPlayer) receiver : FAKE_PLAYER_BUNGEE;
-        String[] msgs = this.messageManager.getMessage(msgKey).getMessages(player, args);
+        String[] msgs = this.messageManager.getMessage(msgKey).getMessagesForPlayer(player, args);
         for (String msg : msgs) {
             // 将信息放入类型模板
-            msg = this.messageManager.getMessage("message.type." + type).getMessage(player, msg);
+            msg = this.messageManager.getMessage("message.type." + type).getMessageForPlayer(player, msg);
             ((CommandSender) receiver).sendMessage(TextComponent.fromLegacyText(msg));
         }
     }

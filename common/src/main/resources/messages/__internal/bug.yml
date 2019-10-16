@@ -3,11 +3,11 @@ common:
   foot: "§d为了LMC-Core更好的发展，请将BUG信息报告插件作者！"
 
 SimpleCommandRegister: |
-  {##bug.common.head}
+  {#bug.common.head}
   §6Type：§9SimpleCommandRegister
   §6ExceptionType：§9{1}
   §6ExceptionMessage：§9{2}
   §6CommandName：§9{3}
   §6DeclaringClass：§9{4}
   §6MethodSignature：§9{5}
-  {##bug.common.foot}
+  {#bug.common.foot}

@@ -14,22 +14,22 @@ public class MockMessage extends BaseMessage {
     }
 
     @Override
-    public String getMessage(Object player, Object... args) {
+    public String getMessageForPlayer(Object player, Object... args) {
         return msg;
     }
 
     @Override
-    public String[] getMessages(Object player, Object... args) {
+    public String[] getMessagesForPlayer(Object player, Object... args) {
         return new String[]{ msg };
     }
 
     @Override
-    public String getMessage(UUID playerId, Object... args) {
+    public String getMessageForPlayer(UUID playerId, Object... args) {
         return msg;
     }
 
     @Override
-    public String[] getMessages(UUID playerId, Object... args) {
+    public String[] getMessagesForPlayer(UUID playerId, Object... args) {
         return new String[]{ msg };
     }
 }

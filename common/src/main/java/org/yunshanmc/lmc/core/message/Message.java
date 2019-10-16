@@ -20,13 +20,17 @@ public interface Message {
 
     String getRawMessage();
 
-    String getMessage(Object player, Object... args);
+    String getMessageForPlayer(Object player, Object... args);
 
-    String[] getMessages(Object player, Object... args);
+    String[] getMessagesForPlayer(Object player, Object... args);
 
-    String getMessage(UUID playerId, Object... args);
+    String getMessageForPlayer(UUID playerId, Object... args);
 
-    String[] getMessages(UUID playerId, Object... args);
+    String[] getMessagesForPlayer(UUID playerId, Object... args);
+
+    String getMessage(Object... args);
+
+    String[] getMessages(Object... args);
 
     static Message getMissingMessage(String msg) {
         String missingMsg = BuiltinMessage.getMessage("MissingLanguage", msg);

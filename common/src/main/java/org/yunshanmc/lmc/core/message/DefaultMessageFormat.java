@@ -23,9 +23,9 @@ public class DefaultMessageFormat implements MessageFormat {
     private static final Pattern VARIABLE_PATTERN =
         Pattern.compile("" +
             "\\{(" +
-            "(?<idx>[0-9]+)" +
-            "|(?<subMsg>##[\\w.]+)" +
-            "|(?<context>\\$[\\w.]+)" +
+            "(?<idx>[0-9]{1,2})" + // 按序号参数，最多两位数
+            "|(?<subMsg>#[\\w.]+)" + // 引用其它信息，不限长度
+            "|(?<context>%[\\w.]+)" + // 上下文变量，暂时不限长度
             // "|(?<js>&[^}]+)" + // TODO js功能
             ")}");
 
@@ -42,8 +42,8 @@ public class DefaultMessageFormat implements MessageFormat {
                     val = String.valueOf(args[idx - 1]);
                 }
             } else if ((key = matcher.group("subMsg")) != null) {
-                Message message = this.context.getMessageManager().getMessage(key.substring(2));
-                val = message.getMessage(null);
+                Message message = this.context.getMessageManager().getMessage(key.substring(1));
+                val = message.getMessage();
 
                 if (val != null) {
                     val = "§r" + val + "§r";

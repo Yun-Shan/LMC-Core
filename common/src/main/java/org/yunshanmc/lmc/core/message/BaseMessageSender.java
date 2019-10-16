@@ -24,7 +24,7 @@ public abstract class BaseMessageSender implements MessageSender {
 
     @Override
     public String getMessage(String msgKey, UUID playerId, Object... args) {
-        return this.messageManager.getMessage(msgKey).getMessage(playerId, args);
+        return this.messageManager.getMessage(msgKey).getMessageForPlayer(playerId, args);
     }
 
     @Override

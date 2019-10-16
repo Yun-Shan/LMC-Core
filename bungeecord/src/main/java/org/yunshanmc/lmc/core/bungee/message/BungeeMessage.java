@@ -29,7 +29,7 @@ public class BungeeMessage extends BaseMessage {
     }
 
     @Override
-    public String getMessage(Object player, Object... args) {
+    public String getMessageForPlayer(Object player, Object... args) {
         if (player != null) {
             PlatformUtils.checkPlayer(player);
         }
@@ -37,7 +37,7 @@ public class BungeeMessage extends BaseMessage {
     }
 
     @Override
-    public String[] getMessages(Object player, Object... args) {
+    public String[] getMessagesForPlayer(Object player, Object... args) {
         if (player != null) {
             PlatformUtils.checkPlayer(player);
         }
@@ -49,22 +49,22 @@ public class BungeeMessage extends BaseMessage {
     }
 
     @Override
-    public String getMessage(UUID playerId, Object... args) {
-        if (playerId == null) return getMessage((Object) null, args);
+    public String getMessageForPlayer(UUID playerId, Object... args) {
+        if (playerId == null) return getMessageForPlayer((Object) null, args);
         ProxiedPlayer p = ProxyServer.getInstance().getPlayer(playerId);
         if (p != null) {
-            return this.getMessage(p, args);
+            return this.getMessageForPlayer(p, args);
         } else {
             return null;
         }
     }
 
     @Override
-    public String[] getMessages(UUID playerId, Object... args) {
-        if (playerId == null) return getMessages((Object) null, args);
+    public String[] getMessagesForPlayer(UUID playerId, Object... args) {
+        if (playerId == null) return getMessagesForPlayer((Object) null, args);
         ProxiedPlayer p = ProxyServer.getInstance().getPlayer(playerId);
         if (p != null) {
-            return this.getMessages(p, args);
+            return this.getMessagesForPlayer(p, args);
         } else {
             return null;
         }

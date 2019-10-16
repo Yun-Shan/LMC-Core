@@ -26,18 +26,18 @@ public class BukkitMessageSender extends BaseMessageSender {
                 switch (method.getName()) {
                     case "sendMessage":
                         if (args[0] instanceof String) {
-                            Bukkit.getConsoleSender().sendMessage(
-                                (String) args[0]);
+                            Bukkit.getConsoleSender().sendMessage("[LMC-FakePlayer]" + args[0]);
                         } else if (args[0] instanceof String[]) {
-                            Bukkit.getConsoleSender().sendMessage(
-                                (String[]) args[0]);
+                            for (String msg : (String[]) args[0]) {
+                                Bukkit.getConsoleSender().sendMessage("[LMC-FakePlayer]" + msg);
+                            }
                         }
                         return null;
                     case "getName":
                     case "getDisplayName":
                     case "getCustomName":
                     case "getPlayerListName":
-                        return "[$LMC-Mock$]";
+                        return "[$LMC-FakePlayer$]";
                     default:
                         throw new UnsupportedOperationException();
                 }
@@ -50,7 +50,7 @@ public class BukkitMessageSender extends BaseMessageSender {
 
     @Override
     public String getMessage(String msgKey, Object player, Object... args) {
-        return this.messageManager.getMessage(msgKey).getMessage(player, args);
+        return this.messageManager.getMessage(msgKey).getMessageForPlayer(player, args);
     }
 
     @Override
@@ -70,17 +70,22 @@ public class BukkitMessageSender extends BaseMessageSender {
     public void message(Object receiver, String type, String msgKey, Object... args) {
         PlatformUtils.checkCommandSender(receiver);
         Player player = receiver instanceof Player ? (Player) receiver : FAKE_PLAYER_BUKKIT;
-        String[] msgs = this.messageManager.getMessage(msgKey).getMessages(player, args);
+        String[] msgs = this.messageManager.getMessage(msgKey).getMessagesForPlayer(player, args);
         // 将信息放入类型模板
         for (int i = 0; i < msgs.length; i++) {
-            msgs[i] = this.messageManager.getMessage("message.type." + type).getMessage(player, msgs[i]);
+            msgs[i] = this.messageManager.getMessage("message.type." + type).getMessageForPlayer(player, msgs[i]);
         }
-        ((CommandSender)receiver).sendMessage(msgs);
+        ((CommandSender) receiver).sendMessage(msgs);
     }
 
     @Override
     public void messageConsole(String type, String msgKey, Object... args) {
-        this.message(Bukkit.getConsoleSender(), type, msgKey, args);
+        String[] msgs = this.messageManager.getMessage(msgKey).getMessages(args);
+        // 将信息放入类型模板
+        for (int i = 0; i < msgs.length; i++) {
+            msgs[i] = this.messageManager.getMessage("message.type." + type).getMessage(msgs[i]);
+        }
+        Bukkit.getConsoleSender().sendMessage(msgs);
     }
 
     @Override

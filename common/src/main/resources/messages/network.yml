@@ -2,7 +2,7 @@ client:
   Connected: '成功连接服务器！'
   Disconnected: '已和服务器断开连接！'
   AccidentallyDisconnected: '意外和服务器断开连接！'
-  TryingReconnect: '{##network.client.AccidentallyDisconnected} 将在{1}秒后尝试重连！'
+  TryingReconnect: '{#network.client.AccidentallyDisconnected} 将在{1}秒后尝试重连！'
 
 server:
   ClientDisconnected: '客户端{1}已断开连接'

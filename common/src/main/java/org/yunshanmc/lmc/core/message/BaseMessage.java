@@ -48,11 +48,13 @@ public abstract class BaseMessage implements Message {
         return this.msg;
     }
 
-    protected String getMessage(Object... args) {
+    @Override
+    public String getMessage(Object... args) {
         return this.format.format(this.msg, args);
     }
 
-    protected String[] getMessages(Object... args) {
+    @Override
+    public String[] getMessages(Object... args) {
         String[] msgs = this.msg.split("\n");
         for (int i = 0; i < msgs.length; i++) {
             msgs[i] = this.format.format(msgs[i], args);

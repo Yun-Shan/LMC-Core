@@ -6,15 +6,13 @@ package org.yunshanmc.lmc.core.message;
 
 import org.yaml.snakeyaml.Yaml;
 import org.yunshanmc.lmc.core.LMCPlugin;
+import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.internal.LMCCoreUtils;
 import org.yunshanmc.lmc.core.resource.Resource;
 import org.yunshanmc.lmc.core.resource.ResourceManager;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 
@@ -31,9 +29,16 @@ public abstract class BaseMessageManager implements MessageManager {
 
     protected MessageContext context;
 
+    /**
+     * 储存已经读取过的文件
+     */
+    protected Map<String, Map<String, ?>> pathCache = new HashMap<>();
+    /**
+     * 储存已经解析完的信息
+     */
     private Map<String, Message> messageCache = new HashMap<>();
     private Set<String> invalidKeyCache = new HashSet<>();
-    private Map<String, String> defaultMsg;
+    private Map<String, ?> defaultMsg;
     private int debugLevel;
 
     private static final String MESSAGE_PATH = "messages.yml";
@@ -49,9 +54,7 @@ public abstract class BaseMessageManager implements MessageManager {
         Resource defMsgRes = resourceManager.getSelfResource(defMsgPath);
         if (defMsgRes != null) {
             try {
-                @SuppressWarnings("unchecked")
-                Map<String, ?> defaultMsg = new Yaml().loadAs(defMsgRes.getInputStream(), Map.class);
-                this.defaultMsg = resolveMap(defaultMsg);
+                this.defaultMsg = this.resolveResource(defMsgRes);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -83,7 +86,7 @@ public abstract class BaseMessageManager implements MessageManager {
                 return Message.getMissingMessage(key);
             }
             message = this.getMessageFromResource(key, context, true);
-            if (message != null) {
+            if (message != null && !message.isMissingMessage()) {
                 this.messageCache.put(key, message);
             }
         }
@@ -129,56 +132,80 @@ public abstract class BaseMessageManager implements MessageManager {
     }
 
     protected Message getMessageFromResource(String key, MessageContext context, boolean useDef) {
-        Resource res = this.resourceManager.getFolderResource(MESSAGE_PATH);
-        String msg = null;
-        try {
-            // 尝试从用户配置获取
-            if (res != null) {
-                @SuppressWarnings("unchecked")
-                Map<String, ?> dataMap = new Yaml().loadAs(res.getInputStream(), Map.class);
-                Map<String, String> msgMap = resolveMap(dataMap);
-                msg = msgMap.get(key);
+        Object msgObj = null;
+        // 尝试从用户配置获取
+        Map<String, ?> msgMap = this.pathCache.get(MESSAGE_PATH);
+        if (msgMap == null) {
+            try {
+                Resource res = this.resourceManager.getFolderResource(MESSAGE_PATH);
+                if (res != null) {
+                    msgMap = this.resolveResource(res);
+                    this.pathCache.put(MESSAGE_PATH, msgMap);
+                }
+            } catch (IOException e) {
+                ExceptionHandler.handle(e);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        }
+        if (msgMap != null) {
+            msgObj = msgMap.get(key);
         }
 
         // 用户配置文件不存在或配置项不存在，且需要使用默认值，尝试从默认配置获取
-        if (msg == null && useDef && this.defaultMsg.containsKey(key)) {
-            msg = this.defaultMsg.get(key);
+        if (msgObj == null && useDef) {
+            msgObj = this.defaultMsg.get(key);
         }
-        // 存在用户配置或默认配置
-        if (msg != null) {
-            return this.newMessage(msg, context);
-        }
-        // 用户配置和默认配置都不存在
-        return null;
+        // msg != null时，存在用户配置或默认配置，会返回对应Message对象
+        // msg == null时，用户配置和默认配置都不存在，会返回null
+        return this.resolveMessage(msgObj);
     }
 
     /**
      * 构建新信息
      *
-     * @param msg 原始信息字符串
+     * @param msg     原始信息字符串
      * @param context 信息上下文
      * @return 构建出的新信息
      */
     protected abstract Message newMessage(String msg, MessageContext context);
 
     @SuppressWarnings("unchecked")
-    protected final Map<String, String> resolveMap(Map<String, ?> map) {
-        Map<String, String> msg = new HashMap<>(map != null ? map.size() : 8);
+    protected final Map<String, ?> resolveResource(Resource res) throws IOException {
+        Map<String, ?> dataMap = new Yaml().loadAs(res.getInputStream(), Map.class);
+        ;
+        Map<String, Object> msg = new HashMap<>(dataMap != null ? dataMap.size() : 8);
         AtomicReference<BiConsumer<String, Object>> resolver = new AtomicReference<>();
         resolver.set((k, data) -> {
-            if (data instanceof String) {
-                msg.put(k, (String) data);
-            } else if (data instanceof Map) {
+            if (data instanceof Map) {
                 ((Map<String, ?>) data)
                     .forEach((nextK, nextData) ->
                         resolver.get().accept((k.isEmpty() ? "" : k + '.') + nextK, nextData)
                     );
+            } else if (data instanceof List) {
+                msg.put(k, data);
+            } else {
+                msg.put(k, String.valueOf(data));
             }
         });
-        resolver.get().accept("", map);
-        return msg;
+        resolver.get().accept("", dataMap);
+        return msg.isEmpty() ? null : msg;
+    }
+
+    protected Message resolveJsonMessage(List<?> data) {
+        // TODO
+        throw new UnsupportedOperationException();
+    }
+
+    protected Message resolveMessage(Object msgObj) {
+        if (msgObj != null) {
+            if (msgObj instanceof List) {
+                return resolveJsonMessage((List<?>) msgObj);
+            } else if (msgObj instanceof Message) {
+                return (Message) msgObj;
+            } else {
+                return newMessage(String.valueOf(msgObj), context);
+            }
+        } else {
+            return null;
+        }
     }
 }

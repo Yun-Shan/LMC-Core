@@ -10,6 +10,6 @@ public class DefaultMessageFormatTest {
         MockPlugin plugin = MockPlugin.newInstance();
         MessageContext context = new MessageContext(plugin, plugin.getMessageManager());
         DefaultMessageFormat format = new DefaultMessageFormat(context);
-        System.out.println(format.format("{$PluginName}"));
+        System.out.println(format.format("{%PluginName}"));
     }
 }

@@ -10,12 +10,12 @@ public class MockMessageSender extends BaseMessageSender {
 
     @Override
     public String getMessage(String msgKey, Object player, Object... args) {
-        return messageManager.getMessage(msgKey).getMessage(player, args);
+        return messageManager.getMessage(msgKey).getMessageForPlayer(player, args);
     }
 
     @Override
     public String getMessage(String msgKey, Object... args) {
-        return messageManager.getMessage(msgKey).getMessage(null, args);
+        return messageManager.getMessage(msgKey).getMessageForPlayer(null, args);
     }
 
     @Override
