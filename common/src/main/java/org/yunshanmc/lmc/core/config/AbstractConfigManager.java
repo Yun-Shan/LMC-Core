@@ -1,23 +1,29 @@
 package org.yunshanmc.lmc.core.config;
 
 import com.google.common.collect.Maps;
+import org.yunshanmc.lmc.core.resource.InputStreamResource;
 import org.yunshanmc.lmc.core.resource.Resource;
 import org.yunshanmc.lmc.core.resource.ResourceManager;
 
 import javax.annotation.Nonnull;
+import java.io.ByteArrayInputStream;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 默认配置管理器
  * TODO 提取重复代码
+ *
  * @author Yun-Shan
  */
 public abstract class AbstractConfigManager implements ConfigManager {
 
-    private final ResourceManager resourceManager;
+    protected final ResourceManager resourceManager;
+    private LMCConfiguration mainConfig;
 
     public AbstractConfigManager(ResourceManager resourceManager) {
         this.resourceManager = resourceManager;
+        this.resourceManager.saveDefaultResource("config.yml", "config.yml", false);
     }
 
     @Override
@@ -92,18 +98,14 @@ public abstract class AbstractConfigManager implements ConfigManager {
     @Nonnull
     @Override
     public LMCConfiguration getMainConfig() {
-        LMCConfiguration config = getConfig("config.yml");
-        if (config == null) {
-            config = this.createEmptyConfig();
+        if (this.mainConfig == null) {
+            this.mainConfig = getConfig("config.yml");
+            if (this.mainConfig == null) {
+                this.resourceManager.writeResource("config.yml", new InputStreamResource(new ByteArrayInputStream(new byte[0])), false);
+            }
+            this.mainConfig = getUserConfig("config.yml");
+            Objects.requireNonNull(this.mainConfig);
         }
-        return config;
+        return this.mainConfig;
     }
-
-    /**
-     * 创建一个新的空配置，目前暂时仅用于保证{@link #getMainConfig()}非空
-     *
-     * @return 新的空配置
-     */
-    @Nonnull
-    protected abstract LMCConfiguration createEmptyConfig();
 }

@@ -12,13 +12,12 @@ public class Button extends NormalIcon {
     private BiConsumer<ClickInfo, Object> handle;
 
     public Button(int row, int column, BiConsumer<ClickInfo, Object> handle) {
-        super(row, column);
-        this.handle = handle;
+        this(row, column, null, handle);
     }
 
     public Button(int row, int column, Icon icon, BiConsumer<ClickInfo, Object> handle) {
         super(row, column, icon);
-        this.handle = handle;
+        this.setHandle(handle);
     }
 
     public Button(int row, int column) {

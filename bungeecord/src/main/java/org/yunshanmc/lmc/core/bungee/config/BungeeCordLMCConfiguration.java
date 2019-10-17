@@ -1,26 +1,34 @@
 package org.yunshanmc.lmc.core.bungee.config;
 
 import net.md_5.bungee.config.Configuration;
+import net.md_5.bungee.config.ConfigurationProvider;
+import net.md_5.bungee.config.YamlConfiguration;
+import org.yunshanmc.lmc.core.config.BaseLMCConfiguration;
 import org.yunshanmc.lmc.core.config.LMCConfiguration;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
+import org.yunshanmc.lmc.core.resource.Resource;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
 /**
- * @author YunShan
+ * @author Yun-Shan
  */
-public class BungeeCordLMCConfiguration implements LMCConfiguration {
+public class BungeeCordLMCConfiguration extends BaseLMCConfiguration {
 
     private static final Field F_DECLARED;
     private static final Field F_SELF;
-
+    private static final YamlConfiguration YAML;
     static {
         Field fDeclared = null;
         Field fSelf = null;
@@ -32,7 +40,6 @@ public class BungeeCordLMCConfiguration implements LMCConfiguration {
             modifiers.setAccessible(true);
             modifiers.setInt(fDeclared, Modifier.PUBLIC);
 
-
             fSelf = Configuration.class.getDeclaredField("self");
             fSelf.setAccessible(true);
         } catch (ReflectiveOperationException e) {
@@ -40,12 +47,34 @@ public class BungeeCordLMCConfiguration implements LMCConfiguration {
         }
         F_DECLARED = fDeclared;
         F_SELF = fSelf;
+
+        YAML = (YamlConfiguration) ConfigurationProvider.getProvider(YamlConfiguration.class);
     }
 
+    private final Configuration root;
     private Configuration config;
 
-    public BungeeCordLMCConfiguration(Configuration config) {
+    public BungeeCordLMCConfiguration(Resource resource) throws IOException {
+        super(resource);
+        this.reload();
+        this.root = this.config;
+    }
+
+    BungeeCordLMCConfiguration(Configuration root, Configuration config) {
+        this.root = root;
         this.config = config;
+    }
+
+    @Override
+    public String saveToString() {
+        StringWriter writer = new StringWriter();
+        YAML.save(this.root, writer);
+        return writer.toString();
+    }
+
+    @Override
+    protected void reload0() throws IOException {
+        this.config = YAML.load(new InputStreamReader(this.resource.getInputStream(), StandardCharsets.UTF_8));
     }
 
     @Override
@@ -80,7 +109,7 @@ public class BungeeCordLMCConfiguration implements LMCConfiguration {
     @Override
     public LMCConfiguration getSection(@Nonnull String path) {
         Configuration section = this.config.getSection(path);
-        return new BungeeCordLMCConfiguration(section);
+        return new BungeeCordLMCConfiguration(this.root, section);
     }
 
     @Override

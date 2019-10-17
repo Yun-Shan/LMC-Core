@@ -3,23 +3,45 @@ package org.yunshanmc.lmc.core.bukkit.config;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.yunshanmc.lmc.core.config.BaseLMCConfiguration;
 import org.yunshanmc.lmc.core.config.LMCConfiguration;
+import org.yunshanmc.lmc.core.resource.Resource;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
 /**
- * @author YunShan
+ * @author Yun-Shan
  */
-public class BukkitLMCConfiguration implements LMCConfiguration {
+public class BukkitLMCConfiguration extends BaseLMCConfiguration {
 
     private ConfigurationSection config;
 
-    public BukkitLMCConfiguration(ConfigurationSection config) {
+    public BukkitLMCConfiguration(Resource resource) throws IOException {
+        super(resource);
+        this.reload();
+    }
+
+    BukkitLMCConfiguration(ConfigurationSection config) {
         this.config = config;
+    }
+
+    @Override
+    public String saveToString() {
+        YamlConfiguration root = (YamlConfiguration) this.config.getRoot();
+        return root.saveToString();
+    }
+
+    @Override
+    public void reload0() throws IOException {
+        this.config = YamlConfiguration.loadConfiguration(new InputStreamReader(this.resource.getInputStream(), StandardCharsets.UTF_8));
     }
 
     @Override

@@ -6,6 +6,7 @@ package org.yunshanmc.lmc.core.message;
 
 /**
  * TODO 注释
+ * TODO 信息预编译 加快获取速度
  *
  * @author Yun-Shan
  */

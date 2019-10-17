@@ -52,6 +52,5 @@ public abstract class BaseComponent {
      * @param player 玩家对象
      */
     public void onClick(int slot, ClickInfo click, Object player) {
-
     }
 }

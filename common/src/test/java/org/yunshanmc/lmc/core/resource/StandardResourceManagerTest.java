@@ -7,6 +7,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
@@ -27,7 +28,7 @@ public class StandardResourceManagerTest {
     public static void setUp() throws Exception {
         // 由于该类中的测试有直接写jar文件的操作，为避免影响其它测试，使用自己独立的jar文件
 
-        m_resolvePath = StandardResourceManager.class.getDeclaredMethod("resolvePath", String.class, FileSystem.class);
+        m_resolvePath = StandardResourceManager.class.getDeclaredMethod("resolvePath", String.class, boolean.class, FileSystem.class);
         m_resolvePath.setAccessible(true);
         testDir = Paths.get("build", "resources", "test").toAbsolutePath().toFile();
         if (!testDir.exists()) assertTrue(testDir.mkdirs());
@@ -113,12 +114,31 @@ public class StandardResourceManagerTest {
 
     @Test
     public void resolvePath() throws Exception {
-        assertEquals(null, resolvePath(null, FileSystems.getDefault()));
-        assertEquals(Paths.get("/"), resolvePath("/", FileSystems.getDefault()));
-        assertEquals(Paths.get("a"), resolvePath("a", FileSystems.getDefault()));
+        assertEquals(Paths.get("/"), resolvePath("/"));
+        assertEquals(Paths.get("a"), resolvePath("a"));
+        assertEquals(Paths.get("c/d"), resolvePath("a/b/../../c/d"));
+        try {
+            resolvePath(null);
+        } catch (InvocationTargetException e) {
+            assertEquals("Invalid Path: (null or empty)", e.getCause().getMessage());
+        }
+        try {
+            resolvePath("a/b/../../../../../c/d");
+        } catch (InvocationTargetException e) {
+            assertEquals("Invalid Path: a/b/../../../../../c/d", e.getCause().getMessage());
+        }
+        try {
+            resolvePath("a/..");
+        } catch (InvocationTargetException e) {
+            assertEquals("Invalid Path: a/.. (only allow file, but there is a directory)", e.getCause().getMessage());
+        }
+    }
+
+    private Object resolvePath(String path) throws Exception {
+        return this.resolvePath(path, FileSystems.getDefault());
     }
 
     private Object resolvePath(String path, FileSystem fs) throws Exception {
-        return m_resolvePath.invoke(null, path, fs);
+        return m_resolvePath.invoke(null, path, true, fs);
     }
 }

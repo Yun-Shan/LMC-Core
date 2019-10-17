@@ -2,12 +2,34 @@ package org.yunshanmc.lmc.core.config;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.util.Set;
 
 /**
- * @author YunShan
+ * @author Yun-Shan
  */
 public interface LMCConfiguration {
+
+    /**
+     * 保存配置为字符串
+     *
+     * @return Yaml格式的配置
+     */
+    String saveToString();
+
+    /**
+     * 保存配置到文件
+     *
+     * @throws IOException 写入文件时出现异常
+     */
+    void save() throws IOException;
+
+    /**
+     * 重载配置文件
+     *
+     * @throws IOException 读取文件时出现异常
+     */
+    void reload() throws IOException;
 
     /**
      * 增加默认值

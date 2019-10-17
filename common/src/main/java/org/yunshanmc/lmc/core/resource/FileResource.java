@@ -48,4 +48,8 @@ public class FileResource implements Resource {
             return null;
         }
     }
+
+    public File getFile() {
+        return this.file;
+    }
 }

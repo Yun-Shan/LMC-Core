@@ -13,10 +13,6 @@ public class Border extends BaseComponent {
         this.setIcon(icon);
     }
 
-    public Border(int rowY, int columnY, Icon icon) {
-        this(1, 1, rowY, columnY, icon);
-    }
-
     public void setIcon(Icon icon) {
         Objects.requireNonNull(icon);
         Arrays.fill(super.icons, icon);
@@ -24,7 +20,7 @@ public class Border extends BaseComponent {
 
     private static int[] computeSlots(int rowX, int columnX, int rowY, int columnY) {
         Preconditions.checkArgument(rowX < rowY, "need rowX < rowY");
-        Preconditions.checkArgument(columnX < columnY, "need columnX < column");
+        Preconditions.checkArgument(columnX < columnY, "need columnX < columnY");
 
         int len = (rowY - rowX) * 2 + (columnY - columnX) * 2;
         int[] slots = new int[len];

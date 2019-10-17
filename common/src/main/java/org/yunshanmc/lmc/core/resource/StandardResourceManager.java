@@ -65,26 +65,26 @@ public class StandardResourceManager implements ResourceManager {
 
     @Override
     public Resource getSelfResource(String path) {
-        Path resPath = this.checkResourcePath(path, true);
+        Path resPath = this.checkResourcePath(path, true, true);
         resPath = this.jarRoot.resolve(resPath);
         return this.getSelfResource(resPath);
     }
 
     @Override
     public Map<String, Resource> getSelfResources(String path, Predicate<String> nameFilter, boolean deep) {
-        Path resPath = this.checkResourcePath(path, true);
+        Path resPath = this.checkResourcePath(path, false, true);
         resPath = this.jarRoot.resolve(resPath);
         return this.getSelfResources(resPath, nameFilter, deep);
     }
 
     @Override
     public Resource getFolderResource(String path) {
-        return this.getFileResource(this.checkResourcePath(path, false));
+        return this.getFileResource(this.checkResourcePath(path, true, false));
     }
 
     @Override
     public Map<String, Resource> getFolderResources(String path, Predicate<String> nameFilter, boolean deep) {
-        return this.getFolderResources(this.checkResourcePath(path, false), nameFilter, deep);
+        return this.getFolderResources(this.checkResourcePath(path, false, false), nameFilter, deep);
     }
 
     protected Resource getSelfResource(Path resPath) {
@@ -152,7 +152,7 @@ public class StandardResourceManager implements ResourceManager {
 
     @Override
     public boolean writeResource(String path, Resource resource, boolean force) {
-        Path resPath = this.checkResourcePath(path, false);
+        Path resPath = this.checkResourcePath(path, true, false);
         resPath = this.pluginFolder.resolve(resPath);
         if (!force && Files.exists(resPath, LinkOption.NOFOLLOW_LINKS)) {
             // 资源已存在，且参数force设为不覆盖，直接返回
@@ -196,25 +196,21 @@ public class StandardResourceManager implements ResourceManager {
      * <p>
      * 不能尝试切换到资源根目录的父级目录
      *
-     * @param path  资源路径
-     * @param isJar 是否为自身Jar的路径，该方法会根据此参数选择相应的文件管理器
+     * @param path   资源路径
+     * @param isFile 资源是文件还是目录
+     * @param isJar  是否为自身Jar的路径，该方法会根据此参数选择相应的文件管理器
      * @return 转换为Path类型的资源路径
      * @throws IllegalArgumentException 当资源路径不合法时抛出
      */
-    protected Path checkResourcePath(String path, boolean isJar) {
-        Path resPath = resolvePath(path, isJar ? this.jarRoot.getFileSystem() : this.pluginFolder.getFileSystem());
-        if (resPath == null) {
-            // TODO I18n
-            throw new IllegalArgumentException("Invalid Path: " + path);
-        }
-        return resPath;
+    protected Path checkResourcePath(String path, boolean isFile, boolean isJar) {
+        return resolvePath(path, isFile, isJar ? this.jarRoot.getFileSystem() : this.pluginFolder.getFileSystem());
     }
 
     private static final String PARENT_DIR_NAME = "..";
 
-    private static Path resolvePath(String path, FileSystem fs) {
+    private static Path resolvePath(String path, boolean isFile, FileSystem fs) {
         if (Strings.isNullOrEmpty(path)) {
-            return null;
+            throw new IllegalArgumentException("Invalid Path: (null or empty)");
         }
         path = path.replace('\\', '/');
         List<String> subs = Lists.newArrayList();
@@ -229,12 +225,13 @@ public class StandardResourceManager implements ResourceManager {
                 1,
                 size));
         resPath = resPath.normalize();
+        // 禁止切到父级目录
         if (resPath.startsWith(PARENT_DIR_NAME)) {
-            // 禁止切到父级目录
-            resPath = resPath.subpath(1, resPath.getNameCount());
+            throw new IllegalArgumentException("Invalid Path: " + path);
         }
-        if (resPath.toString().length() == 0) {
-            return null;
+        // 确认是文件还是目录
+        if (isFile && Files.isDirectory(resPath)) {
+            throw new IllegalArgumentException("Invalid Path: " + path + " (only allow file, but there is a directory)");
         }
         return resPath;
     }

@@ -13,7 +13,7 @@ package org.yunshanmc.lmc.core.message;
 public interface MessageFormat {
 
     /**
-     * 格式化信息.
+     * 为玩家格式化信息.
      * <p>
      *
      * @param player 获取玩家信息时需要用到的玩家，不需要可以传null
@@ -21,14 +21,14 @@ public interface MessageFormat {
      * @param args 格式化参数
      * @return 格式化后的信息
      */
-    default String format(Object player, String msg, Object... args) {
+    default String formatForPlayer(Object player, String msg, Object... args) {
         return this.format(msg, args);
     }
 
     /**
      * 格式化信息.
      * <p>
-     * 相当于调用<code>{@link #format(Object, String, Object...) format}(null, msg, args)</code>
+     * 相当于调用<code>{@link #formatForPlayer(Object, String, Object...) format}(null, msg, args)</code>
      *
      * @param msg 原始信息
      * @param args 格式化参数

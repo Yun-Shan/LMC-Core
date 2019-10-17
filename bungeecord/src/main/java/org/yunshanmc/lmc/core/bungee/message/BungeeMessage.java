@@ -33,7 +33,7 @@ public class BungeeMessage extends BaseMessage {
         if (player != null) {
             PlatformUtils.checkPlayer(player);
         }
-        return this.format.format(player, this.msg, args);
+        return this.format.formatForPlayer(player, this.msg, args);
     }
 
     @Override
@@ -43,7 +43,7 @@ public class BungeeMessage extends BaseMessage {
         }
         String[] msgs = this.msg.split("\n");
         for (int i = 0; i < msgs.length; i++) {
-            msgs[i] = this.format.format(player, msgs[i], args);
+            msgs[i] = this.format.formatForPlayer(player, msgs[i], args);
         }
         return msgs;
     }

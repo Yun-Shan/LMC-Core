@@ -191,7 +191,7 @@ public abstract class BaseMessageManager implements MessageManager {
     }
 
     protected Message resolveJsonMessage(List<?> data) {
-        // TODO
+        // TODO 解析Json
         throw new UnsupportedOperationException();
     }
 

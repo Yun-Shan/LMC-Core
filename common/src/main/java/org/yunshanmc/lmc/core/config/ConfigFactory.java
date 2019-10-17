@@ -131,8 +131,8 @@ public final class ConfigFactory {
                     field.setAccessible(true);
                     try {
                         field.set(obj, val);
-                    } catch (IllegalAccessException e) {
-                        ExceptionHandler.handle(e);
+                    } catch (IllegalAccessException ignored) {
+                        // 上面setAccessible了 该异常不会出现
                     }
                 }
             }
