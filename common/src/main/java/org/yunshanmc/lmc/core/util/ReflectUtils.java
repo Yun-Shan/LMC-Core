@@ -9,6 +9,8 @@ import org.yunshanmc.lmc.core.resource.Resource;
 import org.yunshanmc.lmc.core.resource.URLResource;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -28,6 +30,46 @@ public final class ReflectUtils {
 
     private ReflectUtils() {
         // 禁止实例化
+    }
+
+    private static final Field FIELD_MODIFIERS;
+
+    static {
+        Field modifiers = null;
+        try {
+            modifiers = Field.class.getDeclaredField("modifiers");
+            modifiers.setAccessible(true);
+        } catch (NoSuchFieldException ignored) {
+        }
+        FIELD_MODIFIERS = modifiers;
+    }
+
+    private static void setPublicModifier(Field field) {
+        try {
+            field.setAccessible(true);
+            FIELD_MODIFIERS.set(field, Modifier.PUBLIC | (Modifier.isStatic(field.getModifiers()) ? Modifier.STATIC : 0));
+        } catch (IllegalAccessException ignored) {
+        }
+    }
+
+    public static void setFieldValue(Class<?> clazz, String fieldName, Object obj, Object value) throws NoSuchFieldException {
+        Field field = clazz.getDeclaredField(fieldName);
+        setPublicModifier(field);
+        try {
+            field.set(obj, value);
+        } catch (IllegalAccessException ignored) {
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T getFieldValue(Class<?> clazz, String fieldName, Object obj) throws NoSuchFieldException {
+        Field field = clazz.getDeclaredField(fieldName);
+        field.setAccessible(true);
+        try {
+            return (T) field.get(obj);
+        } catch (IllegalAccessException ignored) {
+            return null;
+        }
     }
 
     /**

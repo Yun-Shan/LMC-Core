@@ -7,8 +7,6 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
 import org.yaml.snakeyaml.Yaml;
-import org.yunshanmc.lmc.core.bungee.command.BungeeLMCCommandSender;
-import org.yunshanmc.lmc.core.command.AbstractParameterConverter;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.resource.Resource;
 import org.yunshanmc.lmc.core.util.PlatformUtils;
@@ -39,8 +37,6 @@ public class BungeeUtils {
         ReflectUtils.checkSafeCall();
 
         PlatformUtils.setConsoleRawMessageSender(msg -> ProxyServer.getInstance().getConsole().sendMessage(TextComponent.fromLegacyText(msg)));
-
-        AbstractParameterConverter.registerLMCSenderClass(BungeeLMCCommandSender.class);
 
         PluginManager pm = ProxyServer.getInstance().getPluginManager();
         PlatformUtils.setPluginGetter(pm::getPlugin);

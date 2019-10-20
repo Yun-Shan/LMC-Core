@@ -11,10 +11,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
-import org.yunshanmc.lmc.core.bukkit.command.BukkitLMCCommandSender;
 import org.yunshanmc.lmc.core.bukkit.gui.BukkitInvProvider;
 import org.yunshanmc.lmc.core.bukkit.gui.sign.BukkitSignEditorProvider;
-import org.yunshanmc.lmc.core.command.AbstractParameterConverter;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.gui.GuiFactory;
 import org.yunshanmc.lmc.core.gui.sign.SignHelper;
@@ -45,8 +43,6 @@ public final class BukkitUtils {
         ReflectUtils.checkSafeCall();
 
         PlatformUtils.setConsoleRawMessageSender(msg -> Bukkit.getConsoleSender().sendMessage(msg.split("\\n")));
-
-        AbstractParameterConverter.registerLMCSenderClass(BukkitLMCCommandSender.class);
 
         PluginManager pm = Bukkit.getPluginManager();
         PlatformUtils.setPluginGetter(pm::getPlugin);

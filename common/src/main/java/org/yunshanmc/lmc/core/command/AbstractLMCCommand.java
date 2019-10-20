@@ -175,14 +175,14 @@ public abstract class AbstractLMCCommand {
      * @param label  玩家输入的主命令
      * @param args   参数列表
      */
-    public abstract void execute(BaseLMCCommandSender sender, String label, String... args);
+    public abstract void execute(LMCCommandSender sender, String label, String... args);
 
     /**
      * 显示命令帮助
      *
      * @param sender 显示命令帮助的对象
      */
-    public void showHelp(BaseLMCCommandSender sender) {
+    public void showHelp(LMCCommandSender sender) {
 
     }
 

@@ -120,7 +120,7 @@ public class BungeeCommandManagerTest {
             }
 
             @SimpleCommand(name = "test11")
-            public void test11(@SimpleCommand.Sender BaseLMCCommandSender sender, String str1, @SimpleCommand.OptionalStart int int1) {
+            public void test11(@SimpleCommand.Sender LMCCommandSender sender, String str1, @SimpleCommand.OptionalStart int int1) {
                 assertEquals("[$Test$]", ((ProxiedPlayer)sender.getHandle()).getName());
                 assertEquals("qwq", str1);
                 assertEquals(777, int1);
@@ -148,7 +148,7 @@ public class BungeeCommandManagerTest {
                         throw new UnsupportedOperationException();
                 }
             });
-        BaseLMCCommandSender fakePlayer = new BungeeLMCCommandSender(fakeBukkitPlayer, plugin.getMessageManager()
+        LMCCommandSender fakePlayer = new BungeeLMCCommandSender(fakeBukkitPlayer, plugin.getMessageManager()
             .getMessageSender());
         commands.get("").execute(fakePlayer, "test", "0");
         commands.get("test0").execute(fakePlayer, "test", "1");

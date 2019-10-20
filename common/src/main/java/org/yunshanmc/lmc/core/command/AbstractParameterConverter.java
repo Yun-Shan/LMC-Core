@@ -15,7 +15,6 @@ public abstract class AbstractParameterConverter<T> {
     private static final MethodHandles.Lookup LOOKUP;
 
     private static Method M_Convert;
-    private static Class<?> LMCSenderCls;
 
     static {
         LOOKUP = MethodHandles.lookup();
@@ -36,17 +35,6 @@ public abstract class AbstractParameterConverter<T> {
     @SuppressWarnings("unchecked")
     public static <R> AbstractParameterConverter<R> getConverter(Class<R> convertTo) {
         return (AbstractParameterConverter<R>) CONVERTERS.get(convertTo);
-    }
-
-    public static synchronized void registerLMCSenderClass(Class<?> lmcSenderCls) {
-        if (LMCSenderCls != null) {
-            throw new IllegalStateException();
-        }
-        LMCSenderCls = lmcSenderCls;
-    }
-
-    public static Class<?> getLMCSenderClass() {
-        return LMCSenderCls;
     }
 
     private final Class<T> convertTo;
@@ -121,7 +109,29 @@ public abstract class AbstractParameterConverter<T> {
 
             @Override
             public Integer getDefaultValue() {
-                return -1;
+                return null;
+            }
+        });
+        register(new AbstractParameterConverter<Long>(long.class) {
+            @Override
+            public Long convertArg(String arg) {
+                return Long.valueOf(arg);
+            }
+
+            @Override
+            public Long getDefaultValue() {
+                return -1L;
+            }
+        });
+        register(new AbstractParameterConverter<Long>(Long.class) {
+            @Override
+            public Long convertArg(String arg) {
+                return Long.valueOf(arg);
+            }
+
+            @Override
+            public Long getDefaultValue() {
+                return null;
             }
         });
         register(new AbstractParameterConverter<Double>(double.class) {
@@ -143,7 +153,7 @@ public abstract class AbstractParameterConverter<T> {
 
             @Override
             public Double getDefaultValue() {
-                return Double.NaN;
+                return null;
             }
         });
         register(new AbstractParameterConverter<Boolean>(boolean.class) {
@@ -166,7 +176,7 @@ public abstract class AbstractParameterConverter<T> {
 
             @Override
             public Boolean getDefaultValue() {
-                return false;
+                return Boolean.FALSE;
             }
         });
         register(new AbstractParameterConverter<Boolean>(Boolean.class) {
@@ -189,7 +199,7 @@ public abstract class AbstractParameterConverter<T> {
 
             @Override
             public Boolean getDefaultValue() {
-                return false;
+                return null;
             }
         });
     }

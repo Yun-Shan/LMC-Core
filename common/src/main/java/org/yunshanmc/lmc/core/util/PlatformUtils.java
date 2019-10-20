@@ -28,7 +28,7 @@ public final class PlatformUtils {
     }
 
     private static final PlatformType PLATFORM;
-    private static final boolean inTest;
+    private static final boolean IN_TEST;
 
     static {
         PlatformType type;
@@ -56,11 +56,11 @@ public final class PlatformUtils {
             test = true;
         }
         //noinspection ConstantConditions
-        inTest = test;
+        IN_TEST = test;
     }
 
     public static boolean isInTest() {
-        return inTest;
+        return IN_TEST;
     }
 
     private static final Class<?> SENDER_CLASS;

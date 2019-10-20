@@ -5,15 +5,16 @@ import org.yunshanmc.lmc.core.message.MessageSender;
 /**
  * @author Yun-Shan
  */
-public abstract class BaseLMCCommandSender {
+public class LMCCommandSender {
 
     private final Object handle;
     protected MessageSender messageSender;
 
-    public BaseLMCCommandSender(Object handle) {
+    public LMCCommandSender(Object handle) {
         this.handle = handle;
     }
-    public BaseLMCCommandSender(Object handle, MessageSender messageSender) {
+
+    public LMCCommandSender(Object handle, MessageSender messageSender) {
         this.handle = handle;
         this.setMessageSender(messageSender);
     }
@@ -34,7 +35,9 @@ public abstract class BaseLMCCommandSender {
      * @param msgKey     信息key
      * @param args       信息文本中的参数列表
      */
-    public abstract void debug(int debugLevel, String msgKey, Object... args);
+    public void debug(int debugLevel, String msgKey, Object... args) {
+        this.messageSender.debug(debugLevel, (Object) getHandle(), msgKey, args);
+    }
 
     /**
      * 发送错误信息
@@ -42,7 +45,9 @@ public abstract class BaseLMCCommandSender {
      * @param msgKey 信息key
      * @param args   信息文本中的参数列表
      */
-    public abstract void error(String msgKey, Object... args);
+    public void error(String msgKey, Object... args) {
+        this.messageSender.error((Object) getHandle(), msgKey, args);
+    }
 
     /**
      * 发送警告信息
@@ -50,7 +55,9 @@ public abstract class BaseLMCCommandSender {
      * @param msgKey 信息key
      * @param args   信息文本中的参数列表
      */
-    public abstract void warning(String msgKey, Object... args);
+    public void warning(String msgKey, Object... args) {
+        this.messageSender.warning((Object) getHandle(), msgKey, args);
+    }
 
     /**
      * 发送普通信息
@@ -58,7 +65,9 @@ public abstract class BaseLMCCommandSender {
      * @param msgKey 信息key
      * @param args   信息文本中的参数列表
      */
-    public abstract void info(String msgKey, Object... args);
+    public void info(String msgKey, Object... args) {
+        this.messageSender.info((Object) getHandle(), msgKey, args);
+    }
 
     /**
      * 发送信息
@@ -67,5 +76,7 @@ public abstract class BaseLMCCommandSender {
      * @param msgKey 信息key
      * @param args   信息文本中的参数列表
      */
-    public abstract void message(String type, String msgKey, Object... args);
+    public void message(String type, String msgKey, Object... args) {
+        this.messageSender.error((Object) getHandle(), msgKey, args);
+    }
 }

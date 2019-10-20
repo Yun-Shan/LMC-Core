@@ -28,23 +28,14 @@ public final class SimpleCommandFactory {
     private static final Class<?> DEFAULT_SENDER_CLS;
     private static final Function<Class<?>, MethodHandle> SENDER_CONVERTER_SERVER_TO_LMC;
     static {
-        Class<?> senderType;
         MethodHandle lmc2server;
         final MethodHandle[] server2lmc = new MethodHandle[1];
         try {
-            senderType = PlatformUtils.getCommandSenderClass();
-            lmc2server = LOOKUP.unreflectConstructor(
-                AbstractParameterConverter.getLMCSenderClass().getDeclaredConstructor(senderType, MessageSender.class)
-            );
-            MethodType methodType = lmc2server.type();
-            methodType = methodType.changeReturnType(methodType.returnType().getSuperclass());
-            lmc2server = lmc2server.asType(methodType);
-
-            server2lmc[0] = LOOKUP.unreflect(lmc2server.type().returnType().getMethod("getHandle"));
+            server2lmc[0] = LOOKUP.unreflect(LMCCommandSender.class.getDeclaredMethod("getHandle"));
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }
-        DEFAULT_SENDER_CLS = senderType;
+        DEFAULT_SENDER_CLS = PlatformUtils.getCommandSenderClass();
         SENDER_CONVERTER_SERVER_TO_LMC = cls -> {
             MethodType methodType = server2lmc[0].type();
             methodType = methodType.changeReturnType(cls);
@@ -89,7 +80,7 @@ public final class SimpleCommandFactory {
 
                         boolean allow;
                         // 使用LMCCommandSender的实现类不优雅，故只判断LMCCommandSender类本身
-                        allow = BaseLMCCommandSender.class.equals(param.getType());
+                        allow = LMCCommandSender.class.equals(param.getType());
                         if (!allow) {
                             allow = PlatformUtils.getCommandSenderClass().isAssignableFrom(param.getType());
                         }
@@ -266,7 +257,7 @@ public final class SimpleCommandFactory {
                 }
 
                 Class<?> senderType = handle.type().parameterType(0);
-                if (!BaseLMCCommandSender.class.equals(senderType)) {
+                if (!LMCCommandSender.class.equals(senderType)) {
                     handle = MethodHandles.filterArguments(handle, 0, SENDER_CONVERTER_SERVER_TO_LMC.apply(senderType));
                 }
 
@@ -382,8 +373,8 @@ public final class SimpleCommandFactory {
         }
 
         @Override
-        public void execute(BaseLMCCommandSender sender, String label, String... rawArgs) {
-            if (!this.senderType.equals(BaseLMCCommandSender.class) && !this.senderType.isInstance(sender.getHandle())) {
+        public void execute(LMCCommandSender sender, String label, String... rawArgs) {
+            if (!this.senderType.equals(LMCCommandSender.class) && !this.senderType.isInstance(sender.getHandle())) {
                 this.failTip(sender, "command.simpleCommand.senderTypeRequire."
                     + this.senderType.getName().replace('.', '-'));
                 return;
@@ -425,11 +416,11 @@ public final class SimpleCommandFactory {
         }
 
         @Override
-        public void showHelp(BaseLMCCommandSender sender) {
+        public void showHelp(LMCCommandSender sender) {
             // TODO
         }
 
-        private void failTip(BaseLMCCommandSender sender, String msgKey, Object... args) {
+        private void failTip(LMCCommandSender sender, String msgKey, Object... args) {
             sender.warning(msgKey, args);
         }
     }
