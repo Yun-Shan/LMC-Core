@@ -3,8 +3,9 @@ InvalidCommand: "§c命令{1}已被禁用"
 simpleCommand:
   senderTypeRequire:
     org-bukkit-entity-Player: "该命令只能在游戏中使用！"
+    org-bukkit-command-ConsoleCommandSender: "该命令禁止在游戏中使用！"
   TooManyArgs: "参数过多！"
   TooLittleArgs: "参数不足！"
-  ConvertFail: "参数不合法！"
+  ConvertFail: "参数不合法！无法将 {0} 转换为 {1}"
   SimpleCommandBug: "LMC-Core出现BUG，请服主查看后台详细信息！"
   DeveloperCommandError: "插件命令执行异常，请服主联系该插件作者解决！"

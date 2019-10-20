@@ -401,7 +401,7 @@ public final class SimpleCommandFactory {
             try {
                 this.handle.invoke(sender, new SimpleCommand.CommandRawInfo(label, this.getName(), rawArgs), args);
             } catch (ParamConverterFailException e) {
-                this.failTip(sender, "command.simpleCommand.ConvertFail", e.getArg());
+                this.failTip(sender, "command.simpleCommand.ConvertFail", e.getArg(), e.getConvertTo());
             } catch (WrongMethodTypeException | ClassCastException e) {
                 // 该项错误不应该出现，若出现则是SimpleCommandFactory有bug
 

@@ -6,9 +6,6 @@ import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,15 +16,6 @@ public final class ConfigFactory {
     private ConfigFactory() {
         // 禁止实例化
         throw new Error();
-    }
-
-    private static final Map<Class, BiFunction<LMCConfiguration, String, ?>> CONFIG_READERS = new HashMap<>();
-
-    static {
-        registerConfigReader(String.class, LMCConfiguration::getString);
-        // TODO 基本类型获取的时候永不为null，考虑用户配置为其它类型时返回基本类型默认值 导致的实际默认值未生效的情况
-        registerConfigReader(Integer.class, LMCConfiguration::getInt);
-        registerConfigReader(Boolean.class, LMCConfiguration::getBoolean);
     }
 
     private static final Pattern UPPER_ALPHA_PATTERN = Pattern.compile("[A-Z]");
@@ -109,10 +97,10 @@ public final class ConfigFactory {
                 }
 
                 Object val = null;
+                AbstractParameterConverter<?> converter = AbstractParameterConverter.getConverter(fieldType);
                 if (config.isSet(fieldPath)) {
-                    BiFunction<LMCConfiguration, String, ?> reader = CONFIG_READERS.get(fieldType);
-                    if (reader != null) {
-                        val = reader.apply(config, fieldPath);
+                    if (converter != null) {
+                        val = converter.convert(config.getString(fieldPath));
                     }
                 } else {
                     if (fieldType.equals(String.class)) {
@@ -120,7 +108,6 @@ public final class ConfigFactory {
                             val = "";
                         }
                     } else if (!configField.defaultValue().isEmpty()) {
-                        AbstractParameterConverter<?> converter = AbstractParameterConverter.getConverter(fieldType);
                         if (converter != null) {
                             val = converter.convert(configField.defaultValue());
                         }
@@ -138,9 +125,5 @@ public final class ConfigFactory {
             }
         }
         return obj;
-    }
-
-    public static <T> void registerConfigReader(Class<T> type, BiFunction<LMCConfiguration, String, T> reader) {
-        CONFIG_READERS.put(type, reader);
     }
 }

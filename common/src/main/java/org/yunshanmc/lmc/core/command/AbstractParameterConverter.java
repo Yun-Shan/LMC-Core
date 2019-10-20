@@ -113,7 +113,29 @@ public abstract class AbstractParameterConverter<T> {
                 return -1;
             }
         });
+        register(new AbstractParameterConverter<Integer>(Integer.class) {
+            @Override
+            public Integer convertArg(String arg) {
+                return Integer.valueOf(arg);
+            }
+
+            @Override
+            public Integer getDefaultValue() {
+                return -1;
+            }
+        });
         register(new AbstractParameterConverter<Double>(double.class) {
+            @Override
+            public Double convertArg(String arg) {
+                return Double.valueOf(arg);
+            }
+
+            @Override
+            public Double getDefaultValue() {
+                return Double.NaN;
+            }
+        });
+        register(new AbstractParameterConverter<Double>(Double.class) {
             @Override
             public Double convertArg(String arg) {
                 return Double.valueOf(arg);
@@ -133,12 +155,33 @@ public abstract class AbstractParameterConverter<T> {
                     case "t":
                     case "1":
                         return true;
-
                     case "false":
                     case "f":
                     case "0":
                         return false;
+                    default:
+                        return null;
+                }
+            }
 
+            @Override
+            public Boolean getDefaultValue() {
+                return false;
+            }
+        });
+        register(new AbstractParameterConverter<Boolean>(Boolean.class) {
+            @Override
+            public Boolean convertArg(String arg) {
+                arg = arg.toLowerCase();
+                switch (arg) {
+                    case "true":
+                    case "t":
+                    case "1":
+                        return true;
+                    case "false":
+                    case "f":
+                    case "0":
+                        return false;
                     default:
                         return null;
                 }

@@ -14,6 +14,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.yunshanmc.lmc.core.bukkit.LMCCoreBukkitPlugin;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.gui.sign.SignHelper;
 import org.yunshanmc.lmc.core.internal.LMCCoreUtils;
@@ -48,7 +49,8 @@ public class BukkitSignEditorProvider implements SignHelper.SignEditorProvider<P
                     PacketContainer packet = event.getPacket();
                     Consumer<String[]> callback = callbackMap.remove(packet.getBlockPositionModifier().read(0));
                     if (callback != null) {
-                        callback.accept(packet.getStringArrays().read(0));
+                        String[] newLines = packet.getStringArrays().read(0);
+                        Bukkit.getScheduler().runTask((LMCCoreBukkitPlugin) LMCCoreUtils.getLMCCorePlugin(), () -> callback.accept(newLines));
                     }
                 }
             });
