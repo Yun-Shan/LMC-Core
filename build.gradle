@@ -7,6 +7,7 @@ static def getBuildNumber() {
     def buildNumber = System.env.TRAVIS_BUILD_NUMBER?.toInteger()
     return buildNumber ?: 0
 }
+
 ext.buildNumber = getBuildNumber()
 
 allprojects {
@@ -40,9 +41,13 @@ subprojects {
     }
 
     javadoc {
-        options.encoding "UTF-8"
-        options.charSet 'UTF-8'
-        options.links("http://docs.oracle.com/javase/8/docs/api/")
+        options.addStringOption('Xdoclint:none', '-quiet')
+        options.addStringOption('encoding', 'UTF-8')
+        options {
+            encoding 'UTF-8'
+            charSet 'UTF-8'
+            links "http://docs.oracle.com/javase/8/docs/api/"
+        }
     }
 
     task javadocJar(type: Jar) {
@@ -78,7 +83,7 @@ subprojects {
     dependencies {
         compileOnly 'org.projectlombok:lombok:1.18.10'
         annotationProcessor 'org.projectlombok:lombok:1.18.10'
-        
+
         compileOnly 'com.google.guava:guava:22.0'
         compileOnly 'org.yaml:snakeyaml:1.25'
         compileOnly 'io.netty:netty-all:4.1.21.Final'
@@ -125,7 +130,7 @@ task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
     additionalSourceDirs.from files(subprojects.sourceSets.main.allSource.srcDirs)
     sourceDirectories.from files(subprojects.sourceSets.main.allSource.srcDirs)
     classDirectories.from files(subprojects.sourceSets.main.output)
-    
+
     executionData.from files(subprojects.jacocoTestReport.executionData)
 
     reports {
@@ -146,11 +151,3 @@ tasks.coveralls {
     dependsOn jacocoRootReport
     onlyIf { System.env.'CI' }
 }
-
-task deleteEmptyJar() {
-    doLast {
-        file('build/libs/LMC-Core.jar').delete()
-    }
-}
-
-rootProject.assemble.finalizedBy deleteEmptyJar
