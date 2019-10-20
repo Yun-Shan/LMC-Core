@@ -1,4 +1,4 @@
 name: LMC-Core
 main: org.yunshanmc.lmc.core.bungee.LMCCoreBungeeCordPlugin
-version: 1.0.0-beat
+version: 0.0.1-alpha
 author: YunShan

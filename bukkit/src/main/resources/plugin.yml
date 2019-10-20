@@ -1,6 +1,6 @@
 name: LMC-Core
 main: org.yunshanmc.lmc.core.bukkit.LMCCoreBukkitPlugin
-version: 1.0.0-beat
+version: 0.0.1-alpha
 author: YunShan
 
 softdepend: [ProtocolLib,PlaceholderAPI]
