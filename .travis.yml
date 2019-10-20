@@ -8,3 +8,20 @@ before_install:
 
 after_success:
   - ./gradlew coveralls
+
+before_deploy:
+  # Set up git user name and tag this commit
+  - git config --local user.name "Yun-Shan"
+  - git config --local user.email "yunshan21st@qq.com"
+  - export TRAVIS_TAG=${TRAVIS_TAG:-$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)}
+  - git tag $TRAVIS_TAG
+deploy:
+  provider: releases
+  api_key:
+    secure: V6q5+07iVxu0SBs5DrcfGSnSTedM4NhCdMdbQqKj8qLKKgQdpPMOT+Nki27PDjMlE7chmmA44gr+2pgwZewSpG6eIhV1EeZH3oi+Am7ak0fG0jWATZRgrfshYvVfElrezK4LYNFbT2NZqJO8ks0CDixdB+uwBqsQuPGb/YzOUJWaqX1a1jHxfqml4wS5XGQM11JEg5LgGtqdZd+yOyv0BIPZPuMMxMu7m7pKTlupX8iInPXNjdlTPhznZVxPW09xmLj8g5SpNATI6arKRmaNqXyQ+LY2hcDOfPnrfuW3KHUO/SqXE5G0YE0LwTZgMbOwCd62OglSHo+CsxZxE/C4iH5donYWyFfydPqlU5sSA7ejzvPX1vI0SN9EsOrUnS1KnRYlp78HxILyG4mK2g3yi6+kLQvawQCU23lCnga7qpuUmHyXrgbanveXHB1NFyi8BeqFwZCGlvNqn5wJ3pQhPEZLe+hgAFqbtkCm6WQGX2Rln+6KOMJqBlhLeddvFdI7DPV8Pm9wpnNSsbixv4X27Va0CdtXOu6hIQCYNjgAbaU0nVbgYYpiQupN6Kspxdh4DIYVq5mJPop85DrF/RJ3PhCJQ7docj0KHlln6nrph6UiT8TekI9iT7AZkVRLDSdP7FkPntJVulf7IKIzbgpEcLpOBX6uHEQIXbBi27AwZes=
+  file_glob: true
+  file:
+    - bukkit/build/libs/*
+    - bungeecord/build/libs/*
+  on:
+    repo: Yun-Shan/LMC-Core
