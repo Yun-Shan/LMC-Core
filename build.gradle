@@ -4,7 +4,7 @@ plugins {
 }
 
 static def getBuildNumber() {
-    def buildNumber = System.env.BUILD_NUMBER?.toInteger()
+    def buildNumber = System.env.TRAVIS_BUILD_NUMBER?.toInteger()
     return buildNumber ?: 0
 }
 ext.buildNumber = getBuildNumber()
@@ -146,3 +146,11 @@ tasks.coveralls {
     dependsOn jacocoRootReport
     onlyIf { System.env.'CI' }
 }
+
+task deleteEmptyJar() {
+    doLast {
+        file('build/libs/LMC-Core.jar').delete()
+    }
+}
+
+rootProject.assemble.finalizedBy deleteEmptyJar
