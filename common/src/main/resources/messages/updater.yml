@@ -1,0 +1,5 @@
+checking: "正在检查更新"
+is-latest-version: "已经是最新版本了！"
+fetch-latest-version-fail: "获取最新版本失败！"
+downing-new-version: "检测到新版本：{0}！正在下载！"
+downloaded-new-version: "新版本下载完毕！请到删除原插件并将插件文件夹中的{0}复制到plugins完成更新！"
