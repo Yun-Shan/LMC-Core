@@ -9,7 +9,7 @@ before_install:
   - chmod +x gradlew
 
 after_success:
-  - ./gradlew coveralls
+  - ./gradlew jacocoTestReport coveralls
 
 deploy:
   provider: releases
