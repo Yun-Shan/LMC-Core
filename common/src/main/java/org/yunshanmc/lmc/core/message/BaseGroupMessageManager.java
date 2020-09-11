@@ -1,6 +1,5 @@
 package org.yunshanmc.lmc.core.message;
 
-import lombok.Setter;
 import org.yunshanmc.lmc.core.LMCPlugin;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.resource.Resource;
@@ -116,7 +115,6 @@ public abstract class BaseGroupMessageManager extends BaseMessageManager {
     private class MessageGroup {
 
         private final String name;
-        @Setter
         private Map<String, ?> msgMap;
         private final Map<String, MessageGroup> subGroups;
 
@@ -144,6 +142,10 @@ public abstract class BaseGroupMessageManager extends BaseMessageManager {
 
         public String getName() {
             return this.name;
+        }
+
+        public void setMsgMap(Map<String, ?> msgMap) {
+            this.msgMap = msgMap;
         }
     }
 }

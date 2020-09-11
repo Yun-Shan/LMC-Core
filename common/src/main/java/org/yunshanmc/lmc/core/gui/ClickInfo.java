@@ -1,11 +1,12 @@
 package org.yunshanmc.lmc.core.gui;
 
-import lombok.RequiredArgsConstructor;
-
-@RequiredArgsConstructor
 public class ClickInfo {
 
     private final ClickType type;
+
+    public ClickInfo(ClickType type) {
+        this.type = type;
+    }
 
     public ClickType getType() {
         return this.type;

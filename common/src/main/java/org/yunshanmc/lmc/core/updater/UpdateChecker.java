@@ -1,6 +1,5 @@
 package org.yunshanmc.lmc.core.updater;
 
-import lombok.RequiredArgsConstructor;
 import org.yunshanmc.lmc.core.exception.ExceptionHandler;
 import org.yunshanmc.lmc.core.message.MessageSender;
 import org.yunshanmc.lmc.core.resource.InputStreamResource;
@@ -13,10 +12,16 @@ import java.net.URL;
 import java.util.function.Consumer;
 
 
-@RequiredArgsConstructor
+/**
+ * @author Yun Shan
+ */
 public class UpdateChecker {
 
     private final AbstractUpdater updater;
+
+    public UpdateChecker(AbstractUpdater updater) {
+        this.updater = updater;
+    }
 
     public void check(String oldVersion, ResourceManager resourceManager, MessageSender messageSender) {
         messageSender.infoConsole("updater.checking");

@@ -68,57 +68,57 @@ public class BukkitLMCConfiguration extends BaseLMCConfiguration {
 
     @Override
     public LMCConfiguration getSection(@Nonnull String path) {
-        ConfigurationSection section = this.config.getConfigurationSection(path);
+        ConfigurationSection section = this.config.getConfigurationSection(Objects.requireNonNull(path));
         return new BukkitLMCConfiguration(section);
     }
 
     @Override
     public boolean isSet(@Nonnull String path) {
-        return config.isSet(path);
+        return config.isSet(Objects.requireNonNull(path));
     }
 
     @Nullable
     @Override
     public Object get(@Nonnull String path) {
-        return config.get(path);
+        return config.get(Objects.requireNonNull(path));
     }
 
     @SuppressWarnings("unchecked")
     @Nullable
     @Override
     public <T> T get(@Nonnull String path, T def) {
-        return (T) config.get(path, def);
+        return (T) config.get(Objects.requireNonNull(path), def);
     }
 
     @Nullable
     @Override
     public String getString(@Nonnull String path) {
-        return config.getString(path);
+        return config.getString(Objects.requireNonNull(path));
     }
 
     @Nonnull
     @Override
     public String getString(@Nonnull String path, @Nonnull String def) {
-        return config.getString(path, def);
+        return config.getString(Objects.requireNonNull(path), Objects.requireNonNull(def));
     }
 
     @Override
     public int getInt(@Nonnull String path) {
-        return config.getInt(path);
+        return config.getInt(Objects.requireNonNull(path));
     }
 
     @Override
     public int getInt(@Nonnull String path, int def) {
-        return config.getInt(path, def);
+        return config.getInt(Objects.requireNonNull(path), def);
     }
 
     @Override
     public boolean getBoolean(@Nonnull String path) {
-        return config.getBoolean(path);
+        return config.getBoolean(Objects.requireNonNull(path));
     }
 
     @Override
     public boolean getBoolean(@Nonnull String path, boolean def) {
-        return config.getBoolean(path, def);
+        return config.getBoolean(Objects.requireNonNull(path), def);
     }
 }

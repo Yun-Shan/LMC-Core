@@ -68,11 +68,11 @@ subprojects {
     repositories {
         maven {
             name 'Aliyun Maven Center'
-            url 'http://maven.aliyun.com/nexus/content/groups/public/'
+            url 'https://maven.aliyun.com/nexus/content/groups/public/'
         }
         maven {
             name 'Aliyun JCenter'
-            url 'http://maven.aliyun.com/nexus/content/repositories/jcenter'
+            url 'https://maven.aliyun.com/nexus/content/repositories/jcenter'
         }
         maven {
             name 'SpigotMC'
@@ -81,9 +81,6 @@ subprojects {
     }
 
     dependencies {
-        compileOnly 'org.projectlombok:lombok:1.18.10'
-        annotationProcessor 'org.projectlombok:lombok:1.18.10'
-
         compileOnly 'com.google.guava:guava:22.0'
         compileOnly 'org.yaml:snakeyaml:1.25'
         compileOnly 'io.netty:netty-all:4.1.21.Final'
@@ -96,8 +93,6 @@ subprojects {
             exclude group: 'org.apache.ant', module: 'ant'
         }
 
-        testCompileOnly 'org.projectlombok:lombok:1.18.10'
-        testAnnotationProcessor 'org.projectlombok:lombok:1.18.10'
         testImplementation 'junit:junit:4.12'
         testImplementation 'org.yaml:snakeyaml:1.18'
         testImplementation 'com.google.guava:guava:22.0'

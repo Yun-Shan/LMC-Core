@@ -1,14 +1,12 @@
 package org.yunshanmc.lmc.core.network;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * @author Yun Shan
+ */
 public abstract class BaseResponsivePacket extends AbstractPacket {
 
-    @Getter
-    @Setter
     protected int responseId;
 
     private static final AtomicInteger COUNTER = new AtomicInteger();
@@ -32,4 +30,12 @@ public abstract class BaseResponsivePacket extends AbstractPacket {
     protected abstract void read0(DataBuffer buffer);
 
     protected abstract void write0(DataBuffer buffer);
+
+    public int getResponseId() {
+        return this.responseId;
+    }
+
+    public void setResponseId(int responseId) {
+        this.responseId = responseId;
+    }
 }

@@ -1,29 +1,26 @@
 package org.yunshanmc.lmc.core.gui.components;
 
 import com.google.common.base.Preconditions;
-import lombok.Getter;
-import lombok.Setter;
 import org.yunshanmc.lmc.core.gui.ClickInfo;
 import org.yunshanmc.lmc.core.gui.Icon;
 
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
+/**
+ * @author Yun Shan
+ */
 public class Container extends BaseComponent {
 
-    @Setter
     private boolean canInput;
-    @Setter
     private boolean canOutput;
-    @Setter
-    private Predicate checker;
-    @Getter
+    private Predicate<Object> checker;
+
     private final int size;
-    @Getter
     private final BiConsumer<ClickInfo, Object>[] handlers;
 
     @SuppressWarnings("unchecked")
-    public Container(int[] slots, Predicate checker) {
+    public Container(int[] slots, Predicate<Object> checker) {
         super(slots);
         this.size = slots.length;
         this.checker = checker;
@@ -34,7 +31,7 @@ public class Container extends BaseComponent {
         this(slots, o -> true);
     }
 
-    public Container(int rowX, int columnX, int rowY, int columnY, Predicate checker) {
+    public Container(int rowX, int columnX, int rowY, int columnY, Predicate<Object> checker) {
         this(computeSlots(rowX, columnX, rowY, columnY), checker);
     }
 
@@ -91,4 +88,29 @@ public class Container extends BaseComponent {
         }
         return slots;
     }
+
+    // region getter and setter
+
+    public void setCanInput(boolean canInput) {
+        this.canInput = canInput;
+    }
+
+    public void setCanOutput(boolean canOutput) {
+        this.canOutput = canOutput;
+    }
+
+    public void setChecker(Predicate<Object> checker) {
+        this.checker = checker;
+    }
+
+    public int getSize() {
+        return this.size;
+    }
+
+    public BiConsumer<ClickInfo, Object>[] getHandlers() {
+        return this.handlers;
+    }
+
+    // endregion
+
 }

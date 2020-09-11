@@ -1,19 +1,17 @@
 package org.yunshanmc.lmc.core.network.packet;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.yunshanmc.lmc.core.network.AbstractPacket;
 import org.yunshanmc.lmc.core.network.DataBuffer;
 
 /**
  * @author Yun-Shan
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RegisterClientPacket extends AbstractPacket {
 
-    @Getter
     private String name;
+
+    private RegisterClientPacket() {
+    }
 
     public RegisterClientPacket(String name) {
         this.name = name;
@@ -27,5 +25,9 @@ public class RegisterClientPacket extends AbstractPacket {
     @Override
     public void write(DataBuffer buffer) {
         buffer.writeString(this.name);
+    }
+
+    public String getName() {
+        return this.name;
     }
 }

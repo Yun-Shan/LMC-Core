@@ -1,20 +1,20 @@
 package org.yunshanmc.lmc.core.gui;
 
-import lombok.Getter;
 import org.yunshanmc.lmc.core.gui.components.BaseComponent;
 import org.yunshanmc.lmc.core.gui.components.Container;
 
 import java.util.Arrays;
 import java.util.Objects;
 
+/**
+ * @author Yun Shan
+ */
 public class Gui {
 
-    @Getter
     private final String title;
-    @Getter
     private final int row;
-    @Getter
     private final int size;
+
     private final Icon[] icons;
     private final BaseComponent[] components;
     private final Container[] containers;
@@ -86,4 +86,20 @@ public class Gui {
         }
         return (T) this.invSingleton;
     }
+
+    // region getter
+
+    public String getTitle() {
+        return this.title;
+    }
+
+    public int getRow() {
+        return this.row;
+    }
+
+    public int getSize() {
+        return this.size;
+    }
+
+    // endregion
 }

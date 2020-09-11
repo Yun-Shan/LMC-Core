@@ -1,7 +1,6 @@
 package org.yunshanmc.lmc.core.updater.driver;
 
 import com.google.common.io.ByteStreams;
-import lombok.RequiredArgsConstructor;
 import org.yunshanmc.lmc.core.updater.Version;
 
 import javax.script.ScriptEngine;
@@ -19,7 +18,9 @@ import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-@RequiredArgsConstructor
+/**
+ * @author Yun Shan
+ */
 @SuppressWarnings("unchecked")
 public class GithubUpdater extends AbstractUpdater {
 
@@ -27,6 +28,13 @@ public class GithubUpdater extends AbstractUpdater {
     private final String repoName;
     private final BiPredicate<String, String> versionNameChecker;
     private final Predicate<String> assetNameChecker;
+
+    public GithubUpdater(String userName, String repoName, BiPredicate<String, String> versionNameChecker, Predicate<String> assetNameChecker) {
+        this.userName = userName;
+        this.repoName = repoName;
+        this.versionNameChecker = versionNameChecker;
+        this.assetNameChecker = assetNameChecker;
+    }
 
     @Override
     public Version checkVersion(String oldVersion) {

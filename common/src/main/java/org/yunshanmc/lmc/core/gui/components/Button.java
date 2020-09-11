@@ -1,14 +1,16 @@
 package org.yunshanmc.lmc.core.gui.components;
 
-import lombok.NonNull;
 import org.yunshanmc.lmc.core.gui.ClickInfo;
 import org.yunshanmc.lmc.core.gui.Icon;
 
+import java.util.Objects;
 import java.util.function.BiConsumer;
 
+/**
+ * @author Yun Shan
+ */
 public class Button extends NormalIcon {
 
-    @NonNull
     private BiConsumer<ClickInfo, Object> handle;
 
     public Button(int row, int column, BiConsumer<ClickInfo, Object> handle) {
@@ -29,7 +31,7 @@ public class Button extends NormalIcon {
     }
 
     public void setHandle(BiConsumer<ClickInfo, Object> handle) {
-        this.handle = handle;
+        this.handle = Objects.requireNonNull(handle);
     }
 
     @Override
