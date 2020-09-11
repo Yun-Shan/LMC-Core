@@ -14,7 +14,7 @@ after_success:
 before_deploy:
   # Set up git user name and tag this commit
   - git config --local user.name "Yun-Shan"
-  - git config --local user.email "yunshan21st@qq.cin"
+  - git config --local user.email "yunshan21st@qq.com"
   - export TRAVIS_TAG=v0.0.1-alpha-build$TRAVIS_BUILD_NUMBER
   - git tag $TRAVIS_TAG
 deploy:
